@@ -30,7 +30,7 @@
     <main>
       <header class="topbar">
         <div><small>TIME</small><b id="clock">--:--</b><em>Melbourne</em></div>
-        <div><small>WEATHER</small><b>16°</b><em>Brunswick</em></div>
+        <div><small>WEATHER</small><b>16° <span class="weather-mini">⛅</span></b><em>Brunswick</em></div>
         <div><small>HOME MODE</small><b class="green">AUTO</b><em>Optimised</em></div>
         <div><small>BATTERY</small><b class="green">89%</b><em>14.3 kWh</em></div>
         <div><small>GRID STATUS</small><b class="green">Importing</b><em>312 W</em></div>
@@ -53,7 +53,16 @@
       <section class="view" id="energy"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Energy explorer</h2><button class="max">⛶</button></div><div id="energyExplorer" class="chart tall"></div></article></div></section>
       <section class="view" id="gas"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Gas explorer</h2><button class="max">⛶</button></div><div id="gasExplorer" class="chart tall"></div></article></div></section>
       <section class="view" id="water"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Water explorer</h2><button class="max">⛶</button></div><div id="waterExplorer" class="chart tall"></div></article></div></section>
-      <section class="view" id="weather"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Weather explorer</h2><button class="max">⛶</button></div><div id="weatherExplorer" class="chart tall"></div></article></div></section>
+      <section class="view" id="weather">
+        <div class="weather-page">
+          <article class="weather-hero panel">
+            <div class="panel-head"><h2>Weather</h2><div class="range-pills"><button class="active">12M</button><button>3Y</button><button>ALL</button><button>Custom</button></div></div>
+            <div class="weather-cards" id="weatherCards"></div>
+            <div id="weatherExplorer" class="chart weather-tall"></div>
+            <div class="time-scale"><button>Years</button><button>Months</button><button>Weeks</button><button>Days</button><button class="active">Hours</button></div>
+          </article>
+        </div>
+      </section>
       <section class="view" id="costs"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Costs explorer</h2><button class="max">⛶</button></div><div id="costExplorer" class="chart tall"></div></article></div></section>
       <section class="view" id="timeline"><div class="placeholder">Timeline integration will link to the Dome timeline and shared home events.</div></section>
       <section class="view" id="assets"><div class="placeholder">Assets will hold appliances, manuals, warranties and documents.</div></section>
