@@ -1,5 +1,3 @@
-# Home Insights V3
+# Home Insights V3 Navigation
 
-Cockpit-first dashboard for home energy, water, gas, weather, costs, timeline events and assets.
-
-Publish with GitHub Pages from `main` / root.
+Working navigation build. All sidebar buttons render a page using local sample data. Next stage is replacing sample arrays with Home Insights Database JSON.
