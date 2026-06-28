@@ -4,75 +4,80 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Home Insights</title>
-  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="stylesheet" href="css/app.css" />
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
-  <div class="app">
-    <aside class="sidebar">
-      <div class="brand"><span class="hamb">☰</span><div><h1>HOME INSIGHTS</h1><p>LIVE OVERVIEW</p></div></div>
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-icon">⌂</div><div><h1>HOME INSIGHTS</h1><p>LIVE OVERVIEW</p></div></div>
+    <nav>
       <button class="nav active" data-view="overview">▦ Overview</button>
       <button class="nav" data-view="energy">⚡ Energy</button>
-      <button class="nav" data-view="gas">♨ Gas</button>
+      <button class="nav" data-view="solar">☀ Solar</button>
+      <button class="nav" data-view="battery">▣ Battery</button>
+      <button class="nav" data-view="gas">🔥 Gas</button>
       <button class="nav" data-view="water">💧 Water</button>
       <button class="nav" data-view="weather">☁ Weather</button>
       <button class="nav" data-view="costs">$ Costs</button>
-      <button class="nav" data-view="timeline">⏱ Timeline</button>
-      <button class="nav" data-view="assets">▣ Assets</button>
-      <div class="status">
-        <h3>System status</h3>
-        <p><span></span> Data local</p>
-        <p><span></span> GitHub Pages</p>
-        <p><span></span> Sheet link next</p>
+      <button class="nav" data-view="timeline">◴ Timeline</button>
+      <button class="nav" data-view="assets">▤ Assets</button>
+    </nav>
+    <div class="status-box"><h3>SYSTEM STATUS</h3><p><span></span>Data local</p><p><span></span>GitHub Pages</p><p><span></span>Sheet link next</p></div>
+    <div class="user-box"><div class="avatar">JC</div><div><b>Julian</b><small>Home workspace</small></div></div>
+  </aside>
+  <main class="app">
+    <header class="topbar">
+      <div class="metric"><small>TIME</small><strong id="clock">--:--</strong><span>Melbourne</span></div>
+      <div class="metric weather-mini"><small>WEATHER</small><strong>16° <span>⛅</span></strong><span>Brunswick</span></div>
+      <div class="metric"><small>HOME MODE</small><strong class="green">AUTO</strong><span>Optimised</span></div>
+      <div class="metric"><small>BATTERY</small><strong class="green">89%</strong><span>14.3 kWh</span></div>
+      <div class="metric"><small>GRID STATUS</small><strong class="green">Importing</strong><span>312 W</span></div>
+      <div class="metric"><small>ENERGY TODAY</small><strong>8.7 <em>kWh</em></strong><span>+12% vs yesterday</span></div>
+      <div class="metric"><small>WATER LAST BILL</small><strong>29 <em>kL</em></strong><span>-8% vs previous</span></div>
+    </header>
+
+    <section class="view active" id="overview">
+      <div class="grid overview-grid">
+        <article class="panel flow-panel"><div class="panel-head"><h2>Energy flow</h2><button class="max">⛶</button></div><div class="flow-map" id="flowMap"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Weather</h2><button class="max">⛶</button></div><div id="overviewWeather" class="chart"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Water</h2><button class="max">⛶</button></div><div id="overviewWater" class="chart"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Costs</h2><button class="max">⛶</button></div><div class="donut-card"><div class="donut"><span>$312</span></div><ul><li><b>Electricity</b><span>$164</span></li><li><b>Water</b><span>$62</span></li><li><b>Gas</b><span>$55</span></li><li><b>Other</b><span>$31</span></li></ul></div></article>
       </div>
-    </aside>
+    </section>
 
-    <main>
-      <header class="topbar">
-        <div><small>TIME</small><b id="clock">--:--</b><em>Melbourne</em></div>
-        <div><small>WEATHER</small><b>16° <span class="weather-mini">⛅</span></b><em>Brunswick</em></div>
-        <div><small>HOME MODE</small><b class="green">AUTO</b><em>Optimised</em></div>
-        <div><small>BATTERY</small><b class="green">89%</b><em>14.3 kWh</em></div>
-        <div><small>GRID STATUS</small><b class="green">Importing</b><em>312 W</em></div>
-        <div><small>ENERGY TODAY</small><b>8.7 <span>kWh</span></b></div>
-        <div><small>WATER LAST BILL</small><b>29 <span>kL</span></b></div>
-      </header>
+    <section class="view" id="weather">
+      <div class="weather-toolbar"><h2>Weather</h2><div class="range-buttons"><button>Live</button><button>1H</button><button>24H</button><button>7D</button><button>30D</button><button class="active">12M</button><button>3Y</button><button>All</button></div><div class="toolbar-actions"><button>Forecast</button><button>Compare</button><button>⚙</button></div></div>
+      <div class="weather-cards">
+        <div class="big-weather card"><div><strong>16.2°</strong><p>Feels like 15.8°</p><h3>Partly Cloudy</h3><span>Brunswick, VIC</span></div><div class="big-icon">⛅</div></div>
+        <div class="card"><small>TODAY</small><div class="icon">☀</div><strong>18° / 9°</strong><span>Mostly sunny</span><p>💧 0–1 mm</p></div>
+        <div class="card"><small>TOMORROW</small><div class="icon">🌧</div><strong>16° / 10°</strong><span>Rain</span><p>💧 5–12 mm</p></div>
+        <div class="card"><small>WIND</small><div class="icon">〰</div><strong>22 km/h</strong><span>NW</span><p>Gusts 35 km/h</p></div>
+        <div class="card"><small>HUMIDITY</small><div class="icon">💧</div><strong>68%</strong><span>Comfortable</span></div>
+        <div class="card"><small>UV INDEX</small><div class="icon">☀</div><strong>3</strong><span class="yellow">Moderate</span></div>
+        <div class="card"><small>SUN</small><div class="icon">🌅</div><strong>07:16 am</strong><span>Sunrise</span><p>05:02 pm sunset</p></div>
+      </div>
+      <article class="panel full"><div class="panel-head"><h2>Weather explorer</h2><button class="max">⛶</button></div><div id="weatherChart" class="weather-chart"></div><div class="time-scale"><button>Years</button><button>Months</button><button>Weeks</button><button>Days</button><button class="active">Hours</button></div></article>
+    </section>
 
-      <section class="view active" id="overview">
-        <div class="kpis" id="kpis"></div>
-        <div class="grid">
-          <article class="panel large" data-panel="flow"><div class="panel-head"><h2>Energy flow</h2><button class="max">⛶</button></div><div id="flowMap" class="flow-map"></div></article>
-          <article class="panel large" data-panel="energy"><div class="panel-head"><h2>Energy + gas comparison</h2><button class="max">⛶</button></div><div id="energyChart" class="chart"></div></article>
-          <article class="panel" data-panel="water"><div class="panel-head"><h2>Water usage</h2><button class="max">⛶</button></div><div id="waterChart" class="chart"></div></article>
-          <article class="panel" data-panel="weather"><div class="panel-head"><h2>Weather alignment</h2><button class="max">⛶</button></div><div id="weatherChart" class="chart"></div></article>
-          <article class="panel wide" data-panel="costs"><div class="panel-head"><h2>Cost + usage history</h2><button class="max">⛶</button></div><div id="costChart" class="chart"></div></article>
-          <article class="panel" data-panel="timeline"><div class="panel-head"><h2>Timeline events</h2><button class="max">⛶</button></div><div id="timelinePanel" class="timeline-panel"></div></article>
-        </div>
-      </section>
+    <section class="view" id="water">
+      <div class="grid water-grid">
+        <article class="panel wide"><div class="panel-head"><h2>Water daily average</h2><button class="max">⛶</button></div><div id="waterDaily" class="chart"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Bill usage</h2><button class="max">⛶</button></div><div id="waterBills" class="chart"></div></article>
+        <article class="panel"><div class="panel-head"><h2>Bill cost</h2><button class="max">⛶</button></div><div id="waterCost" class="chart"></div></article>
+      </div>
+    </section>
 
-      <section class="view" id="energy"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Energy explorer</h2><button class="max">⛶</button></div><div id="energyExplorer" class="chart tall"></div></article></div></section>
-      <section class="view" id="gas"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Gas explorer</h2><button class="max">⛶</button></div><div id="gasExplorer" class="chart tall"></div></article></div></section>
-      <section class="view" id="water"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Water explorer</h2><button class="max">⛶</button></div><div id="waterExplorer" class="chart tall"></div></article></div></section>
-      <section class="view" id="weather">
-        <div class="weather-page">
-          <article class="weather-hero panel">
-            <div class="panel-head"><h2>Weather</h2><div class="range-pills"><button class="active">12M</button><button>3Y</button><button>ALL</button><button>Custom</button></div></div>
-            <div class="weather-cards" id="weatherCards"></div>
-            <div id="weatherExplorer" class="chart weather-tall"></div>
-            <div class="time-scale"><button>Years</button><button>Months</button><button>Weeks</button><button>Days</button><button class="active">Hours</button></div>
-          </article>
-        </div>
-      </section>
-      <section class="view" id="costs"><div class="grid single"><article class="panel full"><div class="panel-head"><h2>Costs explorer</h2><button class="max">⛶</button></div><div id="costExplorer" class="chart tall"></div></article></div></section>
-      <section class="view" id="timeline"><div class="placeholder">Timeline integration will link to the Dome timeline and shared home events.</div></section>
-      <section class="view" id="assets"><div class="placeholder">Assets will hold appliances, manuals, warranties and documents.</div></section>
-    </main>
-  </div>
+    <section class="view placeholder" id="energy"><h2>Energy</h2><p>Daily and hourly electricity data will connect here.</p></section>
+    <section class="view placeholder" id="solar"><h2>Solar</h2><p>SolarEdge and Sigenergy generation panels.</p></section>
+    <section class="view placeholder" id="battery"><h2>Battery</h2><p>Charge, discharge, SOC, grid charging and solar charging.</p></section>
+    <section class="view placeholder" id="gas"><h2>Gas</h2><p>Gas intervals and temperature overlay.</p></section>
+    <section class="view placeholder" id="costs"><h2>Costs</h2><p>Electricity, gas, water and future bills.</p></section>
+    <section class="view placeholder" id="timeline"><h2>Timeline</h2><p>Events layer linking to Dome Timeline later.</p></section>
+    <section class="view placeholder" id="assets"><h2>Assets</h2><p>Battery, heat pump HWS, split system, documents and warranties.</p></section>
+  </main>
 
-  <div class="modal" id="modal"><div class="modal-card"><div class="modal-head"><h2 id="modalTitle"></h2><button id="closeModal">×</button></div><div id="modalBody"></div></div></div>
-
+  <div id="modal" class="modal"><button id="closeModal">×</button><div id="modalContent"></div></div>
   <script src="js/data.js"></script>
-  <script src="js/charts.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>
