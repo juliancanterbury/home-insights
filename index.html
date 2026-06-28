@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Home Insights – Water Dashboard v2</title>
+<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<style>
+  :root{
+    --bg:#06141e; --panel:#071d2a; --panel2:#09283a; --line:#12384c; --text:#e9f7ff; --muted:#8db0c4;
+    --cyan:#00d9ff; --green:#35ff66; --blue:#1677ff; --orange:#ff7a18; --red:#ff4d4d;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(circle at 50% 0,#092539 0,#06141e 42%,#030a10 100%);color:var(--text);font-family:Inter,system-ui,-apple-system,Segoe UI,Arial,sans-serif;font-size:13px;overflow-x:hidden}
+  header{height:72px;display:flex;align-items:center;gap:26px;padding:0 22px;border-bottom:1px solid var(--line);background:rgba(2,10,16,.72);backdrop-filter:blur(14px);position:sticky;top:0;z-index:20}
+  .hamb{font-size:24px;color:#65dfff}.title{min-width:230px}.title h1{margin:0;font-size:22px;letter-spacing:.04em;font-weight:650}.title small{color:var(--green);font-weight:700;letter-spacing:.08em}
+  .topstat{border-left:1px solid var(--line);padding-left:22px;min-width:120px}.topstat .label{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.09em}.topstat .value{font-size:22px;font-weight:700}.topstat .sub{font-size:11px;color:var(--cyan)}
+  .app{display:grid;grid-template-columns:210px 1fr;gap:14px;padding:14px}
+  nav{background:linear-gradient(180deg,rgba(8,29,43,.96),rgba(5,17,25,.96));border:1px solid var(--line);border-radius:14px;padding:12px;min-height:calc(100vh - 100px)}
+  .navitem{display:flex;align-items:center;gap:12px;padding:12px 14px;color:#cfe9f6;border-radius:9px;margin-bottom:5px}.navitem.active{background:#0b3853;color:#18d9ff}.navitem .ico{width:22px;text-align:center;font-size:18px}.section{margin:20px 10px 8px;color:#668ea5;text-transform:uppercase;font-size:11px;letter-spacing:.09em}.statusline{display:flex;justify-content:space-between;margin:9px 10px;color:#bfe6f6}.statusline span:last-child{color:var(--green)}
+  main{min-width:0}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}.tabs{display:flex;gap:8px;flex-wrap:wrap}.tab{padding:9px 14px;border:1px solid var(--line);background:#071a27;color:#cceaf7;border-radius:999px;cursor:pointer}.tab.active{background:#0a4264;color:white;border-color:#1bbcff}.controls{display:flex;align-items:center;gap:8px;color:#a8c7d8}.btn{background:#082537;border:1px solid #16445d;color:#d7f4ff;border-radius:8px;padding:8px 12px;cursor:pointer}.btn.active{background:#0b5d88;border-color:#1dc8ff}
+  .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px}.panel{background:linear-gradient(180deg,rgba(8,29,43,.92),rgba(4,14,22,.94));border:1px solid var(--line);border-radius:13px;box-shadow:0 0 0 1px rgba(0,217,255,.025),0 18px 45px rgba(0,0,0,.28);position:relative;overflow:hidden;min-height:160px}.panel::before{content:"";position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,217,255,.06),transparent 35%,rgba(53,255,102,.025));pointer-events:none}.panelhead{height:42px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid rgba(18,56,76,.65);position:relative;z-index:1}.panelhead h2{font-size:13px;text-transform:uppercase;letter-spacing:.06em;margin:0}.panelhead small{color:var(--muted)}.max{background:transparent;border:1px solid #17475f;color:#8ddff8;border-radius:7px;padding:4px 8px;cursor:pointer}.chart{height:260px;position:relative;z-index:1}.chart.tall{height:320px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.metric{border:1px solid var(--line);border-radius:12px;background:linear-gradient(180deg,#092233,#061823);padding:14px 16px}.metric .big{font-size:30px;font-weight:750;line-height:1}.metric .unit{font-size:16px;color:var(--cyan);margin-left:5px}.metric .label{color:var(--muted);margin-top:8px}.metric .delta{color:var(--green);font-size:16px;font-weight:700}.metric.warn .delta{color:var(--orange)}
+  .span4{grid-column:span 4}.span5{grid-column:span 5}.span6{grid-column:span 6}.span7{grid-column:span 7}.span8{grid-column:span 8}.span12{grid-column:span 12}
+  .note{padding:0 14px 12px;color:#8db0c4;line-height:1.4}.pill{display:inline-block;padding:4px 8px;border:1px solid #35566a;border-radius:999px;color:#cdebf8;margin-right:6px}.warntext{color:var(--orange)}
+  .modal{position:fixed;inset:0;background:rgba(0,5,10,.82);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center;padding:28px}.modal.open{display:flex}.modalcard{width:min(1600px,94vw);height:min(900px,90vh);background:linear-gradient(180deg,#071d2a,#030b12);border:1px solid #1b6583;border-radius:16px;box-shadow:0 0 60px rgba(0,217,255,.16);display:flex;flex-direction:column}.modalhead{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;border-bottom:1px solid var(--line)}.modalhead h3{margin:0;font-size:14px;text-transform:uppercase;letter-spacing:.08em}.close{background:#0c2b3d;border:1px solid #1b6583;color:#dff7ff;border-radius:8px;padding:8px 12px;cursor:pointer}.modalchart{flex:1;min-height:0}.modalnote{padding:0 18px 14px;color:var(--muted)}
+  @media(max-width:1100px){.app{grid-template-columns:1fr}nav{display:none}.span4,.span5,.span6,.span7,.span8{grid-column:span 12}.metrics{grid-template-columns:repeat(2,1fr)}header{overflow:auto}.topstat{min-width:115px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hamb">☰</div><div class="title"><h1>HOME INSIGHTS</h1><small>WATER MODULE</small></div>
+  <div class="topstat"><div class="label">Time</div><div class="value">12:45</div><div class="sub">28 JUN 2026</div></div>
+  <div class="topstat"><div class="label">Water latest</div><div class="value">330 <span style="font-size:13px;color:var(--cyan)">L/day</span></div><div class="sub">29 kL quarter</div></div>
+  <div class="topstat"><div class="label">Status</div><div class="value" style="color:var(--green)">OK</div><div class="sub">22 bills imported</div></div>
+  <div class="topstat"><div class="label">Latest bill</div><div class="value">$299.45</div><div class="sub">Yarra Valley Water</div></div>
+</header>
+<div class="app">
+<nav>
+  <div class="navitem"><span class="ico">▦</span>Overview</div><div class="navitem"><span class="ico">⚡</span>Energy</div><div class="navitem active"><span class="ico">💧</span>Water</div><div class="navitem"><span class="ico">🔥</span>Gas</div><div class="navitem"><span class="ico">☀</span>Solar</div><div class="navitem"><span class="ico">🔋</span>Battery</div><div class="navitem"><span class="ico">$</span>Costs</div><div class="navitem"><span class="ico">📈</span>Compare</div><div class="navitem"><span class="ico">📄</span>Documents</div>
+  <div class="section">System status</div><div class="statusline"><span>Water bills</span><span>Online</span></div><div class="statusline"><span>Database</span><span>Connected</span></div><div class="statusline"><span>Dashboard</span><span>Mockup</span></div>
+</nav>
+<main>
+  <div class="toolbar"><div class="tabs"><button class="tab active">Water</button><button class="tab">Electricity</button><button class="tab">Gas</button><button class="tab">Money</button><button class="tab">Timeline</button></div><div class="controls"><button class="btn active" onclick="setRange('all')">All</button><button class="btn" onclick="setRange('24m')">24M</button><button class="btn" onclick="setRange('12m')">12M</button><button class="btn" onclick="setRange('ytd')">YTD</button></div></div>
+  <div class="metrics">
+    <div class="metric"><div><span class="big">29</span><span class="unit">kL</span></div><div class="label">Latest quarter</div></div>
+    <div class="metric"><div><span class="big">330</span><span class="unit">L/day</span></div><div class="label">Latest average</div></div>
+    <div class="metric warn"><div class="delta">⚠ 4 day interval</div><div class="label">Flagged as outlier, not trend</div></div>
+    <div class="metric"><div><span class="big">$299</span><span class="unit">.45</span></div><div class="label">Latest bill</div></div>
+  </div>
+  <section class="grid">
+    <div class="panel span7" data-chart="daily"><div class="panelhead"><h2>Litres/day over time</h2><div><small>Stepped average by bill period</small> <button class="max" onclick="openModal('daily')">⛶</button></div></div><div id="daily" class="chart tall"></div><div class="note"><span class="pill warntext">CHECK</span> The 2023 short-read interval is flagged so it does not distort the main view.</div></div>
+    <div class="panel span5" data-chart="usage"><div class="panelhead"><h2>kL per bill</h2><div><small>Quarterly totals</small> <button class="max" onclick="openModal('usage')">⛶</button></div></div><div id="usage" class="chart tall"></div></div>
+    <div class="panel span8" data-chart="cost"><div class="panelhead"><h2>Bill cost breakdown</h2><div><small>Usage / service / other</small> <button class="max" onclick="openModal('cost')">⛶</button></div></div><div id="cost" class="chart"></div></div>
+    <div class="panel span4" data-chart="season"><div class="panelhead"><h2>Seasonality</h2><div><small>Average L/day by quarter</small> <button class="max" onclick="openModal('season')">⛶</button></div></div><div id="season" class="chart"></div></div>
+    <div class="panel span12" data-chart="compare"><div class="panelhead"><h2>Water usage + cost comparison</h2><div><small>kL, L/day and total bill</small> <button class="max" onclick="openModal('compare')">⛶</button></div></div><div id="compare" class="chart"></div></div>
+  </section>
+</main>
+</div>
+<div class="modal" id="modal"><div class="modalcard"><div class="modalhead"><h3 id="modalTitle">Expanded panel</h3><button class="close" onclick="closeModal()">Close</button></div><div id="modalChart" class="modalchart"></div><div id="modalNote" class="modalnote"></div></div></div>
+<script>
+const water = [
+{issue:'2021-03-26',start:'2020-12-17',end:'2021-03-26',days:99,kl:63,lpd:636,usage:219.77,service:132.26,other:25.72,total:377.75,status:'OK'},
+{issue:'2021-06-24',start:'2021-03-26',end:'2021-06-23',days:89,kl:23,lpd:258,usage:82.16,service:133.71,other:26.02,total:241.89,status:'OK'},
+{issue:'2021-09-20',start:'2021-06-23',end:'2021-09-17',days:86,kl:15,lpd:174,usage:52.53,service:132.28,other:106.81,total:291.62,status:'OK'},
+{issue:'2021-12-31',start:'2021-09-17',end:'2021-12-16',days:90,kl:49,lpd:544,usage:167.66,service:132.28,other:26.61,total:326.55,status:'OK'},
+{issue:'2022-03-28',start:'2021-12-16',end:'2022-03-26',days:100,kl:55,lpd:550,usage:180.79,service:129.4,other:26.03,total:336.22,status:'OK'},
+{issue:'2022-07-01',start:'2022-03-29',end:'2022-06-29',days:95,kl:23,lpd:242,usage:78.38,service:130.82,other:26.31,total:235.51,status:'OK'},
+{issue:'2022-09-26',start:'2022-06-29',end:'2022-09-14',days:77,kl:14,lpd:182,usage:49.13,service:133.59,other:109.25,total:291.97,status:'OK'},
+{issue:'2022-12-23',start:'2022-09-14',end:'2022-12-19',days:96,kl:32,lpd:333,usage:104.94,service:133.59,other:27.65,total:266.18,status:'OK'},
+{issue:'2023-03-24',start:'2022-12-19',end:'2023-03-22',days:93,kl:56,lpd:602,usage:185.44,service:130.69,other:27.04,total:343.17,status:'OK'},
+{issue:'2023-06-28',start:'2023-03-22',end:'2023-06-26',days:96,kl:32,lpd:333,usage:107.95,service:132.15,other:27.34,total:267.44,status:'OK'},
+{issue:'2023-09-25',start:'2023-06-26',end:'2023-06-30',days:4,kl:16,lpd:4000,usage:53.6,service:135.98,other:51.03,total:240.61,status:'CHECK'},
+{issue:'2023-12-22',start:'2023-09-21',end:'2023-12-21',days:91,kl:29,lpd:319,usage:96.97,service:135.98,other:51.03,total:283.98,status:'OK'},
+{issue:'2024-03-26',start:'2023-12-25',end:'2024-03-28',days:95,kl:46,lpd:484,usage:158.2,service:134.5,other:50.48,total:343.18,status:'OK'},
+{issue:'2024-06-21',start:'2024-03-25',end:'2024-06-19',days:86,kl:39,lpd:453,usage:131.62,service:134.5,other:50.48,total:316.6,status:'OK'},
+{issue:'2024-09-17',start:'2024-06-19',end:'2024-09-17',days:90,kl:23,lpd:256,usage:78.73,service:140.36,other:52.75,total:271.84,status:'OK'},
+{issue:'2024-12-18',start:'2024-09-17',end:'2024-12-17',days:91,kl:50,lpd:549,usage:182.39,service:140.36,other:52.75,total:375.5,status:'OK'},
+{issue:'2025-03-25',start:'2024-12-17',end:'2025-03-21',days:94,kl:71,lpd:755,usage:275.59,service:137.31,other:51.6,total:464.5,status:'OK'},
+{issue:'2025-06-23',start:'2025-03-20',end:'2025-06-20',days:91,kl:44,lpd:484,usage:155.35,service:138.83,other:52.18,total:346.36,status:'OK'},
+{issue:'2025-09-16',start:'2025-06-20',end:'2025-09-15',days:87,kl:30,lpd:345,usage:106.69,service:143.84,other:54.14,total:304.67,status:'OK'},
+{issue:'2025-12-19',start:'2025-09-15',end:'2025-12-18',days:94,kl:42,lpd:447,usage:150.75,service:143.84,other:54.14,total:348.73,status:'OK'},
+{issue:'2026-03-24',start:'2025-12-18',end:'2026-03-23',days:95,kl:73,lpd:768,usage:295.57,service:140.72,other:52.96,total:489.25,status:'OK'},
+{issue:'2026-06-22',start:'2026-03-23',end:'2026-06-19',days:88,kl:29,lpd:330,usage:103.6,service:142.3,other:53.55,total:299.45,status:'OK'}
+];
+let currentRange='all';
+function filtered(){ if(currentRange==='all') return water; const cutoff = new Date(water[water.length-1].issue); const months={ytd:99,'12m':12,'24m':24}[currentRange]||999; if(currentRange==='ytd') return water.filter(d=>new Date(d.issue).getFullYear()===cutoff.getFullYear()); const c=new Date(cutoff); c.setMonth(c.getMonth()-months); return water.filter(d=>new Date(d.issue)>=c); }
+function setRange(r){ currentRange=r; document.querySelectorAll('.btn').forEach(b=>b.classList.remove('active')); event.target.classList.add('active'); renderAll(); }
+const layoutBase={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:'#dff7ff',size:11},margin:{l:54,r:48,t:16,b:44},hovermode:'x unified',legend:{orientation:'h',y:1.14,x:0},xaxis:{gridcolor:'rgba(255,255,255,.04)',zerolinecolor:'#23495a'},yaxis:{gridcolor:'rgba(255,255,255,.06)',zerolinecolor:'#23495a'},modebar:{bgcolor:'rgba(0,0,0,0)',color:'#7dbbd0',activecolor:'#00d9ff'}};
+function mergeLayout(extra){return Object.assign({},layoutBase,extra,{xaxis:Object.assign({},layoutBase.xaxis,extra.xaxis||{}),yaxis:Object.assign({},layoutBase.yaxis,extra.yaxis||{})});}
+function renderPlot(id,traces,layout){Plotly.react(id,traces,layout,{responsive:true,displaylogo:false});}
+function dailySpec(rows){ const ok=rows.filter(d=>d.status==='OK'); const bad=rows.filter(d=>d.status!=='OK'); return {title:'Litres/day over time',note:'Stepped average by bill period. Outliers are shown separately and excluded from the main axis.',traces:[{x:ok.map(d=>d.issue),y:ok.map(d=>d.lpd),name:'L/day',type:'scatter',mode:'lines+markers',line:{shape:'hv',color:'#35ff66',width:2},marker:{size:6,color:'#35ff66'}},{x:bad.map(d=>d.issue),y:bad.map(d=>d.lpd),name:'CHECK interval',type:'scatter',mode:'markers',marker:{size:12,color:'#ff7a18',symbol:'triangle-up'},yaxis:'y2'}],layout:mergeLayout({yaxis:{title:'L/day',range:[0,850]},yaxis2:{title:'Flagged L/day',overlaying:'y',side:'right',showgrid:false,range:[0,4500],tickfont:{color:'#ffb17a'}},shapes:[{type:'line',xref:'paper',x0:0,x1:1,y0:900,y1:900,line:{dash:'dot',color:'rgba(0,217,255,.55)'}}]})};}
+function usageSpec(rows){ return {title:'kL per bill',note:'Quarterly totals from Yarra Valley Water bills.',traces:[{x:rows.map(d=>d.issue),y:rows.map(d=>d.kl),name:'kL used',type:'bar',marker:{color:'#00d9ff'},width:1000*60*60*24*30}],layout:mergeLayout({yaxis:{title:'kL'}})};}
+function costSpec(rows){ return {title:'Bill cost breakdown',note:'Shows whether cost movement is usage or fixed charges.',traces:[{x:rows.map(d=>d.issue),y:rows.map(d=>d.usage),name:'Usage $',type:'bar',marker:{color:'#1677ff'}},{x:rows.map(d=>d.issue),y:rows.map(d=>d.service),name:'Service $',type:'bar',marker:{color:'#00c8d7'}},{x:rows.map(d=>d.issue),y:rows.map(d=>d.other),name:'Other $',type:'bar',marker:{color:'#ff7a18'}}],layout:mergeLayout({barmode:'stack',yaxis:{title:'$'}})};}
+function seasonSpec(rows){ const q={}; rows.filter(d=>d.status==='OK').forEach(d=>{const m=new Date(d.issue).getMonth(); const s=m<3?'Summer':m<6?'Autumn':m<9?'Winter':'Spring'; (q[s]||(q[s]=[])).push(d.lpd);}); const cats=['Summer','Autumn','Winter','Spring']; return {title:'Seasonality',note:'Average litres/day by billing issue season.',traces:[{x:cats,y:cats.map(c=>q[c]?Math.round(q[c].reduce((a,b)=>a+b,0)/q[c].length):0),name:'Avg L/day',type:'bar',marker:{color:'#35ff66'}}],layout:mergeLayout({yaxis:{title:'L/day'}})};}
+function compareSpec(rows){ return {title:'Water usage + cost comparison',note:'Combined view for broad correlation; use specific panels for detailed reading.',traces:[{x:rows.map(d=>d.issue),y:rows.map(d=>d.kl),name:'kL',type:'bar',marker:{color:'#00d9ff'}},{x:rows.map(d=>d.issue),y:rows.map(d=>d.total),name:'Total $',type:'scatter',mode:'lines+markers',line:{color:'#ff7a18',width:2},yaxis:'y2'}],layout:mergeLayout({yaxis:{title:'kL'},yaxis2:{title:'$',overlaying:'y',side:'right',showgrid:false}})};}
+const specs={daily:dailySpec,usage:usageSpec,cost:costSpec,season:seasonSpec,compare:compareSpec};
+function renderAll(){ const rows=filtered(); Object.keys(specs).forEach(id=>{const s=specs[id](rows); renderPlot(id,s.traces,s.layout);}); }
+function openModal(id){ const rows=filtered(); const s=specs[id](rows); document.getElementById('modalTitle').textContent=s.title; document.getElementById('modalNote').textContent=s.note; document.getElementById('modal').classList.add('open'); setTimeout(()=>{renderPlot('modalChart',s.traces,mergeLayout(Object.assign({},s.layout,{font:{color:'#dff7ff',size:12},margin:{l:64,r:64,t:20,b:54}})));},60); }
+function closeModal(){document.getElementById('modal').classList.remove('open'); Plotly.purge('modalChart');}
+window.addEventListener('resize',()=>setTimeout(()=>Object.keys(specs).forEach(id=>Plotly.Plots.resize(id)),80));
+renderAll();
+</script>
+</body>
+</html>
