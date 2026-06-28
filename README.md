@@ -1,3 +1,5 @@
-# Home Insights
+# Home Insights V3
 
-Home dashboard for energy, gas, water, weather, costs, timeline, assets and documents.
+Cockpit-first dashboard for home energy, water, gas, weather, costs, timeline events and assets.
+
+Publish with GitHub Pages from `main` / root.

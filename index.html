@@ -8,72 +8,103 @@
   <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-icon">⌂</div><div><h1>HOME INSIGHTS</h1><p>LIVE OVERVIEW</p></div></div>
+  <aside id="sidebar" class="sidebar">
+    <button id="menuToggle" class="hamburger">☰</button>
+    <div class="brand">
+      <div class="brand-mark">⌂</div>
+      <div><h1>HOME INSIGHTS</h1><p>LIVE HOUSE COCKPIT</p></div>
+    </div>
     <nav>
       <button class="nav active" data-view="overview">▦ Overview</button>
       <button class="nav" data-view="energy">⚡ Energy</button>
-      <button class="nav" data-view="solar">☀ Solar</button>
-      <button class="nav" data-view="battery">▣ Battery</button>
-      <button class="nav" data-view="gas">🔥 Gas</button>
       <button class="nav" data-view="water">💧 Water</button>
       <button class="nav" data-view="weather">☁ Weather</button>
+      <button class="nav" data-view="gas">🔥 Gas</button>
       <button class="nav" data-view="costs">$ Costs</button>
       <button class="nav" data-view="timeline">◴ Timeline</button>
       <button class="nav" data-view="assets">▤ Assets</button>
     </nav>
-    <div class="status-box"><h3>SYSTEM STATUS</h3><p><span></span>Data local</p><p><span></span>GitHub Pages</p><p><span></span>Sheet link next</p></div>
-    <div class="user-box"><div class="avatar">JC</div><div><b>Julian</b><small>Home workspace</small></div></div>
+    <section class="side-status">
+      <h3>SYSTEM STATUS</h3>
+      <p><i></i> GitHub Pages <b>Online</b></p>
+      <p><i></i> Water data <b>Loaded</b></p>
+      <p><i></i> Weather cache <b>Local</b></p>
+      <p><i></i> Sheet link <b>Next</b></p>
+    </section>
+    <div class="profile"><span>JC</span><div><b>Julian</b><small>Home workspace</small></div></div>
   </aside>
-  <main class="app">
-    <header class="topbar">
-      <div class="metric"><small>TIME</small><strong id="clock">--:--</strong><span>Melbourne</span></div>
-      <div class="metric weather-mini"><small>WEATHER</small><strong>16° <span>⛅</span></strong><span>Brunswick</span></div>
-      <div class="metric"><small>HOME MODE</small><strong class="green">AUTO</strong><span>Optimised</span></div>
-      <div class="metric"><small>BATTERY</small><strong class="green">89%</strong><span>14.3 kWh</span></div>
-      <div class="metric"><small>GRID STATUS</small><strong class="green">Importing</strong><span>312 W</span></div>
-      <div class="metric"><small>ENERGY TODAY</small><strong>8.7 <em>kWh</em></strong><span>+12% vs yesterday</span></div>
-      <div class="metric"><small>WATER LAST BILL</small><strong>29 <em>kL</em></strong><span>-8% vs previous</span></div>
+
+  <main class="shell">
+    <header class="topbar glass">
+      <div class="status-pill"><small>TIME</small><strong id="clock">--:--</strong><span>Melbourne</span></div>
+      <div class="status-pill"><small>WEATHER</small><strong>16° <em>⛅</em></strong><span>Brunswick</span></div>
+      <div class="status-pill"><small>HOME MODE</small><strong class="green">AUTO</strong><span>Optimised</span></div>
+      <div class="status-pill"><small>BATTERY</small><strong class="green">89%</strong><span>14.3 kWh</span></div>
+      <div class="status-pill"><small>GRID STATUS</small><strong class="green">Importing</strong><span>312 W</span></div>
+      <div class="status-pill"><small>ENERGY TODAY</small><strong>8.7 <em>kWh</em></strong><span>+12% vs yesterday</span></div>
+      <div class="status-pill"><small>WATER LAST BILL</small><strong>29 <em>kL</em></strong><span>$299.45</span></div>
     </header>
 
-    <section class="view active" id="overview">
-      <div class="grid overview-grid">
-        <article class="panel flow-panel"><div class="panel-head"><h2>Energy flow</h2><button class="max">⛶</button></div><div class="flow-map" id="flowMap"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Weather</h2><button class="max">⛶</button></div><div id="overviewWeather" class="chart"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Water</h2><button class="max">⛶</button></div><div id="overviewWater" class="chart"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Costs</h2><button class="max">⛶</button></div><div class="donut-card"><div class="donut"><span>$312</span></div><ul><li><b>Electricity</b><span>$164</span></li><li><b>Water</b><span>$62</span></li><li><b>Gas</b><span>$55</span></li><li><b>Other</b><span>$31</span></li></ul></div></article>
-      </div>
+    <section id="overview" class="view active cockpit">
+      <article class="panel hero-flow" data-panel="Energy flow">
+        <div class="panel-head"><div><h2>Live Energy Flow</h2><p>Sigenergy-style house flow map</p></div><button class="max">⛶</button></div>
+        <div class="flow-stage" id="flowStage">
+          <div class="flow-node solar"><span>☀</span><b>Solar</b><strong>5.6 kW</strong></div>
+          <div class="flow-node house"><span>⌂</span><b>Home</b><strong>2.8 kW</strong></div>
+          <div class="flow-node battery"><span>▣</span><b>Battery</b><strong>89%</strong></div>
+          <div class="flow-node grid"><span>⌁</span><b>Grid</b><strong>0.3 kW</strong></div>
+          <svg class="flow-svg" viewBox="0 0 900 520" preserveAspectRatio="none">
+            <defs>
+              <filter id="glow"><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <path class="flow-path solar-home" d="M180 120 C330 120 330 255 450 255"/>
+            <path class="flow-path battery-home" d="M450 430 C450 360 450 320 450 280"/>
+            <path class="flow-path grid-home import" d="M720 255 C620 255 560 255 480 255"/>
+            <path class="flow-path solar-battery" d="M180 130 C270 360 340 430 430 430"/>
+            <path class="flow-path solar-grid faint" d="M190 105 C420 40 620 70 720 235"/>
+          </svg>
+          <div class="flow-caption">Currently importing lightly while solar supplies the house and charges battery.</div>
+        </div>
+      </article>
+
+      <aside class="today-stack">
+        <article class="weather-live cardish" data-panel="Weather today">
+          <div class="panel-head mini"><h2>Weather</h2><button class="max">⛶</button></div>
+          <div class="weather-now"><div><strong>16.2°</strong><p>Feels like 15.8°</p><h3>Partly cloudy</h3><small>Brunswick, VIC</small></div><div class="weather-icon">⛅</div></div>
+          <div class="weather-metrics"><span>💧 0 mm</span><span>〰 22 km/h</span><span>☀ UV 3</span><span>💦 68%</span></div>
+          <div class="hour-icons"><span>☀</span><span>⛅</span><span>☁</span><span>🌧</span><span>🌧</span><span>☁</span><span>🌙</span></div>
+        </article>
+        <article class="water-live cardish" data-panel="Water last bill">
+          <div class="panel-head mini"><h2>Water</h2><button class="max">⛶</button></div>
+          <div class="big-stat"><strong>29</strong><em>kL</em><span>330 L/day</span></div>
+          <div class="progress"><i style="width:42%"></i></div>
+          <p class="delta good">↓ 57% vs previous quarter</p>
+          <p class="money">Latest bill <b>$299.45</b></p>
+        </article>
+        <article class="alerts cardish" data-panel="Alerts">
+          <div class="panel-head mini"><h2>Signals</h2><button class="max">⛶</button></div>
+          <p><span class="dot green-dot"></span> Battery available for evening peak</p>
+          <p><span class="dot cyan-dot"></span> Rainfall expected to reduce irrigation</p>
+          <p><span class="dot yellow-dot"></span> Check unusual water interval in Sep 2023</p>
+        </article>
+      </aside>
+
+      <article class="panel overview-chart" data-panel="Energy + gas comparison"><div class="panel-head"><div><h2>Energy + Gas Comparison</h2><p>Shared timeline for utilities and events</p></div><button class="max">⛶</button></div><div id="energyCompare" class="chart"></div></article>
+      <article class="panel overview-chart weather-strip" data-panel="Weather alignment"><div class="panel-head"><div><h2>Weather Alignment</h2><p>Temperature, rainfall and icons aligned to usage</p></div><button class="max">⛶</button></div><div id="weatherAlignment" class="chart"></div></article>
+      <article class="panel overview-chart water-mini-panel" data-panel="Water usage"><div class="panel-head"><div><h2>Water Usage</h2><p>Quarterly bills and daily average</p></div><button class="max">⛶</button></div><div id="waterOverview" class="chart"></div></article>
+      <article class="panel costs-panel" data-panel="Costs"><div class="panel-head"><h2>Costs this quarter</h2><button class="max">⛶</button></div><div class="donut-wrap"><div class="donut"><span>$312</span></div><ul><li><b>Electricity</b><span>$164</span></li><li><b>Water</b><span>$62</span></li><li><b>Gas</b><span>$55</span></li><li><b>Other</b><span>$31</span></li></ul></div></article>
+      <article class="timeline-strip panel" data-panel="Timeline"><div class="panel-head"><h2>House Timeline</h2><button class="max">⛶</button></div><div class="events"><span style="left:12%">☀ Solar</span><span style="left:43%">🔥 HWS</span><span style="left:49%">🔋 Battery</span><span style="left:58%">⚡ OVO</span><span style="left:76%">❄ Split</span></div></article>
     </section>
 
-    <section class="view" id="weather">
-      <div class="weather-toolbar"><h2>Weather</h2><div class="range-buttons"><button>Live</button><button>1H</button><button>24H</button><button>7D</button><button>30D</button><button class="active">12M</button><button>3Y</button><button>All</button></div><div class="toolbar-actions"><button>Forecast</button><button>Compare</button><button>⚙</button></div></div>
-      <div class="weather-cards">
-        <div class="big-weather card"><div><strong>16.2°</strong><p>Feels like 15.8°</p><h3>Partly Cloudy</h3><span>Brunswick, VIC</span></div><div class="big-icon">⛅</div></div>
-        <div class="card"><small>TODAY</small><div class="icon">☀</div><strong>18° / 9°</strong><span>Mostly sunny</span><p>💧 0–1 mm</p></div>
-        <div class="card"><small>TOMORROW</small><div class="icon">🌧</div><strong>16° / 10°</strong><span>Rain</span><p>💧 5–12 mm</p></div>
-        <div class="card"><small>WIND</small><div class="icon">〰</div><strong>22 km/h</strong><span>NW</span><p>Gusts 35 km/h</p></div>
-        <div class="card"><small>HUMIDITY</small><div class="icon">💧</div><strong>68%</strong><span>Comfortable</span></div>
-        <div class="card"><small>UV INDEX</small><div class="icon">☀</div><strong>3</strong><span class="yellow">Moderate</span></div>
-        <div class="card"><small>SUN</small><div class="icon">🌅</div><strong>07:16 am</strong><span>Sunrise</span><p>05:02 pm sunset</p></div>
-      </div>
-      <article class="panel full"><div class="panel-head"><h2>Weather explorer</h2><button class="max">⛶</button></div><div id="weatherChart" class="weather-chart"></div><div class="time-scale"><button>Years</button><button>Months</button><button>Weeks</button><button>Days</button><button class="active">Hours</button></div></article>
-    </section>
+    <section id="weather" class="view page"><div class="weather-page-head"><div><h1>Weather</h1><p>Apple-style weather explorer for Brunswick, aligned with energy, water and gas.</p></div><div class="range"><button>Live</button><button>1H</button><button>24H</button><button>7D</button><button>30D</button><button class="active">12M</button><button>3Y</button><button>All</button></div></div><div class="weather-cards"><div class="cardish big"><strong>16.2°</strong><span>Partly cloudy</span><div class="weather-icon">⛅</div><p>Feels like 15.8°</p></div><div class="cardish"><small>TODAY</small><b>18° / 9°</b><span>☀ Mostly sunny</span></div><div class="cardish"><small>TOMORROW</small><b>16° / 10°</b><span>🌧 5–12 mm</span></div><div class="cardish"><small>WIND</small><b>22 km/h</b><span>NW gusts 35</span></div><div class="cardish"><small>HUMIDITY</small><b>68%</b><span>Comfortable</span></div><div class="cardish"><small>SUN</small><b>07:16</b><span>Sunrise · 17:02 sunset</span></div></div><article class="panel"><div class="panel-head"><h2>Weather Explorer</h2><button class="max">⛶</button></div><div id="weatherFull" class="chart tall"></div><div class="scale-row"><button>Years</button><button>Months</button><button>Weeks</button><button>Days</button><button class="active">Hours</button></div></article></section>
 
-    <section class="view" id="water">
-      <div class="grid water-grid">
-        <article class="panel wide"><div class="panel-head"><h2>Water daily average</h2><button class="max">⛶</button></div><div id="waterDaily" class="chart"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Bill usage</h2><button class="max">⛶</button></div><div id="waterBills" class="chart"></div></article>
-        <article class="panel"><div class="panel-head"><h2>Bill cost</h2><button class="max">⛶</button></div><div id="waterCost" class="chart"></div></article>
-      </div>
-    </section>
+    <section id="water" class="view page"><h1>Water</h1><div class="page-grid"><article class="panel wide"><div class="panel-head"><h2>Daily average</h2><button class="max">⛶</button></div><div id="waterDaily" class="chart"></div></article><article class="panel"><div class="panel-head"><h2>Bill usage</h2><button class="max">⛶</button></div><div id="waterBills" class="chart"></div></article><article class="panel"><div class="panel-head"><h2>Bill cost</h2><button class="max">⛶</button></div><div id="waterCost" class="chart"></div></article></div></section>
 
-    <section class="view placeholder" id="energy"><h2>Energy</h2><p>Daily and hourly electricity data will connect here.</p></section>
-    <section class="view placeholder" id="solar"><h2>Solar</h2><p>SolarEdge and Sigenergy generation panels.</p></section>
-    <section class="view placeholder" id="battery"><h2>Battery</h2><p>Charge, discharge, SOC, grid charging and solar charging.</p></section>
-    <section class="view placeholder" id="gas"><h2>Gas</h2><p>Gas intervals and temperature overlay.</p></section>
-    <section class="view placeholder" id="costs"><h2>Costs</h2><p>Electricity, gas, water and future bills.</p></section>
-    <section class="view placeholder" id="timeline"><h2>Timeline</h2><p>Events layer linking to Dome Timeline later.</p></section>
-    <section class="view placeholder" id="assets"><h2>Assets</h2><p>Battery, heat pump HWS, split system, documents and warranties.</p></section>
+    <section id="energy" class="view page"><h1>Energy</h1><article class="panel"><div class="panel-head"><h2>Daily / hourly electricity explorer</h2><button class="max">⛶</button></div><div id="energyFull" class="chart tall"></div></article></section>
+    <section id="gas" class="view placeholder"><h1>Gas</h1><p>Gas intervals, temperature overlay and gas reduction story.</p></section>
+    <section id="costs" class="view placeholder"><h1>Costs</h1><p>Bill and tariff analysis.</p></section>
+    <section id="timeline" class="view placeholder"><h1>Timeline</h1><p>Events layer and Dome Timeline links.</p></section>
+    <section id="assets" class="view placeholder"><h1>Assets</h1><p>Battery, Rinnai HWS, Mitsubishi split, documents and warranties.</p></section>
   </main>
 
   <div id="modal" class="modal"><button id="closeModal">×</button><div id="modalContent"></div></div>
