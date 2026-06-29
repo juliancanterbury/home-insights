@@ -1,3 +1,3 @@
-# Home Insights V3 Navigation
+# Home Insights
 
-Working navigation build. All sidebar buttons render a page using local sample data. Next stage is replacing sample arrays with Home Insights Database JSON.
+Dashboard reads real energy/gas data from `data/home_insights.json`. Next step is replacing that static JSON with the Google Sheets Apps Script JSON endpoint.
