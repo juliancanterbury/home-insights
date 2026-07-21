@@ -10,161 +10,69 @@
 <body>
   <div class="app-shell">
     <header class="topbar">
-      <button class="brand" data-page-link="home" aria-label="Home Insights home">
-        <span class="brand-mark"></span>
-        <span>Home Insights</span>
-      </button>
-      <div class="live-pill" id="livePill"><span></span><b id="liveText">Connecting</b></div>
+      <button class="brand" data-page-link="home" aria-label="Home Insights home"><span class="brand-mark"></span><span>Home Insights</span></button>
+      <div class="top-actions">
+        <div class="theme-picker" aria-label="Colour scheme">
+          <button class="theme-button" id="themeButton" aria-expanded="false" aria-controls="themeMenu">Colour</button>
+          <div class="theme-menu" id="themeMenu" hidden>
+            <button data-theme="minimal"><i class="theme-swatch minimal"></i>Minimal</button>
+            <button data-theme="original"><i class="theme-swatch original"></i>Original</button>
+            <button data-theme="lcars"><i class="theme-swatch lcars"></i>LCARS</button>
+            <button data-theme="tron"><i class="theme-swatch tron"></i>Tron</button>
+            <button data-theme="hal"><i class="theme-swatch hal"></i>2001</button>
+          </div>
+        </div>
+        <div class="live-pill" id="livePill"><span></span><b id="liveText">Connecting</b></div>
+      </div>
     </header>
 
     <main>
       <section class="page active" id="home" aria-labelledby="homeTitle">
-        <div class="page-intro home-intro">
-          <p class="eyebrow" id="greeting">Good evening</p>
-          <h1 id="homeTitle">Your house, now.</h1>
-          <p class="updated" id="updatedAt">Waiting for live data…</p>
-        </div>
-
+        <div class="page-intro home-intro"><p class="eyebrow" id="greeting">Good evening</p><h1 id="homeTitle">Your house, now.</h1><p class="updated" id="updatedAt">Waiting for live data…</p></div>
         <div class="home-stage" aria-label="Live household electricity flow">
-          <div class="flow-path path-solar"><i></i></div>
-          <div class="flow-path path-grid"><i></i></div>
-          <div class="flow-path path-battery"><i></i></div>
-
-          <button class="energy-node node-solar" data-page-link="solar">
-            <span class="node-icon sun-icon">☀</span>
-            <span class="node-label">Solar</span>
-            <strong id="solarNow">-- kW</strong>
-            <small id="solarState">Waiting</small>
-          </button>
-
-          <button class="energy-node node-grid" data-page-link="electricity">
-            <span class="node-icon">⇄</span>
-            <span class="node-label">Grid</span>
-            <strong id="gridNow">-- kW</strong>
-            <small id="gridState">Waiting</small>
-          </button>
-
-          <div class="house-node">
-            <span class="house-outline"><i></i></span>
-            <span class="node-label">House</span>
-            <strong id="houseNow">-- kW</strong>
-            <small>Live consumption</small>
-          </div>
-
-          <button class="energy-node node-battery" data-page-link="battery">
-            <span class="battery-icon"><i id="batteryFill"></i></span>
-            <span class="node-label">Battery</span>
-            <strong id="batterySoc">--%</strong>
-            <small id="batteryState">Waiting</small>
-          </button>
+          <div class="flow-path path-solar"><i></i></div><div class="flow-path path-grid"><i></i></div><div class="flow-path path-battery"><i></i></div>
+          <button class="energy-node node-solar" data-page-link="solar"><span class="node-icon sun-icon">☀</span><span class="node-label">Solar</span><strong id="solarNow">-- kW</strong><small id="solarState">Waiting</small></button>
+          <button class="energy-node node-grid" data-page-link="electricity"><span class="node-icon">⇄</span><span class="node-label">Grid</span><strong id="gridNow">-- kW</strong><small id="gridState">Waiting</small></button>
+          <div class="house-node"><span class="house-outline"><i></i></span><span class="node-label">House</span><strong id="houseNow">-- kW</strong><small>Live consumption</small></div>
+          <button class="energy-node node-battery" data-page-link="battery"><span class="battery-icon"><i id="batteryFill"></i></span><span class="node-label">Battery</span><strong id="batterySoc">--%</strong><small id="batteryState">Waiting</small></button>
         </div>
-
-        <button class="today-cost" data-page-link="costs">
-          <span>Today’s household services</span>
-          <strong id="homeTotalCost">—</strong>
-          <small>Electricity + estimated gas + estimated water</small>
-        </button>
-
-        <div class="home-foot">
-          <span id="outsideTemp">Outside —</span>
-          <span id="tariffStatus">OVO free period 11:00–14:00</span>
-        </div>
+        <button class="today-cost" data-page-link="costs"><span>Today’s household services</span><strong id="homeTotalCost">—</strong><small>Electricity + estimated gas + estimated water</small></button>
+        <div class="home-foot"><span id="outsideTemp">Outside —</span><span id="tariffStatus">OVO free period 11:00–14:00</span></div>
       </section>
 
       <section class="page" id="electricity" aria-labelledby="electricityTitle">
-        <div class="page-intro">
-          <p class="eyebrow">Electricity</p>
-          <h1 id="electricityTitle">Where today’s energy went.</h1>
-        </div>
-
-        <div class="daily-flow">
-          <div class="flow-total"><span>Solar generated</span><strong id="solarToday">—</strong></div>
-          <div class="flow-total"><span>House used</span><strong id="loadToday">—</strong></div>
-          <div class="flow-total"><span>Imported</span><strong id="importToday">—</strong></div>
-          <div class="flow-total"><span>Exported</span><strong id="exportToday">—</strong></div>
-        </div>
-
-        <button class="expand-card" data-expand="electricityCost">
-          <span><small>Today’s electricity</small><strong id="electricityTotal">—</strong></span>
-          <b>Details <i>⌄</i></b>
-        </button>
-        <div class="details-panel" id="electricityCost">
-          <div><span>Supply charge</span><strong id="supplyCost">—</strong></div>
-          <div><span>Paid energy</span><strong id="paidEnergyCost">—</strong></div>
-          <div><span>Free energy used</span><strong id="freeEnergyUsed">— kWh</strong></div>
-          <div><span>Export credit</span><strong id="exportCredit">—</strong></div>
-          <div class="details-total"><span>Total</span><strong id="electricityDetailTotal">—</strong></div>
-          <p>Exact once interval import/export data and the OVO tariff ledger are connected.</p>
-        </div>
+        <div class="page-intro"><p class="eyebrow">Electricity</p><h1 id="electricityTitle">Where today’s energy went.</h1></div>
+        <div class="daily-flow"><div class="flow-total"><span>Solar</span><strong id="solarToday">—</strong></div><div class="flow-total"><span>House</span><strong id="loadToday">—</strong></div><div class="flow-total"><span>Imported</span><strong id="importToday">—</strong></div><div class="flow-total"><span>Exported</span><strong id="exportToday">—</strong></div></div>
+        <button class="expand-card" data-expand="electricityCost"><span><small>Today’s electricity</small><strong id="electricityTotal">—</strong></span><b>Details <i>⌄</i></b></button>
+        <div class="details-panel" id="electricityCost"><div><span>Supply charge</span><strong id="supplyCost">—</strong></div><div><span>Paid energy</span><strong id="paidEnergyCost">—</strong></div><div><span>Free energy used</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Export credit</span><strong id="exportCredit">—</strong></div><div class="details-total"><span>Total</span><strong id="electricityDetailTotal">—</strong></div></div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Power through the day</h2></div><div class="range-control" data-chart-range="electricity"><button class="active" data-range="live">Live</button><button data-range="7">7D</button><button data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-house"></i>House</span><span><i class="legend-solar"></i>Solar</span><span><i class="legend-grid"></i>Grid</span><span><i class="legend-battery"></i>Battery</span></div><div class="interactive-chart" id="electricityChart" aria-label="Interactive electricity chart"></div></section>
       </section>
 
       <section class="page centered-page" id="battery" aria-labelledby="batteryTitle">
-        <div class="page-intro centered">
-          <p class="eyebrow">Battery</p>
-          <h1 id="batteryTitle">Stored energy.</h1>
-        </div>
-        <div class="battery-hero">
-          <div class="battery-shell"><div id="batteryHeroFill"></div></div>
-          <strong id="batteryHeroSoc">--%</strong>
-          <span id="batteryHeroKwh">— kWh usable</span>
-          <small id="batteryHeroState">Waiting for live data</small>
-        </div>
+        <div class="page-intro centered"><p class="eyebrow">Battery</p><h1 id="batteryTitle">Stored energy.</h1></div>
+        <div class="battery-hero"><div class="battery-shell"><div id="batteryHeroFill"></div></div><strong id="batteryHeroSoc">--%</strong><span id="batteryHeroKwh">— kWh usable</span><small id="batteryHeroState">Waiting for live data</small></div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Charge history</h2></div><div class="range-control" data-chart-range="battery"><button class="active" data-range="live">Live</button><button data-range="7">7D</button><button data-range="30">30D</button></div></div><div class="interactive-chart" id="batteryChart" aria-label="Interactive battery chart"></div></section>
       </section>
 
       <section class="page centered-page" id="solar" aria-labelledby="solarTitle">
-        <div class="page-intro centered">
-          <p class="eyebrow">Solar</p>
-          <h1 id="solarTitle">Today’s sunlight.</h1>
-        </div>
-        <div class="solar-hero">
-          <div class="solar-orb">☀</div>
-          <strong id="solarHeroNow">-- kW</strong>
-          <span>producing now</span>
-          <small id="solarHeroToday">Today — kWh</small>
-        </div>
+        <div class="page-intro centered"><p class="eyebrow">Solar</p><h1 id="solarTitle">Today’s sunlight.</h1></div>
+        <div class="solar-hero"><div class="solar-orb">☀</div><strong id="solarHeroNow">-- kW</strong><span>producing now</span><small id="solarHeroToday">Today — kWh</small></div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Generation history</h2></div><div class="range-control" data-chart-range="solar"><button class="active" data-range="live">Live</button><button data-range="7">7D</button><button data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="interactive-chart" id="solarChart" aria-label="Interactive solar chart"></div></section>
       </section>
 
       <section class="page" id="costs" aria-labelledby="costsTitle">
-        <div class="page-intro">
-          <p class="eyebrow">Services</p>
-          <h1 id="costsTitle">What the house cost today.</h1>
-          <input class="date-picker" id="costDate" type="date" aria-label="Choose date">
-        </div>
-
-        <div class="service-costs">
-          <button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Precise when tariff ledger is connected</em></button>
-          <button class="service-card gas-service" data-expand="serviceGas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em>Daily estimate</em></button>
-          <button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button>
-        </div>
-
+        <div class="page-intro"><p class="eyebrow">Services</p><h1 id="costsTitle">What the house cost.</h1><input class="date-picker" id="costDate" type="date" aria-label="Choose date"></div>
+        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-expand="serviceGas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em>Daily estimate</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button></div>
         <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
-        <div class="details-panel service-detail" id="serviceElectricity"><p>Electricity will include supply charge, paid imports outside 11:00–14:00, zero-cost imports during the free period, and export credit at 1¢/kWh.</p></div>
-        <div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills and allocated to each calendar day.</p></div>
-        <div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period, including usage and applicable service charges.</p></div>
+        <div class="details-panel service-detail" id="serviceElectricity"><p>Supply charge + paid imports − export credit. Imports from 11:00–14:00 are free.</p></div><div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills.</p></div><div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period.</p></div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
       </section>
 
-      <section class="page ask-page" id="ask" aria-labelledby="askTitle">
-        <div class="page-intro centered">
-          <p class="eyebrow">Ask Home Insights</p>
-          <h1 id="askTitle">Ask about your house.</h1>
-        </div>
-        <form class="ask-form" id="askForm">
-          <input id="askInput" placeholder="How much did gas and water cost on 7 April 2026?" autocomplete="off">
-          <button type="submit" aria-label="Ask">↑</button>
-        </form>
-        <div class="ask-answer" id="askAnswer" hidden></div>
-      </section>
+      <section class="page ask-page" id="ask" aria-labelledby="askTitle"><div class="page-intro centered"><p class="eyebrow">Ask Home Insights</p><h1 id="askTitle">Ask about your house.</h1></div><form class="ask-form" id="askForm"><input id="askInput" placeholder="How much did gas and water cost on 7 April 2026?" autocomplete="off"><button type="submit" aria-label="Ask">↑</button></form><div class="ask-answer" id="askAnswer" hidden></div></section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Primary navigation">
-      <button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button>
-      <button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button>
-      <button data-page-link="battery"><span>▰</span><small>Battery</small></button>
-      <button data-page-link="costs"><span>$</span><small>Services</small></button>
-      <button data-page-link="ask"><span>⌕</span><small>Ask</small></button>
-    </nav>
+    <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="battery"><span>▰</span><small>Battery</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="ask"><span>⌕</span><small>Ask</small></button></nav>
   </div>
-  <script src="js/data.js"></script>
-  <script src="js/app.js"></script>
+  <script src="js/data.js"></script><script src="js/charts.js"></script><script src="js/app.js"></script>
 </body>
 </html>

@@ -67,6 +67,7 @@
     $('liveText').textContent = 'Live';
     $('livePill').className = 'live-pill live';
     lastLive = payload;
+    window.HomeInsightsCharts?.addLiveSample({solar:solar||0,house:house||0,grid:importing?(gridImport||0):exporting?-(gridExport||0):0,battery:batteryPower||0,soc:soc});
   }
 
   function liveError(message){
@@ -136,11 +137,24 @@
     $('askAnswer').innerHTML = values.map(x => `<div><b>${x.name}</b> ${money(x.value)}</div>`).join('') + `<br><strong>Combined ${money(combined)}</strong><br><small>Gas and water are daily estimates allocated from their meter or billing intervals.</small>`;
   });
 
+  function setTheme(theme){
+    document.body.className = theme === 'minimal' ? '' : `theme-${theme}`;
+    localStorage.setItem('hi-theme',theme);
+    document.querySelectorAll('[data-theme]').forEach(b=>b.classList.toggle('active',b.dataset.theme===theme));
+    window.HomeInsightsCharts?.renderAll();
+  }
+  const themeButton=$('themeButton'),themeMenu=$('themeMenu');
+  themeButton?.addEventListener('click',()=>{const open=themeMenu.hidden;themeMenu.hidden=!open;themeButton.setAttribute('aria-expanded',String(open));});
+  document.querySelectorAll('[data-theme]').forEach(btn=>btn.addEventListener('click',()=>{setTheme(btn.dataset.theme);themeMenu.hidden=true;themeButton.setAttribute('aria-expanded','false');}));
+  document.addEventListener('click',e=>{if(!e.target.closest('.theme-picker')&&themeMenu)themeMenu.hidden=true;});
+  setTheme(localStorage.getItem('hi-theme')||'minimal');
+
   const today = new Date().toISOString().slice(0,10);
   $('costDate').value = today;
   $('costDate').addEventListener('change',e => renderCosts(e.target.value));
   renderCosts(today);
   setGreeting();
+  window.HomeInsightsCharts?.init();
   poll();
   setInterval(poll,cfg.pollMs);
 })();

@@ -1,79 +1,53 @@
-const darkLayout={paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:'#cfe6f2',size:11},margin:{l:42,r:42,t:22,b:48},xaxis:{gridcolor:'rgba(80,140,170,.12)',zerolinecolor:'rgba(180,230,255,.15)',tickfont:{color:'#8ea6b6'}},yaxis:{gridcolor:'rgba(80,140,170,.12)',zerolinecolor:'rgba(180,230,255,.15)',tickfont:{color:'#8ea6b6'}},legend:{orientation:'h',x:0,y:1.12,font:{size:11}},hovermode:'x unified'};
-const cfg={responsive:true,displaylogo:false,modeBarButtonsToRemove:['lasso2d','select2d']};
+(() => {
+  'use strict';
+  const liveSamples = [];
+  const charts = new Map();
+  const css = name => getComputedStyle(document.body).getPropertyValue(name).trim();
+  const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-function plotEnergy(id,full=false){const d=HOME_DAILY;Plotly.newPlot(id,[
-{x:d.map(r=>r.date),y:d.map(r=>r.solar),name:'Solar kWh',type:'scatter',mode:'lines',line:{color:'#34f56a',width:2},fill:'tozeroy',fillcolor:'rgba(52,245,106,.10)'},
-{x:d.map(r=>r.date),y:d.map(r=>r.home),name:'House load kWh',type:'scatter',mode:'lines',line:{color:'#2277ff',width:2}},
-{x:d.map(r=>r.date),y:d.map(r=>r.import),name:'Grid import kWh',type:'scatter',mode:'lines',line:{color:'#ff4e42',width:1.7}},
-{x:d.map(r=>r.date),y:d.map(r=>r.export),name:'Grid export kWh',type:'scatter',mode:'lines',line:{color:'#00d7ff',width:1.7},fill:'tozeroy',fillcolor:'rgba(0,215,255,.12)'},
-{x:d.map(r=>r.date),y:d.map(r=>r.gas),name:'Gas MJ/day',type:'scatter',mode:'lines',yaxis:'y2',line:{color:'#ff7a18',width:1.8}}
-],{...darkLayout,height:full?720:null,yaxis:{...darkLayout.yaxis,title:'kWh/day'},yaxis2:{title:'Gas MJ/day',overlaying:'y',side:'right',gridcolor:'rgba(0,0,0,0)'},xaxis:{...darkLayout.xaxis,rangeslider:{visible:true,thickness:.06},rangeselector:{buttons:[{count:30,label:'30D',step:'day',stepmode:'backward'},{count:90,label:'90D',step:'day',stepmode:'backward'},{count:6,label:'6M',step:'month',stepmode:'backward'},{step:'all',label:'ALL'}],bgcolor:'rgba(12,42,62,.6)',font:{color:'#cfe6f2'},activecolor:'#123e5a'}}},cfg)}
-
-function plotWater(id,full=false){const w=HOME_DATA.water;Plotly.newPlot(id,[
-{x:w.map(r=>r.issue),y:w.map(r=>r.kl),name:'Bill usage kL',type:'bar',marker:{color:'#00d7ff'},opacity:.85},
-{x:w.map(r=>r.issue),y:w.map(r=>r.check?null:r.lpd),name:'L/day',type:'scatter',mode:'lines+markers',yaxis:'y2',line:{color:'#34f56a',shape:'hv',width:2},marker:{size:5}},
-{x:w.filter(r=>r.check).map(r=>r.issue),y:w.filter(r=>r.check).map(r=>r.lpd),name:'Check interval',type:'scatter',mode:'markers',yaxis:'y2',marker:{color:'#ffc928',size:10,symbol:'triangle-up'}}
-],{...darkLayout,height:full?720:null,barmode:'overlay',yaxis:{...darkLayout.yaxis,title:'kL per bill'},yaxis2:{title:'L/day',overlaying:'y',side:'right',gridcolor:'rgba(0,0,0,0)',range:[0,900]},xaxis:{...darkLayout.xaxis,tickformat:'%b\n%Y',dtick:'M3'}},cfg)}
-
-function weatherIconFor(row){
-  if(row.rain>8) return '🌧️';
-  if(row.rain>1) return '🌦️';
-  if(row.temp>24) return '☀️';
-  if(row.temp<12) return '☁️';
-  return '⛅';
-}
-function downsample(arr,n){const step=Math.max(1,Math.floor(arr.length/n));return arr.filter((_,i)=>i%step===0)}
-function minMaxBands(d){
-  return d.map((r,i)=>({
-    date:r.date,
-    min:+(r.temp-3-Math.sin(i/13)*1.5).toFixed(1),
-    max:+(r.temp+3+Math.cos(i/17)*1.5).toFixed(1),
-    feels:+(r.temp+(r.rain>2?-1.2:0)+(r.temp>23?1.4:0)).toFixed(1),
-    humidity:Math.max(35,Math.min(94,Math.round(58+(r.rain?18:0)+Math.sin(i/20)*12+Math.random()*6))),
-    wind:Math.max(2,Math.round(12+Math.random()*15+Math.sin(i/11)*5)),
-    uv:Math.max(0,Math.round((r.temp>20?6:3)+Math.sin(i/22)*2+(r.rain>1?-2:0)))
-  }))
-}
-function plotWeather(id,full=false){
-  const d=HOME_DAILY;
-  const bands=minMaxBands(d);
-  const iconRows=downsample(d, full?28:16);
-  const annotations=iconRows.map(r=>({x:r.date,y:-2.5,text:weatherIconFor(r),showarrow:false,font:{size:full?20:16},xref:'x',yref:'y'}));
-  const monthShapes=[];
-  let cur=new Date(d[0].date);cur.setDate(1);let i=0;
-  while(cur<new Date(d.at(-1).date)){
-    const start=new Date(cur);const end=new Date(cur);end.setMonth(end.getMonth()+1);
-    if(i%2===0) monthShapes.push({type:'rect',xref:'x',yref:'paper',x0:start.toISOString().slice(0,10),x1:end.toISOString().slice(0,10),y0:0,y1:1,fillcolor:'rgba(255,255,255,.018)',line:{width:0},layer:'below'});
-    cur=end;i++;
+  function addLiveSample(sample){
+    liveSamples.push({...sample,time:new Date()});
+    while(liveSamples.length > 360) liveSamples.shift();
+    render('electricity'); render('battery'); render('solar');
   }
-  const traces=[
-    {x:d.map(r=>r.date),y:bands.map(r=>r.max),name:'Max °C',type:'scatter',mode:'lines',line:{color:'rgba(210,230,255,.35)',width:1,dash:'dot'},hoverinfo:'skip'},
-    {x:d.map(r=>r.date),y:bands.map(r=>r.min),name:'Min / Max band',type:'scatter',mode:'lines',line:{color:'rgba(210,230,255,.35)',width:1,dash:'dot'},fill:'tonexty',fillcolor:'rgba(210,230,255,.08)',hoverinfo:'skip'},
-    {x:d.map(r=>r.date),y:bands.map(r=>r.feels),name:'Feels like °C',type:'scatter',mode:'lines',line:{color:'#ff9d16',width:1.5},opacity:.9},
-    {x:d.map(r=>r.date),y:d.map(r=>r.temp),name:'Temperature °C',type:'scatter',mode:'lines',line:{color:'#ffc928',width:2.4},fill:'tozeroy',fillcolor:'rgba(255,201,40,.09)'},
-    {x:d.map(r=>r.date),y:d.map(r=>r.rain),name:'Rainfall mm',type:'bar',yaxis:'y2',marker:{color:'#00d7ff'},opacity:.58},
-    {x:d.map(r=>r.date),y:bands.map(r=>r.wind),name:'Wind km/h',type:'scatter',mode:'lines',yaxis:'y3',line:{color:'rgba(220,232,240,.85)',width:1.2}},
-    {x:d.map(r=>r.date),y:bands.map(r=>r.humidity),name:'Humidity %',type:'scatter',mode:'lines',yaxis:'y4',line:{color:'#00c8b5',width:1.2}},
-    {x:d.map(r=>r.date),y:bands.map(r=>r.uv),name:'UV index',type:'scatter',mode:'lines',yaxis:'y5',line:{color:'#b466ff',width:1.2}}
-  ];
-  const layout={
-    ...darkLayout,
-    height:full?760:null,
-    margin:{l:46,r:52,t:32,b:66},
-    yaxis:{...darkLayout.yaxis,title:'°C',domain:[.44,1],range:[-4,34]},
-    yaxis2:{title:'mm',domain:[.28,.40],side:'left',gridcolor:'rgba(0,215,255,.08)',tickfont:{color:'#7fb3c8'}},
-    yaxis3:{title:'km/h',domain:[.18,.26],side:'left',gridcolor:'rgba(255,255,255,.04)',tickfont:{color:'#9aa9b4'}},
-    yaxis4:{title:'%',domain:[.09,.16],side:'left',gridcolor:'rgba(0,200,181,.05)',tickfont:{color:'#6ecbc5'}},
-    yaxis5:{title:'UV',domain:[0,.07],side:'left',gridcolor:'rgba(180,102,255,.05)',tickfont:{color:'#c99cff'}},
-    xaxis:{...darkLayout.xaxis,tickformat:'%b\n%Y',dtick:'M1',rangeslider:{visible:true,thickness:.09,bgcolor:'rgba(20,60,90,.18)',bordercolor:'rgba(120,200,255,.18)',borderwidth:1},rangeselector:{buttons:[{count:24,label:'24H',step:'hour',stepmode:'backward'},{count:7,label:'7D',step:'day',stepmode:'backward'},{count:30,label:'30D',step:'day',stepmode:'backward'},{count:12,label:'12M',step:'month',stepmode:'backward'},{step:'all',label:'ALL'}],bgcolor:'rgba(12,42,62,.6)',font:{color:'#cfe6f2'},activecolor:'#123e5a'}},
-    shapes:[...monthShapes,{type:'line',xref:'paper',x0:0,x1:1,yref:'y',y0:0,y1:0,line:{color:'rgba(255,255,255,.18)',width:1}}],
-    annotations,
-    legend:{orientation:'h',x:.08,y:1.12,font:{size:11}},
-    hoverlabel:{bgcolor:'rgba(4,16,24,.95)',bordercolor:'#1b5a77',font:{color:'#f3fbff'}},
-  };
-  Plotly.newPlot(id,traces,layout,cfg)
-}
 
-function plotCosts(id,full=false){const d=HOME_DAILY;Plotly.newPlot(id,[{x:d.map(r=>r.date),y:d.map(r=>r.cost),name:'Daily cost $',type:'bar',marker:{color:'#b466ff'},opacity:.7},{x:d.map(r=>r.date),y:movingAvg(d.map(x=>x.cost),14),name:'14 day avg',type:'scatter',mode:'lines',line:{color:'#ff7a18',width:2}}],{...darkLayout,height:full?720:null,yaxis:{...darkLayout.yaxis,title:'$/day'},xaxis:{...darkLayout.xaxis,rangeslider:{visible:true,thickness:.06}}},cfg)}
-function plotGas(id,full=false){const d=HOME_DAILY;Plotly.newPlot(id,[{x:d.map(r=>r.date),y:d.map(r=>r.gas),name:'Gas MJ/day',type:'scatter',mode:'lines',line:{color:'#ff7a18',shape:'hv',width:2},fill:'tozeroy',fillcolor:'rgba(255,122,24,.12)'},{x:d.map(r=>r.date),y:movingAvg(d.map(r=>r.temp),7),name:'Temp °C 7-day',type:'scatter',mode:'lines',yaxis:'y2',line:{color:'#ffc928',width:1.8}}],{...darkLayout,height:full?720:null,yaxis:{...darkLayout.yaxis,title:'MJ/day'},yaxis2:{title:'°C',overlaying:'y',side:'right',gridcolor:'rgba(0,0,0,0)'},xaxis:{...darkLayout.xaxis,rangeslider:{visible:true,thickness:.06}}},cfg)}
-function movingAvg(arr,n){return arr.map((_,i)=>{let s=0,c=0;for(let j=Math.max(0,i-n+1);j<=i;j++){s+=Number(arr[j]);c++}return +(s/c).toFixed(2)})}
+  function dailyRows(days){
+    const rows = window.HOME_INSIGHTS_DAILY || [];
+    return rows.slice(-days);
+  }
+
+  function dataFor(type, range){
+    if(range === 'live'){
+      if(type === 'electricity') return {rows:liveSamples.map(x=>({label:x.time.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}),house:x.house,solar:x.solar,grid:x.grid,battery:x.battery})), series:[['house','House','--text'],['solar','Solar','--solar'],['grid','Grid','--grid'],['battery','Battery','--battery']], unit:'kW'};
+      if(type === 'battery') return {rows:liveSamples.map(x=>({label:x.time.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}),soc:x.soc})),series:[['soc','Battery','--battery']],unit:'%'};
+      return {rows:liveSamples.map(x=>({label:x.time.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'}),solar:x.solar})),series:[['solar','Solar','--solar']],unit:'kW'};
+    }
+    const days = Number(range) || 30, rows = dailyRows(days);
+    if(type === 'electricity') return {rows:rows.map(r=>({label:formatDate(r.date,days),house:+r.loadKwh,solar:+r.solarKwh,grid:+r.importKwh,battery:+r.batteryDischargeKwh})),series:[['house','House','--text'],['solar','Solar','--solar'],['grid','Grid import','--grid'],['battery','Battery','--battery']],unit:'kWh'};
+    if(type === 'battery') return {rows:rows.map(r=>({label:formatDate(r.date,days),soc:+r.batterySocEnd})),series:[['soc','Battery','--battery']],unit:'%'};
+    if(type === 'solar') return {rows:rows.map(r=>({label:formatDate(r.date,days),solar:+r.solarKwh})),series:[['solar','Solar','--solar']],unit:'kWh'};
+    return {rows:rows.map(r=>({label:formatDate(r.date,days),electricity:+r.electricityTotal,gas:+r.gasTotal,water:+r.waterTotal})),series:[['electricity','Electricity','--grid'],['gas','Gas','--gas'],['water','Water','--water']],unit:'$'};
+  }
+  function formatDate(value,days){const d=new Date(value+'T12:00:00');return days>90?d.toLocaleDateString('en-AU',{month:'short',year:'2-digit'}):d.toLocaleDateString('en-AU',{day:'numeric',month:'short'});}
+
+  function render(type){
+    const state=charts.get(type); if(!state) return;
+    const el=document.getElementById(type+'Chart'); if(!el) return;
+    const d=dataFor(type,state.range), rows=d.rows.filter(r=>d.series.some(([k])=>Number.isFinite(r[k])));
+    if(rows.length<2){el.innerHTML=`<div class="chart-empty"><div><strong>${state.range==='live'?'Collecting live readings':'No historical data yet'}</strong><span>${state.range==='live'?'The graph will build while this page is open.':'The graph will appear when the daily ledger is connected.'}</span></div></div>`;return;}
+    const W=1000,H=300,p={l:48,r:18,t:18,b:36};
+    const values=[]; rows.forEach(r=>d.series.forEach(([k])=>{if(Number.isFinite(r[k])) values.push(r[k])}));
+    let min=Math.min(...values),max=Math.max(...values); if(type!=='electricity'||state.range!=='live') min=Math.min(0,min); if(max===min) max=min+1;
+    const x=i=>p.l+(i/(rows.length-1))*(W-p.l-p.r), y=v=>p.t+(max-v)/(max-min)*(H-p.t-p.b);
+    let svg=`<svg viewBox="0 0 ${W} ${H}" role="img">`;
+    for(let i=0;i<5;i++){const yy=p.t+i*(H-p.t-p.b)/4,val=max-i*(max-min)/4;svg+=`<line class="chart-grid" x1="${p.l}" x2="${W-p.r}" y1="${yy}" y2="${yy}"/><text class="chart-axis-text" x="${p.l-8}" y="${yy+4}" text-anchor="end">${formatVal(val,d.unit)}</text>`;}
+    const step=Math.max(1,Math.ceil(rows.length/6)); rows.forEach((r,i)=>{if(i%step===0||i===rows.length-1)svg+=`<text class="chart-axis-text" x="${x(i)}" y="${H-10}" text-anchor="middle">${esc(r.label)}</text>`});
+    d.series.forEach(([key,label,varName])=>{const pts=rows.map((r,i)=>Number.isFinite(r[key])?`${x(i)},${y(r[key])}`:null).filter(Boolean);if(!pts.length)return;const color=css(varName);svg+=`<polyline class="chart-line" style="stroke:${color}" points="${pts.join(' ')}"/>`;});
+    rows.forEach((r,i)=>svg+=`<rect class="chart-hit" data-i="${i}" x="${Math.max(p.l,x(i)-(W-p.l-p.r)/rows.length/2)}" y="${p.t}" width="${Math.max(8,(W-p.l-p.r)/rows.length)}" height="${H-p.t-p.b}" fill="transparent"/>`);
+    svg+=`</svg><div class="chart-tooltip" hidden></div>`;el.innerHTML=svg;
+    const tip=el.querySelector('.chart-tooltip'); el.querySelectorAll('.chart-hit').forEach(hit=>{const show=e=>{const i=+hit.dataset.i,r=rows[i];tip.innerHTML=`<b>${esc(r.label)}</b>`+d.series.filter(([k])=>Number.isFinite(r[k])).map(([k,l])=>`<div><span>${l}</span><strong>${formatVal(r[k],d.unit)}</strong></div>`).join('');tip.hidden=false;tip.style.left=`${x(i)/W*100}%`;tip.style.top=`${y(Math.max(...d.series.map(([k])=>Number.isFinite(r[k])?r[k]:min)))/H*100}%`;};hit.addEventListener('pointerenter',show);hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',()=>tip.hidden=true);hit.addEventListener('click',show);});
+  }
+  function formatVal(v,unit){if(unit==='$')return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:2}).format(v);return `${Math.abs(v)>=10?v.toFixed(1):v.toFixed(2)} ${unit}`;}
+  function init(){document.querySelectorAll('[data-chart-range]').forEach(group=>{const type=group.dataset.chartRange;charts.set(type,{range:group.querySelector('.active')?.dataset.range||'30'});group.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');charts.get(type).range=btn.dataset.range;render(type);}));render(type);});}
+  window.HomeInsightsCharts={init,renderAll:()=>charts.forEach((_,k)=>render(k)),addLiveSample};
+})();
