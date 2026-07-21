@@ -1,43 +1,146 @@
-const navItems=[['overview','▦','Overview'],['energy','⚡','Energy'],['solar','☀','Solar'],['battery','▣','Battery'],['gas','🔥','Gas'],['water','💧','Water'],['weather','☁','Weather'],['costs','$','Costs'],['timeline','◴','Timeline'],['assets','▣','Assets']];
-const view=document.getElementById('view'); const nav=document.getElementById('nav');
-navItems.forEach(([id,ico,label])=>{const b=document.createElement('button');b.dataset.view=id;b.innerHTML=`${ico} <span>${label}</span>`;b.onclick=()=>render(id);nav.appendChild(b)});
-function setActive(id){document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.dataset.view===id))}
-function panel(title,content,cls=''){return `<section class="panel ${cls}"><button class="max">⛶</button><h2>${title}</h2>${content}</section>`}
-function cards(){return `<div class="cards">${[['Solar 30 days','297','kWh'],['Grid import 30 days','516','kWh'],['Grid export 30 days','6','kWh'],['House load 30 days','786','kWh'],['Water last bill','29','kL'],['Latest water bill','$299.45','']].map(c=>`<div class="card"><span>${c[0]}</span><strong>${c[1]} <em>${c[2]}</em></strong></div>`).join('')}</div>`}
-function render(id='overview'){setActive(id); const pages={overview,energy,solar,battery,gas,water,weather,costs,timeline,assets}; view.innerHTML=pages[id](); bindMax(); drawCharts(id)}
-function overview(){return `${cards()}<div class="grid overview">${panel('Live energy flow',flow(),'tall')}${panel('Weather cockpit',weatherSummary(),'tall')}${panel('Live alerts',alerts())}</div><div class="grid two" style="margin-top:14px">${panel('Water usage','<div id="waterMini" class="chart"></div>')}${panel('Energy + gas comparison','<div id="energyMini" class="chart"></div>')}</div><div style="margin-top:14px">${panel('House timeline',events())}</div>`}
-function energy(){return `${cards()}<div class="grid two">${panel('Energy flow',flow(),'tall')}${panel('Electricity + gas comparison','<div id="energyCompare" class="chart large"></div>','tall')}</div>`}
-function solar(){return `<div class="grid two">${panel('Solar generation','<div id="solarChart" class="chart large"></div>','tall')}${panel('Solar performance','<div class="card"><span>Self use</span><strong>72 <em>%</em></strong></div><div class="card"><span>Export</span><strong>6 <em>kWh</em></strong></div>','tall')}</div>`}
-function battery(){return `<div class="grid two">${panel('Battery SOC','<div id="batteryChart" class="chart large"></div>','tall')}${panel('Battery flow',flow(),'tall')}</div>`}
-function gas(){return `<div class="grid two">${panel('Gas stepped usage','<div id="gasChart" class="chart large"></div>','tall')}${panel('Gas notes','<p>Gas values are interval averages from meter readings. Negative intervals should be flagged, not plotted.</p>','tall')}</div>`}
-function water(){return `<div class="grid two">${panel('Water usage','<div id="waterChart" class="chart large"></div>','tall')}${panel('Bill breakdown','<div id="waterCost" class="chart large"></div>','tall')}</div>`}
-function weather(){return `<div>${weatherHero()}${panel('Weather timeline','<div id="weatherChart" class="chart large"></div>','tall')}<div style="margin-top:14px">${panel('Weather aligned with utilities','<div id="weatherAlign" class="chart"></div>')}</div></div>`}
-function costs(){return `<div class="grid two">${panel('Costs by category','<div id="costChart" class="chart large"></div>','tall')}${panel('Cost detail','<table class="table"><tr><th>Category</th><th>Amount</th></tr><tr><td>Electricity</td><td>$164</td></tr><tr><td>Water</td><td>$62</td></tr><tr><td>Gas</td><td>$55</td></tr><tr><td>Other</td><td>$31</td></tr></table>','tall')}</div>`}
-function timeline(){return panel('Home events timeline',events(),'tall')+`<div class="grid three" style="margin-top:14px">${panel('Energy events','<p>Solar, battery, split system, OVO.</p>')}${panel('Water events','<p>Garden, guests, irrigation, leaks.</p>')}${panel('Documents','<p>Bills and PDFs will link here.</p>')}</div>`}
-function assets(){return `<div class="grid three">${['Sigenergy battery','Rinnai heat pump HWS','Mitsubishi cassette split','Nest thermostat','SolarEdge inverter','Dome'].map(a=>panel(a,'<p>Status: active</p><p>Documents and warranty links next.</p>')).join('')}</div>`}
-function weatherHero(){return `<div class="weatherHero"><div class="weatherCard big"><strong>16.2°</strong><p>Feels like 15.8°</p><div class="icon">🌤</div><h3>Partly cloudy</h3><p>Brunswick, VIC</p></div>${[['TODAY','☀️','18° / 9°','0–1 mm'],['TOMORROW','🌧','16° / 10°','5–12 mm'],['WIND','💨','22 km/h','NW'],['HUMIDITY','💧','68%','Comfortable']].map(x=>`<div class="weatherCard"><h3>${x[0]}</h3><div class="icon">${x[1]}</div><h2>${x[2]}</h2><p>${x[3]}</p></div>`).join('')}</div><div class="ribbon">${['☀️','🌤','☁️','🌧','☀️','☀️','🌦','☀️','☁️','🌧','☀️','🌤'].map(i=>`<span>${i}</span>`).join('')}</div>`}
-function weatherSummary(){return weatherHero()+`<div id="weatherSmall" class="chart"></div>`}
-function alerts(){return `<table class="table"><tr><td>Battery charging</td><td class="green">OK</td></tr><tr><td>Grid importing</td><td>312 W</td></tr><tr><td>Rain tomorrow</td><td>5–12 mm</td></tr><tr><td>Water bill</td><td>29 kL</td></tr></table>`}
-function events(){return `<div class="timeline">${['Solar installed','Heat pump HWS','Battery installed','Amber started','Split installed','OVO started','Water imported'].map(e=>`<div class="event">${e}</div>`).join('')}</div>`}
-function flow(){return `<div class="flow"><svg viewBox="0 0 700 420"><rect class="node" x="280" y="145" width="140" height="78" rx="14"/><text class="nodeText" x="350" y="178">HOME</text><text class="nodeSub" x="350" y="204">2.8 kW</text><rect class="node" x="55" y="145" width="130" height="78" rx="14"/><text class="nodeText" x="120" y="178">SOLAR</text><text class="nodeSub" x="120" y="204">5.6 kW</text><rect class="node" x="515" y="145" width="130" height="78" rx="14"/><text class="nodeText" x="580" y="178">GRID</text><text class="nodeSub" x="580" y="204">0.3 kW</text><rect class="node" x="285" y="305" width="130" height="78" rx="14"/><text class="nodeText" x="350" y="338">BATTERY</text><text class="nodeSub" x="350" y="364">89%</text><path class="flowLine" style="stroke:#25ff67;color:#25ff67" d="M185 184 H280"/><path class="flowLine" style="stroke:#00d9ff;color:#00d9ff" d="M350 223 V305"/><path class="flowLine" style="stroke:#ff453a;color:#ff453a" d="M420 184 H515"/><path class="flowLine" style="stroke:#ff7a18;color:#ff7a18" d="M415 344 H515"/></svg></div>`}
-function dates(n=220){let arr=[];let d=new Date('2025-05-01');for(let i=0;i<n;i++){arr.push(new Date(d));d.setDate(d.getDate()+2)}return arr}
-function drawCharts(id){const d=dates();const x=d.map(v=>v.toISOString().slice(0,10));const temp=x.map((_,i)=>13+8*Math.sin(i/30)+Math.random()*7);const rain=x.map(()=>Math.random()>.82?Math.random()*22:0);const load=x.map((_,i)=>15+4*Math.sin(i/14)+Math.random()*12);const solar=x.map((_,i)=>20+12*Math.sin(i/28)+Math.random()*8);const gas=x.map((_,i)=>150+60*Math.sin(i/40)+Math.random()*35);const waterDates=['2021-03-26','2021-06-24','2021-09-20','2021-12-31','2022-03-28','2022-07-01','2022-09-26','2022-12-23','2023-03-24','2023-06-28','2023-09-25','2023-12-22','2024-03-26','2024-06-21','2024-09-17','2024-12-18','2025-03-25','2025-06-23','2025-09-16','2025-12-19','2026-03-24','2026-06-22'];const kl=[63,23,15,49,55,23,14,32,56,32,16,29,46,39,23,50,71,44,30,42,73,29];const lpd=[636,258,174,544,550,242,182,333,602,333,4000,319,484,453,256,549,755,484,345,447,768,330];
- const layout={paper_bgcolor:'transparent',plot_bgcolor:'transparent',font:{color:'#dff8ff'},margin:{l:48,r:45,t:18,b:38},xaxis:{gridcolor:'#0c3040'},yaxis:{gridcolor:'#0c3040'},legend:{orientation:'h',y:1.15}};
- function plot(el,data,l=layout){if(document.getElementById(el))Plotly.newPlot(el,data,l,{displayModeBar:false,responsive:true})}
- plot('weatherSmall',[{x,y:temp,type:'scatter',mode:'lines',line:{color:'#ffc400'},name:'Temp'},{x,y:rain,type:'bar',marker:{color:'#00d9ff'},name:'Rain',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('weatherChart',[{x,y:temp,type:'scatter',mode:'lines',fill:'tozeroy',line:{color:'#ffc400'},name:'Temperature °C'},{x,y:rain,type:'bar',marker:{color:'#00d9ff'},name:'Rain mm',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('weatherAlign',[{x,y:temp,type:'scatter',mode:'lines',line:{color:'#ffc400'},name:'Temp'},{x,y:load,type:'scatter',mode:'lines',line:{color:'#118dff'},name:'House load'}]);
- plot('energyMini',[{x,y:solar,type:'scatter',mode:'lines',line:{color:'#25ff67'},name:'Solar'},{x,y:load,type:'scatter',mode:'lines',line:{color:'#118dff'},name:'Load'},{x,y:gas,type:'scatter',mode:'lines',line:{color:'#ff7a18'},name:'Gas',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('energyCompare',[{x,y:solar,type:'scatter',mode:'lines',line:{color:'#25ff67'},name:'Solar'},{x,y:load,type:'scatter',mode:'lines',line:{color:'#118dff'},name:'House load'},{x,y:gas,type:'scatter',mode:'lines',line:{color:'#ff7a18'},name:'Gas',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('waterMini',[{x:waterDates,y:kl,type:'bar',marker:{color:'#00d9ff'},name:'kL'},{x:waterDates,y:lpd,type:'scatter',mode:'lines+markers',line:{color:'#25ff67',shape:'hv'},name:'L/day',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('waterChart',[{x:waterDates,y:kl,type:'bar',marker:{color:'#00d9ff'},name:'kL per bill'},{x:waterDates,y:lpd,type:'scatter',mode:'lines+markers',line:{color:'#25ff67',shape:'hv'},name:'L/day',yaxis:'y2'}],{...layout,yaxis2:{overlaying:'y',side:'right',gridcolor:'transparent'}});
- plot('waterCost',[{x:waterDates,y:kl.map(v=>v*3.4),type:'bar',name:'Usage',marker:{color:'#00d9ff'}},{x:waterDates,y:kl.map(()=>140),type:'bar',name:'Service',marker:{color:'#118dff'}},{x:waterDates,y:kl.map(()=>55),type:'bar',name:'Other',marker:{color:'#ff7a18'}}],{...layout,barmode:'stack'});
- plot('solarChart',[{x,y:solar,type:'scatter',mode:'lines',fill:'tozeroy',line:{color:'#ffc400'},name:'Generation'}]);
- plot('batteryChart',[{x,y:x.map((_,i)=>60+25*Math.sin(i/16)+Math.random()*12),type:'scatter',mode:'lines',fill:'tozeroy',line:{color:'#25ff67'},name:'SOC %'}]);
- plot('gasChart',[{x,y:gas,type:'scatter',mode:'lines',line:{color:'#ff7a18',shape:'hv'},name:'MJ/day'}]);
- plot('costChart',[{labels:['Electricity','Water','Gas','Other'],values:[164,62,55,31],type:'pie',hole:.55,marker:{colors:['#118dff','#00d9ff','#ff7a18','#8e44ff']}}],{...layout,showlegend:true});
-}
-function bindMax(){document.querySelectorAll('.max').forEach(btn=>btn.onclick=()=>{const p=btn.closest('.panel').cloneNode(true);p.querySelector('.max')?.remove();document.getElementById('modalContent').innerHTML='';document.getElementById('modalContent').appendChild(p);document.getElementById('modal').classList.add('open');setTimeout(()=>drawCharts('modal'),100)})}
-document.getElementById('closeModal').onclick=()=>document.getElementById('modal').classList.remove('open');
-setInterval(()=>{document.getElementById('clock').textContent=new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})},1000);
-render('overview');
+(() => {
+  'use strict';
+  const cfg = window.HOME_INSIGHTS_CONFIG;
+  const daily = window.HOME_INSIGHTS_DAILY || [];
+  const $ = id => document.getElementById(id);
+  const money = value => Number.isFinite(+value) ? new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD'}).format(+value) : '—';
+  const number = item => item && item.available && Number.isFinite(Number(item.value)) ? Number(item.value) : null;
+  const kw = value => value === null ? '-- kW' : `${Math.abs(value).toFixed(Math.abs(value) >= 10 ? 1 : 2)} kW`;
+  let lastLive = null;
+
+  function setGreeting(){
+    const h = new Date().getHours();
+    $('greeting').textContent = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
+  }
+
+  function showPage(id){
+    document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === id));
+    document.querySelectorAll('.bottom-nav [data-page-link]').forEach(btn => btn.classList.toggle('active', btn.dataset.pageLink === id));
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+
+  document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', () => showPage(el.dataset.pageLink)));
+  document.querySelectorAll('[data-expand]').forEach(el => el.addEventListener('click', () => {
+    const panel = $(el.dataset.expand);
+    if (!panel) return;
+    const open = panel.classList.toggle('open');
+    if (el.classList.contains('expand-card')) el.classList.toggle('open', open);
+    document.querySelectorAll('.service-detail').forEach(other => { if (other !== panel) other.classList.remove('open'); });
+  }));
+
+  function setFlow(selector, active){ document.querySelector(selector)?.classList.toggle('paused', !active); }
+
+  function renderLive(payload, serverTime){
+    const solar = number(payload.solar);
+    const house = number(payload.house);
+    const batteryPower = number(payload.batteryPower);
+    const soc = number(payload.batterySoc);
+    const gridImport = number(payload.gridImport);
+    const gridExport = number(payload.gridExport);
+    const importing = (gridImport || 0) > .02;
+    const exporting = (gridExport || 0) > .02;
+    const charging = (batteryPower || 0) > .02;
+    const discharging = (batteryPower || 0) < -.02;
+
+    $('solarNow').textContent = kw(solar);
+    $('solarHeroNow').textContent = kw(solar);
+    $('solarState').textContent = (solar || 0) > .02 ? 'Generating' : 'Idle';
+    $('houseNow').textContent = kw(house);
+    $('gridNow').textContent = kw(importing ? gridImport : exporting ? gridExport : 0);
+    $('gridState').textContent = importing ? 'Importing' : exporting ? 'Exporting' : 'Idle';
+    $('batterySoc').textContent = soc === null ? '--%' : `${soc.toFixed(0)}%`;
+    $('batteryHeroSoc').textContent = soc === null ? '--%' : `${soc.toFixed(0)}%`;
+    const batteryStatus = charging ? `Charging ${kw(batteryPower)}` : discharging ? `Discharging ${kw(batteryPower)}` : 'Idle';
+    $('batteryState').textContent = batteryStatus;
+    $('batteryHeroState').textContent = batteryStatus;
+    const fill = soc === null ? 0 : Math.max(0,Math.min(100,soc));
+    $('batteryFill').style.width = `${fill}%`;
+    $('batteryHeroFill').style.width = `${fill}%`;
+    $('batteryHeroKwh').textContent = soc === null ? '— kWh usable' : `${(cfg.batteryCapacityKwh * soc / 100).toFixed(1)} kWh stored`;
+
+    setFlow('.path-solar',(solar || 0) > .02);
+    setFlow('.path-grid',importing || exporting);
+    setFlow('.path-battery',charging || discharging);
+
+    const stamp = new Date(serverTime || Date.now());
+    $('updatedAt').textContent = `Updated ${stamp.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
+    $('liveText').textContent = 'Live';
+    $('livePill').className = 'live-pill live';
+    lastLive = payload;
+  }
+
+  function liveError(message){
+    $('liveText').textContent = lastLive ? 'Last values' : 'Unavailable';
+    $('livePill').className = 'live-pill error';
+    $('updatedAt').textContent = lastLive ? `Live update interrupted · ${message}` : `Live connection unavailable · ${message}`;
+  }
+
+  async function poll(){
+    try{
+      const response = await fetch(cfg.liveApi,{cache:'no-store'});
+      if(!response.ok) throw new Error(`HTTP ${response.status}`);
+      const json = await response.json();
+      if(!json.ok) throw new Error(json.error || 'Backend error');
+      renderLive(json.data || {},json.serverTime);
+    }catch(error){
+      console.warn('Home Insights live energy:',error);
+      liveError(error.message || 'Connection failed');
+    }
+  }
+
+  function recordFor(date){ return daily.find(r => r.date === date); }
+  function renderCosts(date){
+    const r = recordFor(date);
+    const electric = r?.electricityTotal;
+    const gas = r?.gasTotal;
+    const water = r?.waterTotal;
+    const total = [electric,gas,water].every(v => Number.isFinite(+v)) ? +electric + +gas + +water : null;
+    $('costElectricity').textContent = money(electric);
+    $('costGas').textContent = money(gas);
+    $('costWater').textContent = money(water);
+    $('costTotal').textContent = money(total);
+    $('homeTotalCost').textContent = money(total);
+    $('electricityTotal').textContent = money(electric);
+    $('electricityDetailTotal').textContent = money(electric);
+    $('supplyCost').textContent = money(r?.electricitySupply);
+    $('paidEnergyCost').textContent = money(r?.paidEnergyCost);
+    $('freeEnergyUsed').textContent = Number.isFinite(+r?.freeImportKwh) ? `${(+r.freeImportKwh).toFixed(2)} kWh` : '— kWh';
+    $('exportCredit').textContent = Number.isFinite(+r?.exportCredit) ? `−${money(Math.abs(+r.exportCredit))}` : '—';
+    $('solarToday').textContent = Number.isFinite(+r?.solarKwh) ? `${(+r.solarKwh).toFixed(2)} kWh` : '—';
+    $('loadToday').textContent = Number.isFinite(+r?.loadKwh) ? `${(+r.loadKwh).toFixed(2)} kWh` : '—';
+    $('importToday').textContent = Number.isFinite(+r?.importKwh) ? `${(+r.importKwh).toFixed(2)} kWh` : '—';
+    $('exportToday').textContent = Number.isFinite(+r?.exportKwh) ? `${(+r.exportKwh).toFixed(2)} kWh` : '—';
+    $('solarHeroToday').textContent = Number.isFinite(+r?.solarKwh) ? `Today ${(+r.solarKwh).toFixed(2)} kWh` : 'Today — kWh';
+  }
+
+  function parseQuestion(question){
+    const q = question.toLowerCase();
+    const dateMatch = question.match(/(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
+    if(!dateMatch) return {error:'Please include a date, for example “7 April 2026”.'};
+    const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
+    const date = `${dateMatch[3]}-${String(months.indexOf(dateMatch[2].toLowerCase())+1).padStart(2,'0')}-${String(dateMatch[1]).padStart(2,'0')}`;
+    const services = ['electricity','gas','water'].filter(s => q.includes(s));
+    return {date,services:services.length ? services : ['electricity','gas','water']};
+  }
+
+  $('askForm').addEventListener('submit', event => {
+    event.preventDefault();
+    const parsed = parseQuestion($('askInput').value.trim());
+    $('askAnswer').hidden = false;
+    if(parsed.error){ $('askAnswer').textContent = parsed.error; return; }
+    const r = recordFor(parsed.date);
+    if(!r){ $('askAnswer').innerHTML = `<strong>No daily ledger yet</strong><br>The live dashboard is working, but historical electricity, gas and water costs have not yet been loaded for ${new Date(parsed.date+'T12:00:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'})}.`; return; }
+    const labels = {electricity:'Electricity',gas:'Gas',water:'Water'};
+    const values = parsed.services.map(s => ({name:labels[s],value:r[`${s}Total`]}));
+    const combined = values.reduce((sum,x) => sum + (+x.value || 0),0);
+    $('askAnswer').innerHTML = values.map(x => `<div><b>${x.name}</b> ${money(x.value)}</div>`).join('') + `<br><strong>Combined ${money(combined)}</strong><br><small>Gas and water are daily estimates allocated from their meter or billing intervals.</small>`;
+  });
+
+  const today = new Date().toISOString().slice(0,10);
+  $('costDate').value = today;
+  $('costDate').addEventListener('change',e => renderCosts(e.target.value));
+  renderCosts(today);
+  setGreeting();
+  poll();
+  setInterval(poll,cfg.pollMs);
+})();

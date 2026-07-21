@@ -1,33 +1,170 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Home Insights v2</title>
-<script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
-<style>
-:root{--bg:#050b12;--panel:#0b1722;--panel2:#101f2d;--line:#24394a;--text:#f7fbff;--muted:#91a4b5;--cyan:#38d8ff;--green:#77e39b;--yellow:#ffd15a;--orange:#ff9f43;--red:#ff6b6b;--r:20px;font-family:Inter,Segoe UI,Arial,sans-serif}*{box-sizing:border-box}body{margin:0;background:linear-gradient(145deg,#03080d,#07121c 45%,#020508);color:var(--text)}button,input{font:inherit}.app{min-height:100vh;display:grid;grid-template-columns:210px 1fr}.side{position:sticky;top:0;height:100vh;padding:22px 14px;background:rgba(4,12,19,.96);border-right:1px solid var(--line)}.brand{font-size:22px;font-weight:900;line-height:.95;letter-spacing:.04em;margin:0 10px 25px}.brand span{display:block;font-size:11px;color:var(--green);margin-top:8px;letter-spacing:.1em}.nav{display:grid;gap:6px}.nav button{border:0;background:transparent;color:#d9e6ef;text-align:left;padding:12px 13px;border-radius:12px;cursor:pointer}.nav button.active,.nav button:hover{background:#0e3040;color:#fff}.main{padding:20px;min-width:0}.page{display:none}.page.active{display:block}.topline{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:18px}.eyebrow{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.13em}.topline h1{font-size:36px;margin:4px 0 0}.connection{font-size:12px;color:var(--green)}.grid{display:grid;gap:14px}.liveGrid{grid-template-columns:1.35fr .65fr}.cards4{grid-template-columns:repeat(4,1fr)}.cards3{grid-template-columns:repeat(3,1fr)}.two{grid-template-columns:1fr 1fr}.panel,.card{background:linear-gradient(180deg,rgba(255,255,255,.035),transparent),var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}.card{min-height:130px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;font-weight:800}.value{font-size:34px;font-weight:900;margin-top:8px}.sub{color:var(--muted);font-size:13px;margin-top:4px}.hero{min-height:520px;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 43%,rgba(56,216,255,.12),transparent 35%),var(--panel)}.heroHeader{display:flex;justify-content:space-between}.heroTitle{font-size:18px;font-weight:850}.flowStage{height:420px;position:relative}.node{position:absolute;width:155px;padding:16px 10px;text-align:center;border-radius:18px;background:#08131d;border:1px solid var(--line)}.node b{display:block;font-size:12px;letter-spacing:.1em;color:var(--muted)}.node strong{display:block;font-size:27px;margin:6px 0}.nSolar{top:15px;left:50%;transform:translateX(-50%);border-color:#7a6c28}.nHouse{top:170px;left:50%;transform:translateX(-50%);border-color:#31647b}.nGrid{top:170px;left:4%;border-color:#80582e}.nBattery{top:170px;right:4%;border-color:#34704b}.line{position:absolute;background:linear-gradient(90deg,transparent,var(--cyan),transparent);height:3px;opacity:.8;animation:pulse 1.5s infinite}.vline{width:3px;height:65px;background:linear-gradient(180deg,transparent,var(--cyan),transparent)}.l1{left:50%;top:115px}.l2{left:20%;right:50%;top:220px}.l3{left:50%;right:20%;top:220px}.batteryBar{margin:14px auto 0;width:82%;height:12px;background:#1b2935;border-radius:20px;overflow:hidden}.batteryBar span{display:block;height:100%;background:linear-gradient(90deg,var(--green),var(--cyan));width:0}.costToday{display:grid;gap:12px}.costRow{display:grid;grid-template-columns:1fr auto;align-items:center;padding:14px 0;border-bottom:1px solid var(--line)}.costRow:last-child{border:0}.costRow strong{font-size:23px}.totalBox{background:linear-gradient(135deg,rgba(255,209,90,.15),rgba(56,216,255,.08));border-color:#6e6538}.totalBox .value{font-size:48px}.ask{display:flex;gap:10px;margin-top:14px}.ask input,.dateInput{flex:1;background:#07111a;border:1px solid var(--line);color:var(--text);border-radius:14px;padding:14px}.ask button,.primary{border:0;border-radius:14px;background:var(--cyan);color:#021018;font-weight:900;padding:0 18px;cursor:pointer}.answer{margin-top:14px;padding:18px;border-radius:16px;background:#07111a;border:1px solid var(--line);min-height:90px;line-height:1.55}.sectionTitle{font-size:15px;text-transform:uppercase;letter-spacing:.11em;margin:0 0 14px}.chart{height:340px}.metricStrip{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.metric{background:var(--panel2);border-radius:14px;padding:14px}.metric strong{display:block;font-size:24px;margin-top:6px}.note{padding:13px;border-left:3px solid var(--yellow);background:rgba(255,209,90,.07);color:#dbe6ed;font-size:13px;border-radius:8px}.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.settings{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.settings label{font-size:12px;color:var(--muted)}.settings input{width:100%;margin-top:6px;padding:10px;border-radius:10px;border:1px solid var(--line);background:#061018;color:white}@keyframes pulse{50%{opacity:.25}}@media(max-width:1100px){.app{grid-template-columns:1fr}.side{position:static;height:auto}.nav{grid-template-columns:repeat(4,1fr)}.liveGrid,.two,.cards4,.cards3{grid-template-columns:1fr 1fr}.main{padding:14px}}@media(max-width:700px){.nav{grid-template-columns:1fr 1fr}.liveGrid,.two,.cards4,.cards3,.metricStrip,.settings{grid-template-columns:1fr}.topline h1{font-size:28px}.flowStage{height:450px}.nGrid{left:0}.nBattery{right:0}}
-</style></head><body><div class="app"><aside class="side"><div class="brand">HOME<br>INSIGHTS<span>● LIVE HOUSE</span></div><nav class="nav" id="nav"><button class="active" data-page="home">⌂ Home</button><button data-page="cost">$ Usage & Cost</button><button data-page="electricity">⚡ Electricity</button><button data-page="solar">☀ Solar</button><button data-page="battery">▣ Battery</button><button data-page="gas">🔥 Gas</button><button data-page="water">💧 Water</button><button data-page="ask">⌕ Ask</button></nav></aside><main class="main">
-<section class="page active" id="home"><div class="topline"><div><div class="eyebrow" id="greeting">Good evening</div><h1>What is happening now</h1></div><div class="connection" id="liveConnection">Connecting to Home Assistant…</div></div><div class="grid liveGrid"><div class="panel hero"><div class="heroHeader"><div class="heroTitle">Live energy flow</div><div class="sub" id="updatedAt">—</div></div><div class="flowStage"><div class="line vline l1"></div><div class="line l2"></div><div class="line l3"></div><div class="node nSolar"><b>Solar</b><strong id="solarNow">-- kW</strong><span class="sub" id="solarState">Connecting</span></div><div class="node nGrid"><b>Grid</b><strong id="gridNow">-- kW</strong><span class="sub" id="gridState">Connecting</span></div><div class="node nHouse"><b>House</b><strong id="houseNow">-- kW</strong><span class="sub">Current demand</span></div><div class="node nBattery"><b>Battery</b><strong id="batterySoc">--%</strong><span class="sub" id="batteryState">Connecting</span><div class="batteryBar"><span id="batteryFill"></span></div></div></div></div><div class="grid costToday"><div class="card"><div class="label">Outside</div><div class="value" id="outsideNow">--°</div><div class="sub" id="weatherSummary">Brunswick</div></div><div class="card totalBox"><div class="label">All services today</div><div class="value" id="todayTotal">$—</div><div class="sub">Electricity precise · gas and water estimated</div></div><div class="panel"><div class="costRow"><span>Electricity</span><strong id="todayElectricity">$—</strong></div><div class="costRow"><span>Gas <small class="sub">estimated</small></span><strong id="todayGas">$—</strong></div><div class="costRow"><span>Water <small class="sub">estimated</small></span><strong id="todayWater">$—</strong></div></div><div class="note">The home screen now answers only two questions: what is happening now, and what has today cost so far.</div></div></div></section>
-<section class="page" id="cost"><div class="topline"><div><div class="eyebrow">Daily ledger</div><h1>Usage & Cost</h1></div></div><div class="panel"><div class="controls"><input class="dateInput" type="date" id="costDate"><button class="primary" id="showCost">Show day</button></div></div><div class="grid cards4" style="margin-top:14px"><div class="card"><div class="label">Electricity</div><div class="value" id="dayElec">$—</div><div class="sub">Interval-derived where available</div></div><div class="card"><div class="label">Gas</div><div class="value" id="dayGas">$—</div><div class="sub">Averaged between readings</div></div><div class="card"><div class="label">Water</div><div class="value" id="dayWater">$—</div><div class="sub">Averaged across bill period</div></div><div class="card totalBox"><div class="label">Total</div><div class="value" id="dayTotal">$—</div><div class="sub" id="dayLabel">Select a date</div></div></div><div class="grid two" style="margin-top:14px"><div class="panel"><h2 class="sectionTitle">Daily cost history</h2><div id="costChart" class="chart"></div></div><div class="panel"><h2 class="sectionTitle">Cost assumptions</h2><div class="settings"><label>Gas usage $/MJ<input id="gasRate" type="number" step="0.0001" value="0.032"></label><label>Gas supply $/day<input id="gasSupply" type="number" step="0.01" value="1.10"></label><label>Water fallback $/day<input id="waterFallback" type="number" step="0.01" value="3.33"></label></div><p class="sub">These are editable placeholders until the precise tariff tables are entered. Water bill intervals use actual bill totals where known.</p><button class="primary" id="saveSettings" style="padding:12px 18px">Save assumptions</button></div></div></section>
-<section class="page" id="electricity"><div class="topline"><div><div class="eyebrow">Import · export · load</div><h1>Electricity</h1></div></div><div class="metricStrip"><div class="metric"><span class="label">Today import</span><strong id="eImport">—</strong></div><div class="metric"><span class="label">Today export</span><strong id="eExport">—</strong></div><div class="metric"><span class="label">Today solar</span><strong id="eSolar">—</strong></div><div class="metric"><span class="label">Today load</span><strong id="eLoad">—</strong></div><div class="metric"><span class="label">Today cost</span><strong id="eCost">—</strong></div></div><div class="panel" style="margin-top:14px"><h2 class="sectionTitle">Daily electricity</h2><div id="electricityChart" class="chart"></div></div></section>
-<section class="page" id="solar"><div class="topline"><div><div class="eyebrow">Generation and use</div><h1>Solar</h1></div></div><div class="grid cards3"><div class="card"><div class="label">Generating now</div><div class="value" id="solarPageNow">-- kW</div></div><div class="card"><div class="label">Today generated</div><div class="value" id="solarToday">—</div></div><div class="card"><div class="label">Today exported</div><div class="value" id="solarExport">—</div></div></div><div class="panel" style="margin-top:14px"><h2 class="sectionTitle">Generation versus export</h2><div id="solarChart" class="chart"></div></div></section>
-<section class="page" id="battery"><div class="topline"><div><div class="eyebrow">Storage</div><h1>Battery</h1></div></div><div class="grid cards3"><div class="card"><div class="label">Current level</div><div class="value" id="batteryPageSoc">--%</div></div><div class="card"><div class="label">Current power</div><div class="value" id="batteryPower">-- kW</div><div class="sub" id="batteryDirection">Connecting</div></div><div class="card"><div class="label">Usable energy</div><div class="value" id="batteryKwh">—</div><div class="sub">Based on 16 kWh nominal capacity</div></div></div><div class="panel" style="margin-top:14px"><h2 class="sectionTitle">Charge and discharge history</h2><div id="batteryChart" class="chart"></div></div></section>
-<section class="page" id="gas"><div class="topline"><div><div class="eyebrow">Estimated daily allocation</div><h1>Gas</h1></div></div><div class="grid cards3"><div class="card"><div class="label">Selected day use</div><div class="value" id="gasUse">—</div></div><div class="card"><div class="label">Selected day cost</div><div class="value" id="gasCost">—</div></div><div class="card"><div class="label">Method</div><div class="value" style="font-size:22px">Averaged</div><div class="sub">Between bill or meter readings</div></div></div><div class="panel" style="margin-top:14px"><div id="gasChart" class="chart"></div></div></section>
-<section class="page" id="water"><div class="topline"><div><div class="eyebrow">Billing interval allocation</div><h1>Water</h1></div></div><div class="grid cards3"><div class="card"><div class="label">Latest bill</div><div class="value">$299.45</div><div class="sub">22 June 2026</div></div><div class="card"><div class="label">Latest usage</div><div class="value">29 kL</div><div class="sub">330 L/day</div></div><div class="card"><div class="label">Estimated daily cost</div><div class="value" id="waterDaily">—</div></div></div><div class="panel" style="margin-top:14px"><div id="waterChart" class="chart"></div></div></section>
-<section class="page" id="ask"><div class="topline"><div><div class="eyebrow">Natural-language query</div><h1>Ask Home Insights</h1></div></div><div class="panel"><div class="ask"><input id="query" placeholder="How much did gas and water cost us on April 7th 2026?"><button id="askBtn">Ask</button></div><div class="answer" id="answer">Ask about the cost of electricity, gas, water or all services on a specific date.</div></div><div class="grid cards3" style="margin-top:14px"><div class="card example">How much did gas and water cost on April 7th 2026?</div><div class="card example">What did all services cost on June 10th 2026?</div><div class="card example">How much electricity did we use on May 30th 2026?</div></div></section>
-</main></div>
-<script>
-const LIVE_API='https://script.google.com/macros/s/AKfycbzRFtNQjssui4ta4LRDHI6BA6CpNA_Jqt3TXq5n3Up00av_GXkmV01LU00JK1iMGU6mMg/exec';
-const waterBills=[['2021-03-26',377.75],['2021-06-24',241.89],['2021-09-20',291.62],['2021-12-31',326.55],['2022-03-28',336.22],['2022-07-01',235.51],['2022-09-26',291.97],['2022-12-23',266.18],['2023-03-24',343.17],['2023-06-28',267.44],['2023-09-25',240.61],['2023-12-22',283.98],['2024-03-26',343.18],['2024-06-21',316.60],['2024-09-17',271.84],['2024-12-18',375.50],['2025-03-25',464.50],['2025-06-23',346.36],['2025-09-16',304.67],['2025-12-19',348.73],['2026-03-24',489.25],['2026-06-22',299.45]];
-let DATA=[], ledger=[];const $=id=>document.getElementById(id);const money=v=>Number.isFinite(v)?v.toLocaleString('en-AU',{style:'currency',currency:'AUD'}):'$—';const num=v=>Number.isFinite(+v)?+v:0;const dateKey=d=>new Date(d).toISOString().slice(0,10);const days=(a,b)=>Math.max(1,Math.round((new Date(b)-new Date(a))/86400000));
-function settings(){return{gasRate:+(localStorage.gasRate||$('gasRate')?.value||.032),gasSupply:+(localStorage.gasSupply||$('gasSupply')?.value||1.1),waterFallback:+(localStorage.waterFallback||$('waterFallback')?.value||3.33)}}
-function waterCost(date){const d=new Date(date);for(let i=1;i<waterBills.length;i++){const prev=new Date(waterBills[i-1][0]),end=new Date(waterBills[i][0]);if(d>prev&&d<=end)return waterBills[i][1]/days(prev,end)}return settings().waterFallback}
-function buildLedger(){const s=settings();ledger=DATA.map(r=>{const electric=Number.isFinite(+r.netCost)?+r.netCost:0;const gasMJ=num(r.gasMJ);const gas=gasMJ*s.gasRate+s.gasSupply;const water=waterCost(r.date);return{...r,electricityCost:electric,gasCost:gas,waterCost:water,totalCost:electric+gas+water}});drawAll();showDay($('costDate').value||ledger.at(-1)?.date)}
-function rowFor(d){return ledger.find(r=>r.date===d)}
-function showDay(d){const r=rowFor(d);$('dayLabel').textContent=new Date(d+'T12:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});$('dayElec').textContent=money(r?.electricityCost);$('dayGas').textContent=money(r?.gasCost);$('dayWater').textContent=money(r?.waterCost);$('dayTotal').textContent=money(r?.totalCost);$('gasUse').textContent=r?num(r.gasMJ).toFixed(1)+' MJ':'—';$('gasCost').textContent=money(r?.gasCost)}
-const layout=(h=340)=>({height:h,paper_bgcolor:'rgba(0,0,0,0)',plot_bgcolor:'rgba(0,0,0,0)',font:{color:'#cbd9e3'},margin:{l:45,r:20,t:20,b:45},xaxis:{gridcolor:'#203443'},yaxis:{gridcolor:'#203443'},legend:{orientation:'h',y:1.12}});
-function drawAll(){if(!ledger.length)return;const r=ledger.slice(-90),x=r.map(a=>a.date);Plotly.react('costChart',[{x,y:r.map(a=>a.electricityCost),stackgroup:'one',name:'Electricity'},{x,y:r.map(a=>a.gasCost),stackgroup:'one',name:'Gas'},{x,y:r.map(a=>a.waterCost),stackgroup:'one',name:'Water'}],layout(),{responsive:true});Plotly.react('electricityChart',[{x,y:r.map(a=>a.gridImport),name:'Import'},{x,y:r.map(a=>a.gridExport),name:'Export'},{x,y:r.map(a=>a.load),name:'House load'},{x,y:r.map(a=>a.solar),name:'Solar'}],layout(),{responsive:true});Plotly.react('solarChart',[{x,y:r.map(a=>a.solar),type:'bar',name:'Solar'},{x,y:r.map(a=>a.gridExport),type:'bar',name:'Export'}],layout(),{responsive:true});Plotly.react('batteryChart',[{x,y:r.map(a=>a.batteryCharge),name:'Charge'},{x,y:r.map(a=>a.batteryDischarge),name:'Discharge'}],layout(),{responsive:true});Plotly.react('gasChart',[{x,y:r.map(a=>a.gasMJ),name:'Gas MJ'},{x,y:r.map(a=>a.gasCost),name:'Cost $',yaxis:'y2'}],{...layout(),yaxis2:{overlaying:'y',side:'right'}},{responsive:true});const wb=waterBills.slice(-12);Plotly.react('waterChart',[{x:wb.map(a=>a[0]),y:wb.map(a=>a[1]),type:'bar',name:'Bill $'}],layout(),{responsive:true});const last=ledger.at(-1);$('eImport').textContent=num(last.gridImport).toFixed(1)+' kWh';$('eExport').textContent=num(last.gridExport).toFixed(1)+' kWh';$('eSolar').textContent=num(last.solar).toFixed(1)+' kWh';$('eLoad').textContent=num(last.load).toFixed(1)+' kWh';$('eCost').textContent=money(last.electricityCost);$('solarToday').textContent=num(last.solar).toFixed(1)+' kWh';$('solarExport').textContent=num(last.gridExport).toFixed(1)+' kWh';$('waterDaily').textContent=money(waterCost(new Date()));const today=rowFor(dateKey(new Date()))||last;$('todayElectricity').textContent=money(today?.electricityCost);$('todayGas').textContent=money(today?.gasCost);$('todayWater').textContent=money(today?.waterCost);$('todayTotal').textContent=money(today?.totalCost)}
-function parseQuestion(q){const months={january:0,february:1,march:2,april:3,may:4,june:5,july:6,august:7,september:8,october:9,november:10,december:11};let m=q.toLowerCase().match(/(\d{1,2})(?:st|nd|rd|th)?\s+(?:of\s+)?(january|february|march|april|may|june|july|august|september|october|november|december)\s+(20\d{2})/);if(!m)m=q.toLowerCase().match(/(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{1,2})(?:st|nd|rd|th)?[,]?\s+(20\d{2})/);if(!m)return null;let day,mon,yr;if(isNaN(m[1])){mon=months[m[1]];day=+m[2];yr=+m[3]}else{day=+m[1];mon=months[m[2]];yr=+m[3]}return `${yr}-${String(mon+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`}
-function answerQuestion(){const q=$('query').value.trim(),d=parseQuestion(q);if(!d){$('answer').textContent='I could not identify a date. Try “How much did gas and water cost on April 7th 2026?”';return}const r=rowFor(d);if(!r){$('answer').textContent=`There is no daily energy record for ${d}. The question engine can only answer dates covered by the loaded daily ledger.`;return}const wants={electric:/electric|power|energy/.test(q.toLowerCase()),gas:/gas/.test(q.toLowerCase()),water:/water/.test(q.toLowerCase()),all:/all services|total|everything|combined/.test(q.toLowerCase())};let parts=[];if(wants.all||(!wants.electric&&!wants.gas&&!wants.water)){parts=[['Electricity',r.electricityCost],['Gas',r.gasCost],['Water',r.waterCost]]}else{if(wants.electric)parts.push(['Electricity',r.electricityCost]);if(wants.gas)parts.push(['Gas',r.gasCost]);if(wants.water)parts.push(['Water',r.waterCost])}const total=parts.reduce((s,a)=>s+a[1],0),label=new Date(d+'T12:00').toLocaleDateString('en-AU',{day:'numeric',month:'long',year:'numeric'});$('answer').innerHTML=`On <b>${label}</b>, ${parts.map(p=>`${p[0]} was <b>${money(p[1])}</b>`).join(', ')}. Combined: <b>${money(total)}</b>.<br><span class="sub">Electricity uses the daily dataset; gas and water are averaged estimates.</span>`}
-async function live(){try{const j=await(await fetch(LIVE_API,{cache:'no-store'})).json();if(!j.ok)throw Error(j.error||'Connection error');const d=j.data||{},v=x=>x&&x.available&&Number.isFinite(+x.value)?+x.value:null,s=v(d.solar),h=v(d.house),bp=v(d.batteryPower),soc=v(d.batterySoc),imp=v(d.gridImport),exp=v(d.gridExport);$('solarNow').textContent=s==null?'-- kW':s.toFixed(2)+' kW';$('solarPageNow').textContent=$('solarNow').textContent;$('houseNow').textContent=h==null?'-- kW':h.toFixed(2)+' kW';$('gridNow').textContent=((imp||exp)||0).toFixed(2)+' kW';$('gridState').textContent=(imp||0)>.02?'Importing':(exp||0)>.02?'Exporting':'Idle';$('batterySoc').textContent=soc==null?'--%':soc.toFixed(1)+'%';$('batteryPageSoc').textContent=$('batterySoc').textContent;$('batteryFill').style.width=(soc||0)+'%';$('batteryPower').textContent=bp==null?'-- kW':Math.abs(bp).toFixed(2)+' kW';const dir=(bp||0)>.02?'Charging':(bp||0)<-.02?'Discharging':'Idle';$('batteryState').textContent=dir+' '+(bp==null?'':Math.abs(bp).toFixed(2)+' kW');$('batteryDirection').textContent=dir;$('batteryKwh').textContent=soc==null?'—':(soc*.16).toFixed(2)+' kWh';$('solarState').textContent=(s||0)>.02?'Generating':'Idle';$('liveConnection').textContent='● Home Assistant connected';$('updatedAt').textContent='Updated '+new Date(j.serverTime||Date.now()).toLocaleTimeString('en-AU');}catch(e){$('liveConnection').textContent='Live connection unavailable'}}
-async function weather(){try{const u='https://api.open-meteo.com/v1/forecast?latitude=-37.7667&longitude=144.9610&timezone=Australia%2FSydney&current=temperature_2m,apparent_temperature,weather_code';const j=await(await fetch(u)).json();$('outsideNow').textContent=Math.round(j.current.temperature_2m)+'°';$('weatherSummary').textContent='Feels like '+Math.round(j.current.apparent_temperature)+'° · Brunswick'}catch(e){}}
-function init(){const now=new Date(),hr=now.getHours();$('greeting').textContent=hr<12?'Good morning':hr<18?'Good afternoon':'Good evening';$('costDate').value=dateKey(now);document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('#nav button').forEach(x=>x.classList.remove('active'));b.classList.add('active');document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));$(b.dataset.page).classList.add('active');setTimeout(()=>window.dispatchEvent(new Event('resize')),50)});$('showCost').onclick=()=>showDay($('costDate').value);$('askBtn').onclick=answerQuestion;$('query').addEventListener('keydown',e=>{if(e.key==='Enter')answerQuestion()});document.querySelectorAll('.example').forEach(e=>e.onclick=()=>{$('query').value=e.textContent;answerQuestion()});$('saveSettings').onclick=()=>{localStorage.gasRate=$('gasRate').value;localStorage.gasSupply=$('gasSupply').value;localStorage.waterFallback=$('waterFallback').value;buildLedger()};['gasRate','gasSupply','waterFallback'].forEach(id=>{if(localStorage[id])$(id).value=localStorage[id]});fetch('data/home_insights.json').then(r=>r.json()).then(j=>{DATA=j.energyDaily||[];buildLedger()}).catch(()=>{$('answer').textContent='Historical data file data/home_insights.json could not be loaded. Live data will still work.'});live();setInterval(live,5000);weather()}
-init();
-</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071018">
+  <title>Home Insights</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <button class="brand" data-page-link="home" aria-label="Home Insights home">
+        <span class="brand-mark"></span>
+        <span>Home Insights</span>
+      </button>
+      <div class="live-pill" id="livePill"><span></span><b id="liveText">Connecting</b></div>
+    </header>
+
+    <main>
+      <section class="page active" id="home" aria-labelledby="homeTitle">
+        <div class="page-intro home-intro">
+          <p class="eyebrow" id="greeting">Good evening</p>
+          <h1 id="homeTitle">Your house, now.</h1>
+          <p class="updated" id="updatedAt">Waiting for live data…</p>
+        </div>
+
+        <div class="home-stage" aria-label="Live household electricity flow">
+          <div class="flow-path path-solar"><i></i></div>
+          <div class="flow-path path-grid"><i></i></div>
+          <div class="flow-path path-battery"><i></i></div>
+
+          <button class="energy-node node-solar" data-page-link="solar">
+            <span class="node-icon sun-icon">☀</span>
+            <span class="node-label">Solar</span>
+            <strong id="solarNow">-- kW</strong>
+            <small id="solarState">Waiting</small>
+          </button>
+
+          <button class="energy-node node-grid" data-page-link="electricity">
+            <span class="node-icon">⇄</span>
+            <span class="node-label">Grid</span>
+            <strong id="gridNow">-- kW</strong>
+            <small id="gridState">Waiting</small>
+          </button>
+
+          <div class="house-node">
+            <span class="house-outline"><i></i></span>
+            <span class="node-label">House</span>
+            <strong id="houseNow">-- kW</strong>
+            <small>Live consumption</small>
+          </div>
+
+          <button class="energy-node node-battery" data-page-link="battery">
+            <span class="battery-icon"><i id="batteryFill"></i></span>
+            <span class="node-label">Battery</span>
+            <strong id="batterySoc">--%</strong>
+            <small id="batteryState">Waiting</small>
+          </button>
+        </div>
+
+        <button class="today-cost" data-page-link="costs">
+          <span>Today’s household services</span>
+          <strong id="homeTotalCost">—</strong>
+          <small>Electricity + estimated gas + estimated water</small>
+        </button>
+
+        <div class="home-foot">
+          <span id="outsideTemp">Outside —</span>
+          <span id="tariffStatus">OVO free period 11:00–14:00</span>
+        </div>
+      </section>
+
+      <section class="page" id="electricity" aria-labelledby="electricityTitle">
+        <div class="page-intro">
+          <p class="eyebrow">Electricity</p>
+          <h1 id="electricityTitle">Where today’s energy went.</h1>
+        </div>
+
+        <div class="daily-flow">
+          <div class="flow-total"><span>Solar generated</span><strong id="solarToday">—</strong></div>
+          <div class="flow-total"><span>House used</span><strong id="loadToday">—</strong></div>
+          <div class="flow-total"><span>Imported</span><strong id="importToday">—</strong></div>
+          <div class="flow-total"><span>Exported</span><strong id="exportToday">—</strong></div>
+        </div>
+
+        <button class="expand-card" data-expand="electricityCost">
+          <span><small>Today’s electricity</small><strong id="electricityTotal">—</strong></span>
+          <b>Details <i>⌄</i></b>
+        </button>
+        <div class="details-panel" id="electricityCost">
+          <div><span>Supply charge</span><strong id="supplyCost">—</strong></div>
+          <div><span>Paid energy</span><strong id="paidEnergyCost">—</strong></div>
+          <div><span>Free energy used</span><strong id="freeEnergyUsed">— kWh</strong></div>
+          <div><span>Export credit</span><strong id="exportCredit">—</strong></div>
+          <div class="details-total"><span>Total</span><strong id="electricityDetailTotal">—</strong></div>
+          <p>Exact once interval import/export data and the OVO tariff ledger are connected.</p>
+        </div>
+      </section>
+
+      <section class="page centered-page" id="battery" aria-labelledby="batteryTitle">
+        <div class="page-intro centered">
+          <p class="eyebrow">Battery</p>
+          <h1 id="batteryTitle">Stored energy.</h1>
+        </div>
+        <div class="battery-hero">
+          <div class="battery-shell"><div id="batteryHeroFill"></div></div>
+          <strong id="batteryHeroSoc">--%</strong>
+          <span id="batteryHeroKwh">— kWh usable</span>
+          <small id="batteryHeroState">Waiting for live data</small>
+        </div>
+      </section>
+
+      <section class="page centered-page" id="solar" aria-labelledby="solarTitle">
+        <div class="page-intro centered">
+          <p class="eyebrow">Solar</p>
+          <h1 id="solarTitle">Today’s sunlight.</h1>
+        </div>
+        <div class="solar-hero">
+          <div class="solar-orb">☀</div>
+          <strong id="solarHeroNow">-- kW</strong>
+          <span>producing now</span>
+          <small id="solarHeroToday">Today — kWh</small>
+        </div>
+      </section>
+
+      <section class="page" id="costs" aria-labelledby="costsTitle">
+        <div class="page-intro">
+          <p class="eyebrow">Services</p>
+          <h1 id="costsTitle">What the house cost today.</h1>
+          <input class="date-picker" id="costDate" type="date" aria-label="Choose date">
+        </div>
+
+        <div class="service-costs">
+          <button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Precise when tariff ledger is connected</em></button>
+          <button class="service-card gas-service" data-expand="serviceGas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em>Daily estimate</em></button>
+          <button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button>
+        </div>
+
+        <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
+        <div class="details-panel service-detail" id="serviceElectricity"><p>Electricity will include supply charge, paid imports outside 11:00–14:00, zero-cost imports during the free period, and export credit at 1¢/kWh.</p></div>
+        <div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills and allocated to each calendar day.</p></div>
+        <div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period, including usage and applicable service charges.</p></div>
+      </section>
+
+      <section class="page ask-page" id="ask" aria-labelledby="askTitle">
+        <div class="page-intro centered">
+          <p class="eyebrow">Ask Home Insights</p>
+          <h1 id="askTitle">Ask about your house.</h1>
+        </div>
+        <form class="ask-form" id="askForm">
+          <input id="askInput" placeholder="How much did gas and water cost on 7 April 2026?" autocomplete="off">
+          <button type="submit" aria-label="Ask">↑</button>
+        </form>
+        <div class="ask-answer" id="askAnswer" hidden></div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav" aria-label="Primary navigation">
+      <button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button>
+      <button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button>
+      <button data-page-link="battery"><span>▰</span><small>Battery</small></button>
+      <button data-page-link="costs"><span>$</span><small>Services</small></button>
+      <button data-page-link="ask"><span>⌕</span><small>Ask</small></button>
+    </nav>
+  </div>
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

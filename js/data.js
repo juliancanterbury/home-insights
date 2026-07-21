@@ -1,4 +1,10 @@
-const waterRows = [
- ['26 Mar 2021',63,636,377.75],['24 Jun 2021',23,258,241.89],['20 Sep 2021',15,174,291.62],['31 Dec 2021',49,544,326.55],['28 Mar 2022',55,550,336.22],['1 Jul 2022',23,242,235.51],['26 Sep 2022',14,182,291.97],['23 Dec 2022',32,333,266.18],['24 Mar 2023',56,602,343.17],['28 Jun 2023',32,333,267.44],['25 Sep 2023',16,4000,240.61],['22 Dec 2023',29,319,283.98],['26 Mar 2024',46,484,343.18],['21 Jun 2024',39,453,316.60],['17 Sep 2024',23,256,271.84],['18 Dec 2024',50,549,375.50],['25 Mar 2025',71,755,464.50],['23 Jun 2025',44,484,346.36],['16 Sep 2025',30,345,304.67],['19 Dec 2025',42,447,348.73],['24 Mar 2026',73,768,489.25],['22 Jun 2026',29,330,299.45]
-];
-function makeWeatherData(){const start=new Date('2025-05-01');const arr=[];for(let i=0;i<420;i++){const d=new Date(start);d.setDate(start.getDate()+i);const m=d.getMonth();const seasonal=(m>=5&&m<=7)?10:(m===4||m===8)?15:22;const temp=seasonal+(Math.random()*8-4)+Math.sin(i/11)*1.5;const min=temp-4-Math.random()*2;const max=temp+4+Math.random()*3;const rain=Math.random()<.18?Math.random()*18:0;const wind=14+Math.random()*18+Math.sin(i/6)*4;const hum=55+Math.random()*25-(m>=11||m<=1?8:0);const uv=(m>=10||m<=2)?6+Math.random()*5:1+Math.random()*3;arr.push({date:d.toISOString().slice(0,10),temp:+temp.toFixed(1),min:+min.toFixed(1),max:+max.toFixed(1),rain:+rain.toFixed(1),wind:+wind.toFixed(1),hum:+hum.toFixed(0),uv:+uv.toFixed(1)})}return arr}const weatherRows=makeWeatherData();
+window.HOME_INSIGHTS_CONFIG = {
+  liveApi: 'https://script.google.com/macros/s/AKfycbzRFtNQjssui4ta4LRDHI6BA6CpNA_Jqt3TXq5n3Up00av_GXkmV01LU00JK1iMGU6mMg/exec',
+  pollMs: 5000,
+  batteryCapacityKwh: 16,
+  feedInRate: 0.01,
+  freeWindow: { start: 11, end: 14 }
+};
+
+// Daily ledger entries can be added here later. Costs remain blank rather than invented.
+window.HOME_INSIGHTS_DAILY = [];
