@@ -30,14 +30,14 @@
       <section class="page active" id="home" aria-labelledby="homeTitle">
         <div class="page-intro home-intro"><p class="eyebrow" id="greeting">Good evening</p><h1 id="homeTitle">Your house, now.</h1><p class="updated" id="updatedAt">Waiting for live data…</p></div>
         <div class="home-stage" aria-label="Live household electricity flow">
-          <div class="flow-path path-solar"><i></i></div><div class="flow-path path-grid"><i></i></div><div class="flow-path path-battery"><i></i></div>
+          <div class="flow-path path-solar" id="solarFlow"><i></i></div><div class="flow-path path-grid" id="gridFlow"><i></i></div><div class="flow-path path-battery" id="batteryFlow"><i></i></div>
           <button class="energy-node node-solar" data-page-link="solar"><span class="node-icon sun-icon">☀</span><span class="node-label">Solar</span><strong id="solarNow">-- kW</strong><small id="solarState">Waiting</small></button>
-          <button class="energy-node node-grid" data-page-link="electricity"><span class="node-icon">⇄</span><span class="node-label">Grid</span><strong id="gridNow">-- kW</strong><small id="gridState">Waiting</small></button>
+          <button class="energy-node node-grid" data-page-link="electricity"><span class="node-icon">⇄</span><span class="node-label">Grid <b class="free-badge" id="freeBadge" hidden>FREE</b></span><strong id="gridNow">-- kW</strong><small id="gridState">Waiting</small></button>
           <div class="house-node"><span class="house-outline"><i></i></span><span class="node-label">House</span><strong id="houseNow">-- kW</strong><small>Live consumption</small></div>
           <button class="energy-node node-battery" data-page-link="battery"><span class="battery-icon"><i id="batteryFill"></i></span><span class="node-label">Battery</span><strong id="batterySoc">--%</strong><small id="batteryState">Waiting</small></button>
         </div>
         <button class="today-cost" data-page-link="costs"><span>Today’s household services</span><strong id="homeTotalCost">—</strong><small>Electricity + estimated gas + estimated water</small></button>
-        <div class="home-foot"><span id="outsideTemp">Outside —</span><span id="tariffStatus">OVO free period 11:00–14:00</span></div>
+        <div class="home-foot"><button class="weather-glance" data-page-link="weather"><span id="weatherIcon">◌</span><b id="outsideTemp">Outside —</b><small id="weatherSummary">Weather loading…</small></button><span id="tariffStatus">OVO free period 11:00–14:00</span></div>
       </section>
 
       <section class="page" id="electricity" aria-labelledby="electricityTitle">
@@ -68,10 +68,43 @@
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
       </section>
 
+
+      <section class="page" id="weather" aria-labelledby="weatherTitle">
+        <div class="page-intro"><p class="eyebrow">Weather</p><h1 id="weatherTitle">Outside, and what comes next.</h1><p class="updated" id="weatherUpdated">Loading Brunswick forecast…</p></div>
+        <div class="weather-hero"><div><span id="weatherHeroIcon">◌</span><strong id="weatherHeroTemp">—°</strong><p id="weatherHeroText">Loading…</p></div><div class="weather-facts"><span>Feels like <b id="feelsLike">—°</b></span><span>Rain <b id="rainChance">—%</b></span><span>Wind <b id="windSpeed">— km/h</b></span><span>Humidity <b id="humidity">—%</b></span></div></div>
+        <div class="hourly-strip" id="hourlyStrip"></div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Forecast</p><h2>Next seven days</h2></div></div><div class="forecast-list" id="forecastList"></div></section>
+      </section>
+
+      <section class="page" id="meters" aria-labelledby="metersTitle">
+        <div class="page-intro"><p class="eyebrow">Meters</p><h1 id="metersTitle">Add a reading.</h1><p class="updated">Manual readings and meter photos are kept in this browser until the shared data store is connected.</p></div>
+        <div class="meter-grid">
+          <article class="meter-card"><span class="meter-symbol gas-symbol">♨</span><h2>Gas</h2><p>Last reading</p><strong id="gasLastReading">—</strong><small id="gasLastDate">No reading saved</small><button class="primary-action" data-open-meter="gas">Add gas reading</button></article>
+          <article class="meter-card"><span class="meter-symbol water-symbol">●</span><h2>Water</h2><p>Last reading</p><strong id="waterLastReading">—</strong><small id="waterLastDate">No reading saved</small><button class="primary-action" data-open-meter="water">Add water reading</button></article>
+        </div>
+        <div class="meter-entry" id="meterEntry" hidden>
+          <div class="meter-entry-head"><div><p class="eyebrow" id="meterKindLabel">Meter</p><h2>New reading</h2></div><button id="closeMeterEntry">Close</button></div>
+          <div class="entry-grid"><label>Reading<input id="meterValue" inputmode="decimal" placeholder="Enter meter value"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
+          <label class="photo-input">Meter photo<input id="meterPhoto" type="file" accept="image/*" capture="environment"><span>Choose or take photo</span></label><img id="meterPreview" class="meter-preview" alt="Meter photo preview" hidden>
+          <p class="entry-note">The photo is retained as a preview only in this version. Confirm or correct the number before saving.</p>
+          <button class="primary-action" id="saveMeterReading">Save reading</button>
+        </div>
+        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Reading history</p><h2>Gas and water records</h2></div></div><div class="records-list" id="meterRecords"></div></section>
+      </section>
+
+      <section class="page" id="data" aria-labelledby="dataTitle">
+        <div class="page-intro"><p class="eyebrow">Detailed data</p><h1 id="dataTitle">The full record.</h1><p class="updated">This is the deliberate deep-data layer: searchable, editable and exportable.</p></div>
+        <div class="data-controls"><select id="dataSource"><option value="daily">Daily ledger</option><option value="meters">Meter readings</option><option value="live">Live samples</option></select><input id="dataSearch" placeholder="Filter records"><button id="downloadCsv">Download CSV</button></div>
+        <div class="data-table-wrap"><table class="data-table"><thead id="dataHead"></thead><tbody id="dataBody"></tbody></table></div>
+        <div class="chart-empty" id="dataEmpty" hidden><div><strong>No records yet</strong>Live and historical source data will appear here without cluttering the main screens.</div></div>
+      </section>
+
+      <section class="page" id="more" aria-labelledby="moreTitle"><div class="page-intro"><p class="eyebrow">More</p><h1 id="moreTitle">Tools and records.</h1></div><div class="more-grid"><button data-page-link="meters"><span>◉</span><b>Meter readings</b><small>Add gas and water readings or photos</small></button><button data-page-link="weather"><span>☁</span><b>Weather</b><small>Hourly and seven-day forecast</small></button><button data-page-link="data"><span>≡</span><b>Detailed data</b><small>Search, inspect and export records</small></button><button data-page-link="ask"><span>⌕</span><b>Ask Home Insights</b><small>Ask questions about dates and costs</small></button></div></section>
+
       <section class="page ask-page" id="ask" aria-labelledby="askTitle"><div class="page-intro centered"><p class="eyebrow">Ask Home Insights</p><h1 id="askTitle">Ask about your house.</h1></div><form class="ask-form" id="askForm"><input id="askInput" placeholder="How much did gas and water cost on 7 April 2026?" autocomplete="off"><button type="submit" aria-label="Ask">↑</button></form><div class="ask-answer" id="askAnswer" hidden></div></section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="battery"><span>▰</span><small>Battery</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="ask"><span>⌕</span><small>Ask</small></button></nav>
+    <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
   <script src="js/data.js"></script><script src="js/charts.js"></script><script src="js/app.js"></script>
 </body>
