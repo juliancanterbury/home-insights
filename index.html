@@ -61,6 +61,22 @@
           </div>
         </section>
         <div class="details-panel electricity-cost-panel" id="electricityCost"><div><span>Supply charge accrued</span><strong id="supplyCost">—</strong></div><div><span>Paid imports</span><strong id="paidEnergyCost">—</strong></div><div><span>Free 11–2 energy</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Feed-in credit</span><strong class="negative-value" id="exportCredit">—</strong></div><div class="details-total"><span>Net cost today</span><strong id="electricityDetailTotal">—</strong></div></div>
+        <section class="explore-section electricity-flow-section" aria-labelledby="energyFlowTitle">
+          <div class="explore-head electricity-explore-head">
+            <div><p class="eyebrow">Today · energy flow</p><h2 id="energyFlowTitle">Where the electricity went</h2><p class="chart-note">Band width represents energy. Values build from live readings and reset each day.</p></div>
+          </div>
+          <div class="sankey-card">
+            <div class="sankey-diagram" id="energySankey" aria-label="Today’s household energy flow diagram"></div>
+            <div class="sankey-summary" id="sankeySummary">
+              <div><span>Solar direct to house</span><strong id="flowSolarHouse">—</strong></div>
+              <div><span>Solar to battery</span><strong id="flowSolarBattery">—</strong></div>
+              <div><span>Solar exported</span><strong id="flowSolarGrid">—</strong></div>
+              <div><span>Grid to house</span><strong id="flowGridHouse">—</strong></div>
+              <div><span>Grid to battery</span><strong id="flowGridBattery">—</strong></div>
+              <div><span>Battery to house</span><strong id="flowBatteryHouse">—</strong></div>
+            </div>
+          </div>
+        </section>
         <section class="explore-section electricity-live-chart-section">
           <div class="explore-head electricity-explore-head"><div><p class="eyebrow">Today · live</p><h2>Power flows through the day</h2><p class="chart-note">Sigenergy-style live power: solar and grid import above zero; battery charging, grid export and other outward flows below zero.</p></div></div>
           <div class="live-series-legend"><span class="solar">Solar</span><span class="battery">Battery</span><span class="grid">Grid</span><span class="load">Load</span></div>
@@ -136,6 +152,6 @@
     <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
   <script src="js/data.js"></script>
-  <script src="js/history-data.js"></script><script src="js/charts.js"></script><script src="js/app.js"></script>
+  <script src="js/history-data.js"></script><script src="js/charts.js"></script><script src="js/sankey.js"></script><script src="js/app.js"></script>
 </body>
 </html>

@@ -16,3 +16,23 @@
 .history-scroll-shell.is-dragging{cursor:grabbing;}
 .history-scroll-shell.is-dragging .history-bar{pointer-events:none;}
 .scroll-hint{display:none;}
+
+/* Today energy-flow Sankey */
+.electricity-flow-section{padding-bottom:18px}
+.sankey-card{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(220px,.65fr);gap:22px;align-items:stretch}
+.sankey-diagram{min-height:390px;border:1px solid color-mix(in srgb,var(--line) 82%,transparent);border-radius:24px;background:linear-gradient(180deg,color-mix(in srgb,var(--panel) 92%,#0a1725),color-mix(in srgb,var(--panel-2) 96%,#06101a));overflow:hidden;position:relative}
+.sankey-diagram svg{display:block;width:100%;height:auto;min-height:390px}
+.sankey-band{mix-blend-mode:screen;opacity:.68;transition:opacity .2s ease}
+.sankey-band:hover{opacity:.96}
+.sankey-node{stroke:color-mix(in srgb,var(--text) 16%,transparent);stroke-width:1}
+.sankey-node-label{font:600 15px/1.2 system-ui,sans-serif;fill:var(--text)}
+.sankey-node-value{font:750 22px/1.2 system-ui,sans-serif;fill:var(--text)}
+.sankey-node-unit{font:500 12px/1.2 system-ui,sans-serif;fill:var(--muted)}
+.sankey-empty{min-height:390px;display:grid;place-items:center;text-align:center;color:var(--muted);padding:36px}
+.sankey-empty strong{display:block;color:var(--text);font-size:20px;margin-bottom:8px}
+.sankey-summary{display:grid;grid-template-columns:1fr;gap:10px}
+.sankey-summary>div{padding:15px 17px;border:1px solid var(--line);border-radius:18px;background:color-mix(in srgb,var(--panel) 88%,transparent);display:flex;align-items:center;justify-content:space-between;gap:14px}
+.sankey-summary span{font-size:13px;color:var(--muted)}
+.sankey-summary strong{font-size:17px;white-space:nowrap}
+@media(max-width:780px){.sankey-card{grid-template-columns:1fr}.sankey-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sankey-summary>div{display:block}.sankey-summary strong{display:block;margin-top:5px}}
+@media(max-width:480px){.sankey-summary{grid-template-columns:1fr}.sankey-diagram,.sankey-diagram svg,.sankey-empty{min-height:330px}}
