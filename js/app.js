@@ -7,6 +7,13 @@
   const number = item => item && item.available && Number.isFinite(Number(item.value)) ? Number(item.value) : null;
   const kw = value => value === null ? '-- kW' : `${Math.abs(value).toFixed(Math.abs(value) >= 10 ? 1 : 2)} kW`;
   let lastLive = null;
+  const liveCostKey = 'home-insights-live-cost-v1';
+  let liveCost = loadLiveCost();
+  function dayKey(d=new Date()){ return new Intl.DateTimeFormat('en-CA',{timeZone:cfg.timezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d); }
+  function loadLiveCost(){ try{ const x=JSON.parse(localStorage.getItem(liveCostKey)||'null'); return x&&x.date===dayKey()?x:{date:dayKey(),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null}; }catch{return {date:dayKey(),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null};} }
+  function saveLiveCost(){ localStorage.setItem(liveCostKey,JSON.stringify(liveCost)); }
+  function renderLiveCost(now=new Date()){ const parts=new Intl.DateTimeFormat('en-AU',{timeZone:cfg.timezone,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(now); const h=+parts.find(x=>x.type==='hour').value,m=+parts.find(x=>x.type==='minute').value,sec=+parts.find(x=>x.type==='second').value; const elapsed=(h*3600+m*60+sec)/86400; const supply=cfg.dailySupplyCharge*elapsed; const paid=liveCost.paidImportKwh*cfg.importRate; const credit=liveCost.exportKwh*cfg.feedInRate; const total=supply+paid-credit; $('electricityTotal').textContent=money(total); $('electricityDetailTotal').textContent=money(total); $('costElectricity').textContent=money(total); $('supplyCost').textContent=money(supply); $('paidEnergyCost').textContent=money(paid); $('freeEnergyUsed').textContent=`${liveCost.freeImportKwh.toFixed(2)} kWh`; $('exportCredit').textContent=credit?`−${money(credit)}`:money(0); }
+  function updateLiveCost(stamp,gridImport,gridExport){ if(liveCost.date!==dayKey(stamp)) liveCost={date:dayKey(stamp),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null}; const t=stamp.getTime(); if(liveCost.lastTime){ const hours=Math.max(0,Math.min((t-liveCost.lastTime)/3600000,0.05)); const hour=+new Intl.DateTimeFormat('en-AU',{timeZone:cfg.timezone,hour:'2-digit',hour12:false}).format(stamp); const imp=Math.max(0,gridImport||0)*hours; if(hour>=cfg.freeWindow.start&&hour<cfg.freeWindow.end) liveCost.freeImportKwh+=imp; else liveCost.paidImportKwh+=imp; liveCost.exportKwh+=Math.max(0,gridExport||0)*hours; } liveCost.lastTime=t; saveLiveCost(); renderLiveCost(stamp); }
 
   function setGreeting(){
     const h = new Date().getHours();
@@ -48,6 +55,7 @@
     $('houseNow').textContent = kw(house);
     $('gridNow').textContent = kw(importing ? gridImport : exporting ? gridExport : 0);
     $('gridState').textContent = importing ? 'Importing' : exporting ? 'Exporting' : 'Idle';
+    $('batteryPowerNow').textContent = kw(batteryPower);
     $('batterySoc').textContent = soc === null ? '--%' : `${soc.toFixed(0)}%`;
     $('batteryHeroSoc').textContent = soc === null ? '--%' : `${soc.toFixed(0)}%`;
     const batteryStatus = charging ? `Charging ${kw(batteryPower)}` : discharging ? `Discharging ${kw(batteryPower)}` : 'Idle';
@@ -72,6 +80,7 @@
     $('updatedAt').textContent = `Updated ${stamp.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
     $('liveText').textContent = 'Live';
     $('livePill').className = 'live-pill live';
+    updateLiveCost(stamp, gridImport, gridExport);
     lastLive = payload;
     const sample={time:stamp.toISOString(),solar:solar||0,house:house||0,grid:importing?(gridImport||0):exporting?-(gridExport||0):0,battery:batteryPower||0,soc:soc};
     window.HomeInsightsCharts?.addLiveSample(sample);
@@ -161,6 +170,8 @@
   $('costDate').value = today;
   $('costDate').addEventListener('change',e => renderCosts(e.target.value));
   renderCosts(today);
+  renderLiveCost();
+  setInterval(()=>renderLiveCost(),60000);
   setGreeting();
   window.HomeInsightsCharts?.init();
   poll();
@@ -170,9 +181,9 @@
 (() => {
   'use strict';
   const $ = id => document.getElementById(id);
-  const weatherCode = code => {
-    if ([0,1].includes(code)) return ['☀','Clear'];
-    if (code === 2) return ['🌤','Partly cloudy'];
+  const weatherCode = (code,isDay=true) => {
+    if ([0,1].includes(code)) return [isDay?'☀':'☾','Clear'];
+    if (code === 2) return [isDay?'🌤':'☾☁','Partly cloudy'];
     if (code === 3) return ['☁','Cloudy'];
     if ([45,48].includes(code)) return ['≋','Fog'];
     if (code >= 51 && code <= 67) return ['🌧','Rain'];
@@ -184,10 +195,10 @@
 
   async function loadWeather(){
     try{
-      const url='https://api.open-meteo.com/v1/forecast?latitude=-37.7667&longitude=144.9610&timezone=Australia%2FSydney&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&hourly=temperature_2m,precipitation_probability,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max';
+      const url='https://api.open-meteo.com/v1/forecast?latitude=-37.7667&longitude=144.9610&timezone=Australia%2FSydney&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,is_day&hourly=temperature_2m,precipitation_probability,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,sunrise,sunset';
       const response=await fetch(url,{cache:'no-store'});
       if(!response.ok) throw new Error(`HTTP ${response.status}`);
-      const j=await response.json(), c=j.current, [icon,text]=weatherCode(c.weather_code);
+      const j=await response.json(), c=j.current, [icon,text]=weatherCode(c.weather_code,Boolean(c.is_day));
       $('weatherIcon').textContent=icon; $('outsideTemp').textContent=`Outside ${Math.round(c.temperature_2m)}°`;
       $('weatherSummary').textContent=text; $('weatherHeroIcon').textContent=icon; $('weatherHeroTemp').textContent=`${Math.round(c.temperature_2m)}°`;
       $('weatherHeroText').textContent=text; $('feelsLike').textContent=`${Math.round(c.apparent_temperature)}°`;
@@ -197,7 +208,7 @@
       $('weatherUpdated').textContent=`Updated ${new Date().toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit'})} · Brunswick`;
       $('hourlyStrip').innerHTML='';
       for(let i=start;i<Math.min(start+8,j.hourly.time.length);i++){
-        const d=new Date(j.hourly.time[i]), [ic]=weatherCode(j.hourly.weather_code[i]);
+        const d=new Date(j.hourly.time[i]), [ic]=weatherCode(j.hourly.weather_code[i],Boolean(j.hourly.is_day?.[i]));
         $('hourlyStrip').insertAdjacentHTML('beforeend',`<div class="weather-hour"><b>${i===start?'Now':d.toLocaleTimeString('en-AU',{hour:'numeric'})}</b><span>${ic}</span><strong>${Math.round(j.hourly.temperature_2m[i])}°</strong><small>${j.hourly.precipitation_probability[i]??0}% rain</small></div>`);
       }
       $('forecastList').innerHTML='';

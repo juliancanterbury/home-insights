@@ -2,6 +2,7 @@
   'use strict';
   const liveSamples = [];
   const charts = new Map();
+  const enabledSeries={electricity:new Set(['house','solar','grid','battery'])};
   const css = name => getComputedStyle(document.body).getPropertyValue(name).trim();
   const esc = value => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -33,7 +34,7 @@
   function render(type){
     const state=charts.get(type); if(!state) return;
     const el=document.getElementById(type+'Chart'); if(!el) return;
-    const d=dataFor(type,state.range), rows=d.rows.filter(r=>d.series.some(([k])=>Number.isFinite(r[k])));
+    const d=dataFor(type,state.range); if(enabledSeries[type]) d.series=d.series.filter(([k])=>enabledSeries[type].has(k)); const rows=d.rows.filter(r=>d.series.some(([k])=>Number.isFinite(r[k])));
     if(rows.length<2){el.innerHTML=`<div class="chart-empty"><div><strong>${state.range==='live'?'Collecting live readings':'No historical data yet'}</strong><span>${state.range==='live'?'The graph will build while this page is open.':'The graph will appear when the daily ledger is connected.'}</span></div></div>`;return;}
     const W=1000,H=300,p={l:48,r:18,t:18,b:36};
     const values=[]; rows.forEach(r=>d.series.forEach(([k])=>{if(Number.isFinite(r[k])) values.push(r[k])}));
@@ -48,6 +49,6 @@
     const tip=el.querySelector('.chart-tooltip'); el.querySelectorAll('.chart-hit').forEach(hit=>{const show=e=>{const i=+hit.dataset.i,r=rows[i];tip.innerHTML=`<b>${esc(r.label)}</b>`+d.series.filter(([k])=>Number.isFinite(r[k])).map(([k,l])=>`<div><span>${l}</span><strong>${formatVal(r[k],d.unit)}</strong></div>`).join('');tip.hidden=false;tip.style.left=`${x(i)/W*100}%`;tip.style.top=`${y(Math.max(...d.series.map(([k])=>Number.isFinite(r[k])?r[k]:min)))/H*100}%`;};hit.addEventListener('pointerenter',show);hit.addEventListener('pointermove',show);hit.addEventListener('pointerleave',()=>tip.hidden=true);hit.addEventListener('click',show);});
   }
   function formatVal(v,unit){if(unit==='$')return new Intl.NumberFormat('en-AU',{style:'currency',currency:'AUD',maximumFractionDigits:2}).format(v);return `${Math.abs(v)>=10?v.toFixed(1):v.toFixed(2)} ${unit}`;}
-  function init(){document.querySelectorAll('[data-chart-range]').forEach(group=>{const type=group.dataset.chartRange;charts.set(type,{range:group.querySelector('.active')?.dataset.range||'30'});group.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');charts.get(type).range=btn.dataset.range;render(type);}));render(type);});}
+  function init(){document.querySelectorAll('[data-series-toggle]').forEach(group=>group.querySelectorAll('button[data-series]').forEach(btn=>btn.addEventListener('click',()=>{const type=group.dataset.seriesToggle,key=btn.dataset.series,set=enabledSeries[type];if(set.has(key)&&set.size>1){set.delete(key);btn.classList.remove('active')}else{set.add(key);btn.classList.add('active')}render(type)})));document.querySelectorAll('[data-chart-range]').forEach(group=>{const type=group.dataset.chartRange;charts.set(type,{range:group.querySelector('.active')?.dataset.range||'30'});group.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{group.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');charts.get(type).range=btn.dataset.range;render(type);}));render(type);});}
   window.HomeInsightsCharts={init,renderAll:()=>charts.forEach((_,k)=>render(k)),addLiveSample};
 })();
