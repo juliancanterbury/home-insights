@@ -61,13 +61,18 @@
           </div>
         </section>
         <div class="details-panel electricity-cost-panel" id="electricityCost"><div><span>Supply charge accrued</span><strong id="supplyCost">—</strong></div><div><span>Paid imports</span><strong id="paidEnergyCost">—</strong></div><div><span>Free 11–2 energy</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Feed-in credit</span><strong class="negative-value" id="exportCredit">—</strong></div><div class="details-total"><span>Net cost today</span><strong id="electricityDetailTotal">—</strong></div></div>
+        <section class="explore-section electricity-live-chart-section">
+          <div class="explore-head electricity-explore-head"><div><p class="eyebrow">Today · live</p><h2>Power flows through the day</h2><p class="chart-note">Sigenergy-style live power: solar and grid import above zero; battery charging, grid export and other outward flows below zero.</p></div></div>
+          <div class="live-series-legend"><span class="solar">Solar</span><span class="battery">Battery</span><span class="grid">Grid</span><span class="load">Load</span></div>
+          <div class="interactive-chart sigenergy-chart live-power-chart" id="electricityLiveChart" aria-label="Live power metrics chart"></div>
+        </section>
         <section class="explore-section electricity-history-section">
           <div class="explore-head electricity-explore-head"><div><p class="eyebrow">Electricity history</p><h2>Grid import and solar export</h2><p class="chart-note" id="electricityHistoryNote">Actual Powershop half-hour meter data from 1 Jan 2019 to 18 Sep 2025.</p></div>
-          <div class="range-control electricity-range" data-chart-range="electricity"><button data-range="live">Live</button><button data-range="30">30D</button><button data-range="365">1Y</button><button class="active" data-range="all">All</button></div></div>
+          <div class="range-control electricity-range" data-chart-range="electricity"><button data-range="7">1W</button><button data-range="30">1M</button><button data-range="365">1Y</button><button class="active" data-range="all">All</button></div></div>
           <div class="year-strip" data-chart-range-secondary="electricity" aria-label="Choose historical year"><button data-range="year:2019">2019</button><button data-range="year:2020">2020</button><button data-range="year:2021">2021</button><button data-range="year:2022">2022</button><button data-range="year:2023">2023</button><button data-range="year:2024">2024</button><button data-range="year:2025">2025</button><button class="active" data-range="all">All years</button></div>
           <div class="history-kpis"><div><span>Period imported</span><strong id="historyImport">—</strong></div><div><span>Period exported</span><strong id="historyExport">—</strong></div><div><span>Net grid energy</span><strong id="historyNet">—</strong></div><div><span>Coverage</span><strong id="historyCoverage">—</strong></div></div>
           <div class="series-toggle" data-series-toggle="electricity"><button class="active" data-series="import">Import</button><button class="active" data-series="export">Export</button><button data-series="net">Net grid</button></div>
-          <div class="interactive-chart sigenergy-chart" id="electricityChart" aria-label="Interactive electricity history chart"></div>
+          <div class="history-scroll-shell"><div class="interactive-chart history-bar-chart" id="electricityChart" aria-label="Scrollable electricity history chart"></div></div><p class="scroll-hint">Drag or scroll sideways to move through time.</p>
           <div class="timeline-events"><span style="--event-pos:0%"><i></i>2019 data begins</span><span style="--event-pos:82%"><i></i>Battery · Aug 2025</span><span style="--event-pos:84%"><i></i>Amber · Sep 2025</span><span style="--event-pos:94%"><i></i>OVO · May 2026</span></div>
         </section>
       </section>
