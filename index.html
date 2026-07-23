@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#071018">
   <title>Home Insights</title>
   <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/electricity.css">
 </head>
 <body>
   <div class="app-shell">
@@ -41,11 +42,34 @@
       </section>
 
       <section class="page" id="electricity" aria-labelledby="electricityTitle">
-        <div class="page-intro"><p class="eyebrow">Electricity</p><h1 id="electricityTitle">Where today’s energy went.</h1></div>
-        <div class="daily-flow"><div class="flow-total"><span>Solar</span><strong id="solarToday">—</strong></div><div class="flow-total"><span>House</span><strong id="loadToday">—</strong></div><div class="flow-total"><span>Imported</span><strong id="importToday">—</strong></div><div class="flow-total"><span>Exported</span><strong id="exportToday">—</strong></div></div>
-        <button class="expand-card" data-expand="electricityCost"><span><small>Today’s electricity</small><strong id="electricityTotal">—</strong></span><b>Details <i>⌄</i></b></button>
-        <div class="details-panel" id="electricityCost"><div><span>Supply charge</span><strong id="supplyCost">—</strong></div><div><span>Paid energy</span><strong id="paidEnergyCost">—</strong></div><div><span>Free energy used</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Export credit</span><strong id="exportCredit">—</strong></div><div class="details-total"><span>Total</span><strong id="electricityDetailTotal">—</strong></div></div>
-        <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Power through the day</h2></div><div class="range-control" data-chart-range="electricity"><button class="active" data-range="live">Live</button><button data-range="7">7D</button><button data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend" data-series-toggle="electricity"><button class="active" data-series="house"><i class="legend-house"></i>House</button><button class="active" data-series="solar"><i class="legend-solar"></i>Solar</button><button class="active" data-series="grid"><i class="legend-grid"></i>Grid</button><button class="active" data-series="battery"><i class="legend-battery"></i>Battery</button></div><div class="interactive-chart" id="electricityChart" aria-label="Interactive electricity chart"></div></section>
+        <div class="electricity-intro-row">
+          <div class="page-intro electricity-intro"><p class="eyebrow">Electricity</p><h1 id="electricityTitle">Energy, cost and history.</h1><p class="electricity-subtitle">Live household energy above. Your complete grid history below.</p></div>
+          <div class="electricity-live-status"><span class="pulse-dot"></span><b>Live</b><small id="electricityLiveStatus">Home Assistant connected</small></div>
+        </div>
+        <section class="electricity-hero" aria-label="Today’s electricity summary">
+          <button class="electricity-cost-hero" data-expand="electricityCost">
+            <span class="cost-kicker">Today’s electricity</span>
+            <strong id="electricityTotal">—</strong>
+            <span class="cost-caption">running cost so far</span>
+            <span class="cost-detail-link">View calculation <i>⌄</i></span>
+          </button>
+          <div class="daily-flow electricity-flow-grid">
+            <div class="flow-total flow-solar"><span>Solar</span><strong id="solarToday">—</strong><small>generated today</small></div>
+            <div class="flow-total flow-house"><span>House</span><strong id="loadToday">—</strong><small>used today</small></div>
+            <div class="flow-total flow-import"><span>Imported</span><strong id="importToday">—</strong><small>from grid</small></div>
+            <div class="flow-total flow-export"><span>Exported</span><strong id="exportToday">—</strong><small>to grid</small></div>
+          </div>
+        </section>
+        <div class="details-panel electricity-cost-panel" id="electricityCost"><div><span>Supply charge accrued</span><strong id="supplyCost">—</strong></div><div><span>Paid imports</span><strong id="paidEnergyCost">—</strong></div><div><span>Free 11–2 energy</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Feed-in credit</span><strong class="negative-value" id="exportCredit">—</strong></div><div class="details-total"><span>Net cost today</span><strong id="electricityDetailTotal">—</strong></div></div>
+        <section class="explore-section electricity-history-section">
+          <div class="explore-head electricity-explore-head"><div><p class="eyebrow">Electricity history</p><h2>Grid import and solar export</h2><p class="chart-note" id="electricityHistoryNote">Actual Powershop half-hour meter data from 1 Jan 2019 to 18 Sep 2025.</p></div>
+          <div class="range-control electricity-range" data-chart-range="electricity"><button data-range="live">Live</button><button data-range="30">30D</button><button data-range="365">1Y</button><button class="active" data-range="all">All</button></div></div>
+          <div class="year-strip" data-chart-range-secondary="electricity" aria-label="Choose historical year"><button data-range="year:2019">2019</button><button data-range="year:2020">2020</button><button data-range="year:2021">2021</button><button data-range="year:2022">2022</button><button data-range="year:2023">2023</button><button data-range="year:2024">2024</button><button data-range="year:2025">2025</button><button class="active" data-range="all">All years</button></div>
+          <div class="history-kpis"><div><span>Period imported</span><strong id="historyImport">—</strong></div><div><span>Period exported</span><strong id="historyExport">—</strong></div><div><span>Net grid energy</span><strong id="historyNet">—</strong></div><div><span>Coverage</span><strong id="historyCoverage">—</strong></div></div>
+          <div class="series-toggle" data-series-toggle="electricity"><button class="active" data-series="import">Import</button><button class="active" data-series="export">Export</button><button data-series="net">Net grid</button></div>
+          <div class="interactive-chart sigenergy-chart" id="electricityChart" aria-label="Interactive electricity history chart"></div>
+          <div class="timeline-events"><span style="--event-pos:0%"><i></i>2019 data begins</span><span style="--event-pos:82%"><i></i>Battery · Aug 2025</span><span style="--event-pos:84%"><i></i>Amber · Sep 2025</span><span style="--event-pos:94%"><i></i>OVO · May 2026</span></div>
+        </section>
       </section>
 
       <section class="page centered-page" id="battery" aria-labelledby="batteryTitle">
@@ -106,6 +130,7 @@
 
     <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
-  <script src="js/data.js"></script><script src="js/charts.js"></script><script src="js/app.js"></script>
+  <script src="js/data.js"></script>
+  <script src="js/history-data.js"></script><script src="js/charts.js"></script><script src="js/app.js"></script>
 </body>
 </html>
