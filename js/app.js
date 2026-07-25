@@ -137,7 +137,7 @@
   }
 
 
-  async function loadSharedSamples(date=dayKey()){
+  window.HomeInsightsLoadSharedSamples = async function(date=dayKey()){
     if(!cfg.sharedApi || !window.HomeInsightsCharts?.setLiveSamples) return;
     try{
       const json=await window.HomeInsightsApi.request(cfg.sharedApi,{action:'samples',date});
@@ -321,7 +321,7 @@
       displayPage(pageFromLocation(), { updateUrl:false, smooth:false });
     }
   } catch (error) { console.error('Router startup:', error); }
-  try { loadSharedSamples(); } catch (error) { console.error('Sample startup:', error); }
+  try { window.HomeInsightsLoadSharedSamples(); } catch (error) { console.error('Sample startup:', error); }
   try { loadWeather(); setInterval(loadWeather,30*60*1000); } catch (error) { console.error('Weather startup:', error); }
   try { renderMeters(); } catch (error) { console.error('Meter startup:', error); }
   try { renderData(); } catch (error) { console.error('Data startup:', error); }
