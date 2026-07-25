@@ -36,3 +36,4 @@
 .sankey-summary strong{font-size:17px;white-space:nowrap}
 @media(max-width:780px){.sankey-card{grid-template-columns:1fr}.sankey-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sankey-summary>div{display:block}.sankey-summary strong{display:block;margin-top:5px}}
 @media(max-width:480px){.sankey-summary{grid-template-columns:1fr}.sankey-diagram,.sankey-diagram svg,.sankey-empty{min-height:330px}}
+.sankey-date-control{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.sankey-date-control label,.sankey-date-control small{font-size:11px;color:var(--muted)}.sankey-date-control input{border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 12px}.sankey-date-control small{flex-basis:100%;text-align:right}@media(max-width:760px){.sankey-date-control{justify-content:flex-start}.sankey-date-control small{text-align:left}}

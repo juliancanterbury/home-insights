@@ -1,5 +1,5 @@
-# Home Insights
+# Home Insights complete shared-data fix
 
-Overview includes real electricity/gas history from `data/home_insights.json`, real water bill values, and live Brunswick weather from Open-Meteo.
+This build centralises live electricity totals and Sankey flows in Google Apps Script/Sheets, supports historical Sigenergy Sankeys reconstructed from retained Home Assistant history, and adds bookmarkable hash URLs for every existing page.
 
-Sigenergy live placeholders are ready for a Home Assistant proxy endpoint.
+Read `SETUP-COMPLETE-FIX.txt` before deployment. The backend source is in `backend/Code.gs`.

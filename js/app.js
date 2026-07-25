@@ -7,26 +7,47 @@
   const number = item => item && item.available && Number.isFinite(Number(item.value)) ? Number(item.value) : null;
   const kw = value => value === null ? '-- kW' : `${Math.abs(value).toFixed(Math.abs(value) >= 10 ? 1 : 2)} kW`;
   let lastLive = null;
-  const liveCostKey = 'home-insights-live-cost-v1';
-  let liveCost = loadLiveCost();
+  let sharedToday = null;
   function dayKey(d=new Date()){ return new Intl.DateTimeFormat('en-CA',{timeZone:cfg.timezone,year:'numeric',month:'2-digit',day:'2-digit'}).format(d); }
-  function loadLiveCost(){ try{ const x=JSON.parse(localStorage.getItem(liveCostKey)||'null'); return x&&x.date===dayKey()?x:{date:dayKey(),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null}; }catch{return {date:dayKey(),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null};} }
-  function saveLiveCost(){ localStorage.setItem(liveCostKey,JSON.stringify(liveCost)); }
-  function renderLiveCost(now=new Date()){ const parts=new Intl.DateTimeFormat('en-AU',{timeZone:cfg.timezone,hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).formatToParts(now); const h=+parts.find(x=>x.type==='hour').value,m=+parts.find(x=>x.type==='minute').value,sec=+parts.find(x=>x.type==='second').value; const elapsed=(h*3600+m*60+sec)/86400; const supply=cfg.dailySupplyCharge*elapsed; const paid=liveCost.paidImportKwh*cfg.importRate; const credit=liveCost.exportKwh*cfg.feedInRate; const total=supply+paid-credit; $('electricityTotal').textContent=money(total); $('electricityDetailTotal').textContent=money(total); $('costElectricity').textContent=money(total); $('supplyCost').textContent=money(supply); $('paidEnergyCost').textContent=money(paid); $('freeEnergyUsed').textContent=`${liveCost.freeImportKwh.toFixed(2)} kWh`; $('exportCredit').textContent=credit?`−${money(credit)}`:money(0); }
-  function updateLiveCost(stamp,gridImport,gridExport){ if(liveCost.date!==dayKey(stamp)) liveCost={date:dayKey(stamp),paidImportKwh:0,freeImportKwh:0,exportKwh:0,lastTime:null}; const t=stamp.getTime(); if(liveCost.lastTime){ const hours=Math.max(0,Math.min((t-liveCost.lastTime)/3600000,0.05)); const hour=+new Intl.DateTimeFormat('en-AU',{timeZone:cfg.timezone,hour:'2-digit',hour12:false}).format(stamp); const imp=Math.max(0,gridImport||0)*hours; if(hour>=cfg.freeWindow.start&&hour<cfg.freeWindow.end) liveCost.freeImportKwh+=imp; else liveCost.paidImportKwh+=imp; liveCost.exportKwh+=Math.max(0,gridExport||0)*hours; } liveCost.lastTime=t; saveLiveCost(); renderLiveCost(stamp); }
+  function renderSharedDay(row){
+    if(!row) return;
+    sharedToday = row;
+    const electric = Number.isFinite(+row.electricityTotal) ? +row.electricityTotal : null;
+    $('electricityTotal').textContent = money(electric);
+    $('electricityDetailTotal').textContent = money(electric);
+    $('costElectricity').textContent = money(electric);
+    $('supplyCost').textContent = money(row.electricitySupply);
+    $('paidEnergyCost').textContent = money(row.paidEnergyCost);
+    $('freeEnergyUsed').textContent = Number.isFinite(+row.freeImportKwh) ? `${(+row.freeImportKwh).toFixed(2)} kWh` : '— kWh';
+    $('exportCredit').textContent = Number.isFinite(+row.exportCredit) ? `−${money(Math.abs(+row.exportCredit))}` : '—';
+    $('solarToday').textContent = Number.isFinite(+row.solarKwh) ? `${(+row.solarKwh).toFixed(2)} kWh` : '—';
+    $('loadToday').textContent = Number.isFinite(+row.loadKwh) ? `${(+row.loadKwh).toFixed(2)} kWh` : '—';
+    $('importToday').textContent = Number.isFinite(+row.importKwh) ? `${(+row.importKwh).toFixed(2)} kWh` : '—';
+    $('exportToday').textContent = Number.isFinite(+row.exportKwh) ? `${(+row.exportKwh).toFixed(2)} kWh` : '—';
+    $('solarHeroToday').textContent = Number.isFinite(+row.solarKwh) ? `Today ${(+row.solarKwh).toFixed(2)} kWh` : 'Today — kWh';
+    window.dispatchEvent(new CustomEvent('homeinsights:shared-day',{detail:row}));
+  }
+
 
   function setGreeting(){
     const h = new Date().getHours();
     $('greeting').textContent = h < 12 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   }
 
-  function showPage(id){
+  const pageIds = new Set(Array.from(document.querySelectorAll('.page')).map(page=>page.id));
+  function routeFor(id){ return `#/${pageIds.has(id)?id:'home'}`; }
+  function pageFromLocation(){ const id=(location.hash||'#/home').replace(/^#\/?/,'').split(/[?&]/)[0]; return pageIds.has(id)?id:'home'; }
+  function showPage(id,{updateUrl=true,smooth=true}={}){
+    if(!pageIds.has(id)) id='home';
     document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === id));
     document.querySelectorAll('.bottom-nav [data-page-link]').forEach(btn => btn.classList.toggle('active', btn.dataset.pageLink === id));
-    window.scrollTo({top:0,behavior:'smooth'});
+    document.title = id==='home' ? 'Home Insights' : `${id.charAt(0).toUpperCase()+id.slice(1)} · Home Insights`;
+    if(updateUrl && location.hash!==routeFor(id)) history.pushState(null,'',routeFor(id));
+    window.scrollTo({top:0,behavior:smooth?'smooth':'auto'});
   }
 
-  document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', () => showPage(el.dataset.pageLink)));
+  document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', event => {event.preventDefault();showPage(el.dataset.pageLink);}));
+  window.addEventListener('hashchange',()=>showPage(pageFromLocation(),{updateUrl:false,smooth:false}));
   document.querySelectorAll('[data-expand]').forEach(el => el.addEventListener('click', () => {
     const panel = $(el.dataset.expand);
     if (!panel) return;
@@ -80,7 +101,6 @@
     $('updatedAt').textContent = `Updated ${stamp.toLocaleTimeString('en-AU',{hour:'2-digit',minute:'2-digit',second:'2-digit'})}`;
     $('liveText').textContent = 'Live';
     $('livePill').className = 'live-pill live';
-    updateLiveCost(stamp, gridImport, gridExport);
     lastLive = payload;
     const sample={time:stamp.toISOString(),solar:solar||0,house:house||0,grid:importing?(gridImport||0):exporting?-(gridExport||0):0,battery:batteryPower||0,soc:soc};
     window.HomeInsightsCharts?.addLiveSample(sample);
@@ -95,13 +115,16 @@
 
   async function poll(){
     try{
-      const response = await fetch(cfg.liveApi,{cache:'no-store'});
+      const endpoint = cfg.sharedApi || cfg.liveApi;
+      const response = await fetch(endpoint,{cache:'no-store'});
       if(!response.ok) throw new Error(`HTTP ${response.status}`);
       const json = await response.json();
       if(!json.ok) throw new Error(json.error || 'Backend error');
       renderLive(json.data || {},json.serverTime);
+      if(json.today) renderSharedDay(json.today);
+      $('electricityLiveStatus').textContent = json.shared ? 'Shared backend connected' : 'Live source connected';
     }catch(error){
-      console.warn('Home Insights live energy:',error);
+      console.warn('Home Insights shared energy:',error);
       liveError(error.message || 'Connection failed');
     }
   }
@@ -168,10 +191,12 @@
 
   const today = new Date().toISOString().slice(0,10);
   $('costDate').value = today;
-  $('costDate').addEventListener('change',e => renderCosts(e.target.value));
-  renderCosts(today);
-  renderLiveCost();
-  setInterval(()=>renderLiveCost(),60000);
+  async function loadSharedDate(date){
+    if(!cfg.sharedApi){renderCosts(date);return;}
+    try{const sep=cfg.sharedApi.includes('?')?'&':'?';const response=await fetch(`${cfg.sharedApi}${sep}action=day&date=${encodeURIComponent(date)}`,{cache:'no-store'});const json=await response.json();if(!json.ok)throw new Error(json.error||'Backend error');const row=json.day||json.today;if(date===dayKey())renderSharedDay(row);const existing=daily.findIndex(r=>r.date===date);if(existing>=0)daily[existing]=row;else daily.push(row);renderCosts(date);}catch(error){console.warn('Shared daily record:',error);renderCosts(date);}
+  }
+  $('costDate').addEventListener('change',e => loadSharedDate(e.target.value));
+  loadSharedDate(today);
   setGreeting();
   window.HomeInsightsCharts?.init();
   poll();
@@ -269,5 +294,6 @@
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`home-insights-${$('dataSource').value}.csv`;a.click();URL.revokeObjectURL(a.href);
   });
 
+  showPage(pageFromLocation(),{updateUrl:false,smooth:false});
   loadWeather();setInterval(loadWeather,30*60*1000);renderMeters();renderData();
 })();

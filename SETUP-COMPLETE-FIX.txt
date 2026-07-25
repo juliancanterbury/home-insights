@@ -1,0 +1,78 @@
+HOME INSIGHTS — SHARED BACKEND + HISTORIC SIGENERGY SANKEY + PAGE URLS
+
+WHAT THIS FIX DOES
+1. Removes browser-local electricity cost and Sankey accumulation.
+2. Desktop, laptop and phone read the same Google Apps Script/Sheet records.
+3. Adds a date selector to the Sankey and a backend API for any recorded day.
+4. Adds a Home Assistant history importer for Sigenergy entities only.
+5. Gives every existing page its own bookmarkable URL using GitHub-Pages-safe hash routes:
+   #/home, #/electricity, #/battery, #/solar, #/costs, #/weather,
+   #/meters, #/data, #/ask and #/more.
+   Browser Back/Forward and refresh now retain the selected page.
+
+A. UPDATE THE WEBSITE
+1. Replace the files in your GitHub home-insights repository with this package.
+2. Check js/data.js. It already contains the shared /exec URL supplied during setup.
+3. Commit and push in GitHub Desktop.
+4. After GitHub Pages deploys, open the site with Ctrl+F5.
+5. The Electricity page should say “Shared backend connected”.
+
+B. UPDATE THE EXISTING SHARED APPS SCRIPT
+1. Open the NEW shared-backend Apps Script project you created (not the older live endpoint).
+2. Replace its entire Code.gs with backend/Code.gs from this package.
+3. Save.
+4. Run setup() once. Authorise it if asked.
+5. Deploy > Manage deployments > Edit > choose New version > Deploy.
+   Keep Execute as Me and access Anyone.
+   The /exec URL should remain the same.
+
+C. IDENTIFY THE SIX SIGENERGY ENTITY IDs
+The historic importer needs the same six underlying Home Assistant values used by the live display:
+- solar power
+- house/load power
+- battery power (positive charging, negative discharging)
+- battery SOC
+- grid import power
+- grid export power
+
+1. In Code.gs, run discoverSigenergyEntities().
+2. Open the “Home Insights Shared Data” spreadsheet created by setup().
+3. Open the Entity Discovery sheet.
+4. Find the six correct Sigenergy entities. The unit for power should normally be kW.
+
+D. CONNECT HOME ASSISTANT HISTORY
+1. In Code.gs find function configureHomeAssistant().
+2. Replace all eight PASTE_ placeholders:
+   - Nabu Casa URL
+   - long-lived Home Assistant token
+   - six entity IDs
+3. Save and run configureHomeAssistant().
+4. It must return: “Connected. All six Sigenergy entities were found.”
+
+The token is saved in Apps Script Script Properties and is not returned by the public web API.
+Do not put the token in GitHub or js/data.js.
+
+E. IMPORT THE HISTORIC SIGENERGY SANKEY DATA
+1. Run startHistoricSigenergyImport() once.
+2. The importer processes up to three days per run and continues automatically every five minutes.
+3. Check the Settings sheet:
+   - History status
+   - History cursor
+4. The import begins at 2025-08-06 and stops at today.
+5. It imports only history retained by Home Assistant for the six Sigenergy entities.
+6. When finished, History status becomes Complete.
+
+You can manually run importNextHistoryBatch() to advance it immediately.
+Run stopHistoricSigenergyImport() to stop it.
+
+F. CHECK IT IS WORKING
+1. Open the website on both machines.
+2. Electricity should show “Shared backend connected”.
+3. Choose the same date in the Sankey on both machines. Values must match.
+4. Try a direct page URL, for example:
+   your-site-address/#/electricity
+   Refresh: it should remain on Electricity.
+5. Browser Back and Forward should move between pages.
+
+IMPORTANT LIMITATION
+Historic Sankeys are reconstructed from the Sigenergy power entities retained in Home Assistant history. They are not invented. A day with missing or incomplete HA history displays “No flow record for this day”. The row is labelled “reconstructed from recorded power states”.
