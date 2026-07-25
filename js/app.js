@@ -37,7 +37,7 @@
   const pageIds = new Set(Array.from(document.querySelectorAll('.page')).map(page=>page.id));
   function routeFor(id){ return `#/${pageIds.has(id)?id:'home'}`; }
   function pageFromLocation(){ const id=(location.hash||'#/home').replace(/^#\/?/,'').split(/[?&]/)[0]; return pageIds.has(id)?id:'home'; }
-  function showPage(id,{updateUrl=true,smooth=true}={}){
+  function displayPage(id,{updateUrl=true,smooth=true}={}){
     if(!pageIds.has(id)) id='home';
     document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === id));
     document.querySelectorAll('.bottom-nav [data-page-link]').forEach(btn => btn.classList.toggle('active', btn.dataset.pageLink === id));
@@ -46,8 +46,10 @@
     window.scrollTo({top:0,behavior:smooth?'smooth':'auto'});
   }
 
-  document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', event => {event.preventDefault();showPage(el.dataset.pageLink);}));
-  window.addEventListener('hashchange',()=>showPage(pageFromLocation(),{updateUrl:false,smooth:false}));
+  const router={showPage:displayPage,pageFromLocation,routeFor};
+  window.HomeInsightsRouter=router;
+  document.querySelectorAll('[data-page-link]').forEach(el => el.addEventListener('click', event => {event.preventDefault();router.showPage(el.dataset.pageLink);}));
+  window.addEventListener('hashchange',()=>router.showPage(router.pageFromLocation(),{updateUrl:false,smooth:false}));
   document.querySelectorAll('[data-expand]').forEach(el => el.addEventListener('click', () => {
     const panel = $(el.dataset.expand);
     if (!panel) return;
@@ -116,9 +118,9 @@
   async function poll(){
     try{
       const endpoint = cfg.sharedApi || cfg.liveApi;
-      const response = await fetch(endpoint,{cache:'no-store'});
-      if(!response.ok) throw new Error(`HTTP ${response.status}`);
-      const json = await response.json();
+      const json = cfg.sharedApi
+        ? await window.HomeInsightsApi.request(endpoint)
+        : await fetch(endpoint,{cache:'no-store'}).then(response=>{if(!response.ok)throw new Error(`HTTP ${response.status}`);return response.json();});
       if(!json.ok) throw new Error(json.error || 'Backend error');
       renderLive(json.data || {},json.serverTime);
       if(json.today) renderSharedDay(json.today);
@@ -127,6 +129,16 @@
       console.warn('Home Insights shared energy:',error);
       liveError(error.message || 'Connection failed');
     }
+  }
+
+
+  async function loadSharedSamples(date=dayKey()){
+    if(!cfg.sharedApi || !window.HomeInsightsCharts?.setLiveSamples) return;
+    try{
+      const json=await window.HomeInsightsApi.request(cfg.sharedApi,{action:'samples',date});
+      if(!json.ok) throw new Error(json.error||'Backend error');
+      window.HomeInsightsCharts.setLiveSamples((json.samples||[]).map(s=>({time:s.timestamp,solar:s.solar,house:s.house,battery:s.batteryPower,soc:s.batterySoc,grid:(s.gridImport||0)>0?s.gridImport:-Math.abs(s.gridExport||0)})));
+    }catch(error){console.warn('Shared live samples:',error);}
   }
 
   function recordFor(date){ return daily.find(r => r.date === date); }
@@ -199,6 +211,7 @@
   loadSharedDate(today);
   setGreeting();
   window.HomeInsightsCharts?.init();
+  loadSharedSamples();
   poll();
   setInterval(poll,cfg.pollMs);
 })();
@@ -294,6 +307,7 @@
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`home-insights-${$('dataSource').value}.csv`;a.click();URL.revokeObjectURL(a.href);
   });
 
-  showPage(pageFromLocation(),{updateUrl:false,smooth:false});
+  router.showPage(router.pageFromLocation(),{updateUrl:false,smooth:false});
+  loadSharedSamples();
   loadWeather();setInterval(loadWeather,30*60*1000);renderMeters();renderData();
 })();

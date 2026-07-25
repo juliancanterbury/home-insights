@@ -1,0 +1,45 @@
+HOME INSIGHTS — CORS, ROUTING, WEATHER AND LIVE DATA FIX
+
+Why it failed
+-------------
+1. The shared Apps Script endpoint was called with fetch(). Chrome blocked the response under CORS, so live house power, today's totals, live samples and Sankey history could not load.
+2. The deployed app.js had a routing initialisation error (showPage was not defined), which stopped JavaScript before Weather could load.
+
+What this package changes
+-------------------------
+- Uses JSONP for all Apps Script reads, avoiding browser CORS restrictions.
+- Adds JSONP support to Code.gs.
+- Makes routing explicit through window.HomeInsightsRouter.
+- Restores Weather loading after routing starts.
+- Reloads today's shared Samples into the live graph.
+- Adds cache-busting versions to the JavaScript file URLs.
+
+Apply it
+--------
+A. APPS SCRIPT
+1. Replace all of Code.gs with backend/Code.gs from this package.
+2. Save.
+3. Deploy > Manage deployments > Edit > New version > Deploy.
+4. Keep the same /exec URL.
+5. Do not rerun setup, configuration or the CSV import.
+
+B. GITHUB HOME-INSIGHTS REPOSITORY
+Replace these files/folders with the package versions:
+- index.html
+- js/app.js
+- js/api.js (new)
+- js/sankey.js
+- js/charts.js
+- css/ (use the package copy to keep the release consistent)
+Keep your existing js/data.js if it already contains the correct sharedApi /exec URL.
+
+Commit and push. Wait for GitHub Pages, then press Ctrl+F5 once.
+
+Expected checks
+---------------
+- Console no longer shows showPage is not defined.
+- Console no longer shows a CORS error for script.google.com.
+- House kW updates every five seconds.
+- Weather loads normally.
+- Electricity date 24/07/2026 displays the imported Sankey values.
+- Live chart loads today's stored Samples immediately after refresh.

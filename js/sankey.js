@@ -35,7 +35,7 @@
   }
   async function loadDate(date){
     const status=document.getElementById('sankeyStatus');if(status)status.textContent='Loading shared history…';
-    try{const sep=cfg.sharedApi.includes('?')?'&':'?';const r=await fetch(`${cfg.sharedApi}${sep}action=day&date=${encodeURIComponent(date)}`,{cache:'no-store'});if(!r.ok)throw new Error(`HTTP ${r.status}`);const j=await r.json();if(!j.ok)throw new Error(j.error||'Backend error');setFlow(j.day||j.today);}
+    try{const j=await window.HomeInsightsApi.request(cfg.sharedApi,{action:'day',date});if(!j.ok)throw new Error(j.error||'Backend error');setFlow(j.day||j.today);}
     catch(err){if(status)status.textContent=`History unavailable · ${err.message}`;setFlow({date});}
   }
   window.addEventListener('homeinsights:shared-day',e=>{const picker=document.getElementById('sankeyDate');if(!picker||picker.value===dayKey())setFlow(e.detail)});
