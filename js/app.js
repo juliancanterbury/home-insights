@@ -115,7 +115,10 @@
     $('updatedAt').textContent = lastLive ? `Live update interrupted · ${message}` : `Live connection unavailable · ${message}`;
   }
 
+  let pollInFlight = false;
   async function poll(){
+    if (pollInFlight) return;
+    pollInFlight = true;
     try{
       const endpoint = cfg.sharedApi || cfg.liveApi;
       const json = cfg.sharedApi
@@ -128,6 +131,8 @@
     }catch(error){
       console.warn('Home Insights shared energy:',error);
       liveError(error.message || 'Connection failed');
+    } finally {
+      pollInFlight = false;
     }
   }
 
@@ -307,7 +312,17 @@
     const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download=`home-insights-${$('dataSource').value}.csv`;a.click();URL.revokeObjectURL(a.href);
   });
 
-  router.showPage(router.pageFromLocation(),{updateUrl:false,smooth:false});
-  loadSharedSamples();
-  loadWeather();setInterval(loadWeather,30*60*1000);renderMeters();renderData();
+  // Start each independent feature defensively so one failure cannot break the rest.
+  try {
+    const r = window.HomeInsightsRouter;
+    if (r && typeof r.showPage === 'function') {
+      r.showPage(r.pageFromLocation(), { updateUrl:false, smooth:false });
+    } else {
+      displayPage(pageFromLocation(), { updateUrl:false, smooth:false });
+    }
+  } catch (error) { console.error('Router startup:', error); }
+  try { loadSharedSamples(); } catch (error) { console.error('Sample startup:', error); }
+  try { loadWeather(); setInterval(loadWeather,30*60*1000); } catch (error) { console.error('Weather startup:', error); }
+  try { renderMeters(); } catch (error) { console.error('Meter startup:', error); }
+  try { renderData(); } catch (error) { console.error('Data startup:', error); }
 })();
