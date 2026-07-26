@@ -1,0 +1,26 @@
+(() => {
+  'use strict';
+  const { $ } = window.HomeInsights;
+  const meterKey = 'home-insights-meter-readings'; let meterKind = 'gas'; const liveRows = [];
+  const readMeters = () => { try { return JSON.parse(localStorage.getItem(meterKey) || '[]'); } catch { return []; } };
+  const writeMeters = rows => localStorage.setItem(meterKey, JSON.stringify(rows));
+  function renderMeters() {
+    const rows = readMeters().sort((a,b) => b.date.localeCompare(a.date));
+    ['gas','water'].forEach(kind => { const row = rows.find(item => item.kind === kind); $(`${kind}LastReading`).textContent = row ? row.value : '—'; $(`${kind}LastDate`).textContent = row ? new Date(row.date).toLocaleString('en-AU',{day:'numeric',month:'short',year:'numeric',hour:'numeric',minute:'2-digit'}) : 'No reading saved'; });
+    $('meterRecords').innerHTML = rows.length ? rows.map(row => `<div class="record-row"><b>${row.kind==='gas'?'Gas':'Water'}</b><strong>${row.value}</strong><small>${new Date(row.date).toLocaleString('en-AU')}</small><button data-delete-meter="${row.id}">Delete</button></div>`).join('') : '<div class="chart-empty"><div><strong>No readings yet</strong>Add a manual reading or meter photo above.</div></div>';
+    document.querySelectorAll('[data-delete-meter]').forEach(button => button.addEventListener('click', () => { writeMeters(readMeters().filter(row => row.id !== button.dataset.deleteMeter)); renderMeters(); renderData(); }));
+  }
+  function sourceRows() { const source = $('dataSource')?.value || 'daily'; if (source === 'meters') return readMeters().map(row => ({date:row.date,service:row.kind,reading:row.value,source:row.source})); if (source === 'live') return liveRows.slice().reverse(); return (window.HOME_INSIGHTS_DAILY || []).slice().reverse(); }
+  function renderData() { const query = ($('dataSearch')?.value || '').toLowerCase(); let rows = sourceRows(); if (query) rows = rows.filter(row => JSON.stringify(row).toLowerCase().includes(query)); const keys = rows.length ? Array.from(new Set(rows.flatMap(row => Object.keys(row)))) : []; $('dataHead').innerHTML = keys.length ? `<tr>${keys.map(key => `<th>${key.replaceAll('_',' ')}</th>`).join('')}</tr>` : ''; $('dataBody').innerHTML = rows.map(row => `<tr>${keys.map(key => `<td>${row[key]??''}</td>`).join('')}</tr>`).join(''); $('dataEmpty').hidden = rows.length > 0; document.querySelector('.data-table-wrap')?.toggleAttribute('hidden', rows.length === 0); }
+  function start() {
+    document.querySelectorAll('[data-open-meter]').forEach(button => button.addEventListener('click', () => { meterKind = button.dataset.openMeter; $('meterKindLabel').textContent = meterKind==='gas'?'Gas meter':'Water meter'; $('meterEntry').hidden = false; const now = new Date(); $('meterDate').value = new Date(now.getTime()-now.getTimezoneOffset()*60000).toISOString().slice(0,16); $('meterValue').value=''; $('meterPreview').hidden=true; $('meterEntry').scrollIntoView({behavior:'smooth'}); }));
+    $('closeMeterEntry')?.addEventListener('click', () => { $('meterEntry').hidden = true; });
+    $('meterPhoto')?.addEventListener('change', event => { const file = event.target.files?.[0]; if (!file) return; $('meterPreview').src = URL.createObjectURL(file); $('meterPreview').hidden = false; });
+    $('saveMeterReading')?.addEventListener('click', () => { const value=$('meterValue').value.trim(), date=$('meterDate').value; if(!value||!date){alert('Enter the meter reading and date.');return;} const rows=readMeters(); rows.push({id:crypto.randomUUID?crypto.randomUUID():String(Date.now()),kind:meterKind,value,date:new Date(date).toISOString(),source:$('meterPhoto').files?.[0]?'photo-confirmed':'manual'}); writeMeters(rows); $('meterEntry').hidden=true; renderMeters(); renderData(); });
+    window.addEventListener('homeinsights:live', event => { liveRows.push(event.detail); if (liveRows.length > 500) liveRows.shift(); if ($('dataSource')?.value === 'live') renderData(); });
+    $('dataSource')?.addEventListener('change', renderData); $('dataSearch')?.addEventListener('input', renderData);
+    $('downloadCsv')?.addEventListener('click', () => { const rows=sourceRows(); if(!rows.length){alert('There are no records to export yet.');return;} const keys=Array.from(new Set(rows.flatMap(row=>Object.keys(row)))); const escape=value=>`"${String(value??'').replaceAll('"','""')}"`; const csv=[keys.map(escape).join(','),...rows.map(row=>keys.map(key=>escape(row[key])).join(','))].join('\n'); const link=document.createElement('a'); link.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); link.download=`home-insights-${$('dataSource').value}.csv`; link.click(); URL.revokeObjectURL(link.href); });
+    renderMeters(); renderData();
+  }
+  window.HomeInsightsLocalData = { start, renderMeters, renderData };
+})();

@@ -39,6 +39,6 @@
     catch(err){if(status)status.textContent=`History unavailable · ${err.message}`;setFlow({date});}
   }
   window.addEventListener('homeinsights:shared-day',e=>{const picker=document.getElementById('sankeyDate');if(!picker||picker.value===dayKey())setFlow(e.detail)});
-  document.addEventListener('DOMContentLoaded',()=>{const picker=document.getElementById('sankeyDate');if(picker){picker.max=dayKey();picker.value=dayKey();picker.addEventListener('change',()=>loadDate(picker.value));}render();});
+  document.addEventListener('DOMContentLoaded',()=>{render();});
   window.HomeInsightsSankey={render,loadDate,setFlow};
 })();

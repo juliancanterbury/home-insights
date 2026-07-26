@@ -48,22 +48,22 @@
         </div>
         <section class="electricity-hero" aria-label="Today’s electricity summary">
           <button class="electricity-cost-hero" data-expand="electricityCost">
-            <span class="cost-kicker">Today’s electricity</span>
+            <span class="cost-kicker" id="electricityCostKicker">Today’s electricity</span>
             <strong id="electricityTotal">—</strong>
-            <span class="cost-caption">running cost so far</span>
+            <span class="cost-caption" id="electricitySelectedDate">Today so far</span>
             <span class="cost-detail-link">View calculation <i>⌄</i></span>
           </button>
           <div class="daily-flow electricity-flow-grid">
-            <div class="flow-total flow-solar"><span>Solar</span><strong id="solarToday">—</strong><small>generated today</small></div>
-            <div class="flow-total flow-house"><span>House</span><strong id="loadToday">—</strong><small>used today</small></div>
+            <div class="flow-total flow-solar"><span>Solar</span><strong id="solarToday">—</strong><small id="solarPeriodLabel">generated</small></div>
+            <div class="flow-total flow-house"><span>House</span><strong id="loadToday">—</strong><small id="loadPeriodLabel">used</small></div>
             <div class="flow-total flow-import"><span>Imported</span><strong id="importToday">—</strong><small>from grid</small></div>
             <div class="flow-total flow-export"><span>Exported</span><strong id="exportToday">—</strong><small>to grid</small></div>
           </div>
         </section>
-        <div class="details-panel electricity-cost-panel" id="electricityCost"><div><span>Supply charge accrued</span><strong id="supplyCost">—</strong></div><div><span>Paid imports</span><strong id="paidEnergyCost">—</strong></div><div><span>Free 11–2 energy</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Feed-in credit</span><strong class="negative-value" id="exportCredit">—</strong></div><div class="details-total"><span>Net cost today</span><strong id="electricityDetailTotal">—</strong></div></div>
+        <div class="details-panel electricity-cost-panel" id="electricityCost"><div><span id="supplyLabel">Supply charge</span><strong id="supplyCost">—</strong></div><div><span>Paid imports</span><strong id="paidEnergyCost">—</strong></div><div><span>Free 11–2 energy</span><strong id="freeEnergyUsed">— kWh</strong></div><div><span>Feed-in credit</span><strong class="negative-value" id="exportCredit">—</strong></div><div class="details-total"><span id="netCostLabel">Net electricity cost</span><strong id="electricityDetailTotal">—</strong></div></div>
         <section class="explore-section electricity-flow-section" aria-labelledby="energyFlowTitle">
           <div class="explore-head electricity-explore-head">
-            <div><p class="eyebrow">Today · energy flow</p><h2 id="energyFlowTitle">Where the electricity went</h2><p class="chart-note">Band width represents energy. Choose any imported Sigenergy day.</p></div><div class="sankey-date-control"><label for="sankeyDate">Date</label><input id="sankeyDate" type="date"><small id="sankeyStatus">Shared backend</small></div>
+            <div><p class="eyebrow" id="energyFlowEyebrow">Today · energy flow</p><h2 id="energyFlowTitle">Where the electricity went</h2><p class="chart-note">Band width represents energy. Choose any imported Sigenergy day.</p></div><div class="sankey-date-control"><label for="sankeyDate">Date</label><input id="sankeyDate" type="date"><small id="sankeyStatus">Shared backend</small></div>
           </div>
           <div class="sankey-card">
             <div class="sankey-diagram" id="energySankey" aria-label="Today’s household energy flow diagram"></div>
@@ -78,7 +78,7 @@
           </div>
         </section>
         <section class="explore-section electricity-live-chart-section">
-          <div class="explore-head electricity-explore-head"><div><p class="eyebrow">Today · live</p><h2>Power flows through the day</h2><p class="chart-note">Sigenergy-style live power: solar and grid import above zero; battery charging, grid export and other outward flows below zero.</p></div></div>
+          <div class="explore-head electricity-explore-head"><div><p class="eyebrow" id="powerChartEyebrow">Today · live</p><h2 id="powerChartTitle">Power flows through the day</h2><p class="chart-note" id="powerChartNote">Sigenergy-style live power: solar and grid import above zero; battery charging, grid export and other outward flows below zero.</p></div></div>
           <div class="live-series-legend"><span class="solar">Solar</span><span class="battery">Battery</span><span class="grid">Grid</span><span class="load">Load</span></div>
           <div class="interactive-chart sigenergy-chart live-power-chart" id="electricityLiveChart" aria-label="Live power metrics chart"></div>
         </section>
@@ -151,8 +151,19 @@
 
     <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
-  <script src="js/data.js?v=20260726a"></script>
-  <script src="js/api.js?v=20260726a"></script>
-  <script src="js/history-data.js?v=20260726a"></script><script src="js/charts.js?v=20260726a"></script><script src="js/sankey.js?v=20260726a"></script><script src="js/app.js?v=20260726a"></script>
+  <script src="js/data.js?v=20260726v2"></script>
+  <script src="js/api.js?v=20260726v2"></script>
+  <script src="js/history-data.js?v=20260726v2"></script>
+  <script src="js/core.js?v=20260726v2"></script>
+  <script src="js/router.js?v=20260726v2"></script>
+  <script src="js/charts.js?v=20260726v2"></script>
+  <script src="js/sankey.js?v=20260726v2"></script>
+  <script src="js/theme.js?v=20260726v2"></script>
+  <script src="js/costs.js?v=20260726v2"></script>
+  <script src="js/live.js?v=20260726v2"></script>
+  <script src="js/weather.js?v=20260726v2"></script>
+  <script src="js/local-data.js?v=20260726v2"></script>
+  <script src="js/electricity-date.js?v=20260726v3"></script>
+  <script src="js/bootstrap.js?v=20260726v3"></script>
 </body>
 </html>
