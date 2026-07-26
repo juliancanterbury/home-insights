@@ -216,7 +216,7 @@
   loadSharedDate(today);
   setGreeting();
   window.HomeInsightsCharts?.init();
-  loadSharedSamples();
+  window.HomeInsightsLoadSharedSamples();
   poll();
   setInterval(poll,cfg.pollMs);
 })();
