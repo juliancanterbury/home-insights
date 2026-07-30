@@ -20,14 +20,17 @@
 /* Today energy-flow Sankey */
 .electricity-flow-section{padding-bottom:18px}
 .sankey-card{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(220px,.65fr);gap:22px;align-items:stretch}
-.sankey-diagram{min-height:390px;border:1px solid color-mix(in srgb,var(--line) 82%,transparent);border-radius:24px;background:linear-gradient(180deg,color-mix(in srgb,var(--panel) 92%,#0a1725),color-mix(in srgb,var(--panel-2) 96%,#06101a));overflow:hidden;position:relative}
+.sankey-diagram{min-height:390px;border:1px solid color-mix(in srgb,var(--line) 68%,transparent);border-radius:24px;background:radial-gradient(circle at 50% 45%,rgba(100,128,180,.06),transparent 52%),linear-gradient(180deg,color-mix(in srgb,var(--panel) 94%,#08131f),color-mix(in srgb,var(--panel-2) 97%,#050d16));overflow:hidden;position:relative}
 .sankey-diagram svg{display:block;width:100%;height:auto;min-height:390px}
-.sankey-band{mix-blend-mode:screen;opacity:.68;transition:opacity .2s ease}
-.sankey-band:hover{opacity:.96}
-.sankey-node{stroke:color-mix(in srgb,var(--text) 16%,transparent);stroke-width:1}
-.sankey-node-label{font:600 15px/1.2 system-ui,sans-serif;fill:var(--text)}
-.sankey-node-value{font:750 22px/1.2 system-ui,sans-serif;fill:var(--text)}
-.sankey-node-unit{font:500 12px/1.2 system-ui,sans-serif;fill:var(--muted)}
+.sankey-links{isolation:isolate}
+.sankey-ribbon{mix-blend-mode:screen;opacity:.82;transition:opacity .2s ease;filter:saturate(1.08)}
+.sankey-ribbon:hover{opacity:1}
+.sankey-node{stroke:rgba(255,255,255,.16);stroke-width:1}
+.sankey-node-group{filter:drop-shadow(0 7px 12px rgba(0,0,0,.22))}
+.sankey-node-label{font:650 14px/1.2 system-ui,sans-serif;fill:#f7fbff}
+.sankey-node-value{font:780 20px/1.2 system-ui,sans-serif;fill:#fff}
+.sankey-node-unit{font:550 10px/1.2 system-ui,sans-serif;fill:rgba(255,255,255,.67);letter-spacing:.02em}
+.sankey-column-heading{font:700 9px/1 system-ui,sans-serif;letter-spacing:.16em;fill:var(--muted)}
 .sankey-empty{min-height:390px;display:grid;place-items:center;text-align:center;color:var(--muted);padding:36px}
 .sankey-empty strong{display:block;color:var(--text);font-size:20px;margin-bottom:8px}
 .sankey-summary{display:grid;grid-template-columns:1fr;gap:10px}
@@ -36,4 +39,3 @@
 .sankey-summary strong{font-size:17px;white-space:nowrap}
 @media(max-width:780px){.sankey-card{grid-template-columns:1fr}.sankey-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.sankey-summary>div{display:block}.sankey-summary strong{display:block;margin-top:5px}}
 @media(max-width:480px){.sankey-summary{grid-template-columns:1fr}.sankey-diagram,.sankey-diagram svg,.sankey-empty{min-height:330px}}
-.sankey-date-control{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}.sankey-date-control label,.sankey-date-control small{font-size:11px;color:var(--muted)}.sankey-date-control input{border:1px solid var(--line);background:var(--surface2);color:var(--text);border-radius:12px;padding:10px 12px}.sankey-date-control small{flex-basis:100%;text-align:right}@media(max-width:760px){.sankey-date-control{justify-content:flex-start}.sankey-date-control small{text-align:left}}
