@@ -85,6 +85,7 @@
 
     setText('batteryState', status);
     setText('batteryHeroState', status);
+    setText('batteryPowerNow', kw(Math.abs(batteryPower)));
 
     const fill = displaySoc === null ? 0 : displaySoc;
 
