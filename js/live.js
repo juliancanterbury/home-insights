@@ -1,7 +1,15 @@
 (() => {
   'use strict';
 
-  const { cfg, $, number, kw, dayKey, upsertDaily } = window.HomeInsights;
+  const {
+    cfg,
+    $,
+    number,
+    kw,
+    dayKey,
+    upsertDaily,
+    calculateLiveFlowBalance
+  } = window.HomeInsights;
 
   let lastLive = null;
   let pollInFlight = false;
@@ -34,6 +42,13 @@
     const soc = number(payload.batterySoc);
     const gridImport = number(payload.gridImport);
     const gridExport = number(payload.gridExport);
+    const balance = calculateLiveFlowBalance({
+      solar,
+      house,
+      batteryPower,
+      gridImport,
+      gridExport
+    });
 
     const importing = (gridImport || 0) > 0.02;
     const exporting = (gridExport || 0) > 0.02;
@@ -135,11 +150,13 @@
 
     setText(
       'updatedAt',
-      `Updated ${stamp.toLocaleTimeString('en-AU', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit'
-      })}`
+      balance.sensorsUpdating
+        ? 'Sensor values updating…'
+        : `Updated ${stamp.toLocaleTimeString('en-AU', {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          })}`
     );
 
     setText('liveText', 'Live');
@@ -160,7 +177,12 @@
           ? -(gridExport || 0)
           : 0,
       battery: batteryPower || 0,
-      soc
+      soc,
+      totalInputs: balance.totalInputs,
+      totalOutputs: balance.totalOutputs,
+      flowMismatch: balance.mismatch,
+      flowWithinTolerance: balance.withinTolerance,
+      sensorsUpdating: balance.sensorsUpdating
     };
 
     window.HomeInsightsCharts?.addLiveSample(sample);
