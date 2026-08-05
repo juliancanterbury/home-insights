@@ -5,6 +5,7 @@
   const fmt=v=>`${Number(v||0).toFixed(Number(v||0)>=10?1:2)} kWh`;
   function dayKey(d=new Date()){return new Intl.DateTimeFormat('en-CA',{timeZone:cfg.timezone||'Australia/Melbourne',year:'numeric',month:'2-digit',day:'2-digit'}).format(d)}
   function band(x1,y1,x2,y2,w,color){const c=(x2-x1)*.48;return `<path class="sankey-band" d="M ${x1} ${y1} C ${x1+c} ${y1}, ${x2-c} ${y2}, ${x2} ${y2}" fill="none" stroke="${color}" stroke-width="${Math.max(2,w)}" stroke-linecap="butt"/>`}
+  
   function node(x,y,w,h,label,value,fill){return `<g><rect class="sankey-node" x="${x}" y="${y}" width="${w}" height="${h}" rx="13" fill="${fill}"/><text class="sankey-node-label" x="${x+14}" y="${y+25}">${label}</text><text class="sankey-node-value" x="${x+14}" y="${y+52}">${value.toFixed(value>=10?1:2)}</text><text class="sankey-node-unit" x="${x+14}" y="${y+70}">kWh</text></g>`}
   function normalise(row){
     if(!row)return null;

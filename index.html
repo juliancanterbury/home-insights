@@ -107,10 +107,33 @@
 
       <section class="page" id="costs" aria-labelledby="costsTitle">
         <div class="page-intro"><p class="eyebrow">Services</p><h1 id="costsTitle">What the house cost.</h1><input class="date-picker" id="costDate" type="date" aria-label="Choose date"></div>
-        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-expand="serviceGas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em>Daily estimate</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button></div>
+        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button></div>
         <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
         <div class="details-panel service-detail" id="serviceElectricity"><p>Supply charge + paid imports − export credit. Imports from 11:00–14:00 are free.</p></div><div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills.</p></div><div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period.</p></div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
+      </section>
+
+      <section class="page gas-v2-page" id="gas" aria-labelledby="gasTitle">
+        <div class="page-intro gas-intro"><div><p class="eyebrow">Gas · V2</p><h1 id="gasTitle">Use less. See the difference.</h1><p class="updated" id="gasCoverage">Add two cumulative meter readings to calculate actual usage between them.</p></div><button class="gas-add-button" data-open-meter="gas">+ Add meter reading</button></div>
+        <section class="gas-hero" aria-label="Latest gas usage">
+          <div class="gas-hero-main"><span>Latest measured period</span><strong id="gasLatestDaily">—</strong><small id="gasLatestPeriod">Waiting for two readings</small></div>
+          <div class="gas-kpi"><span>Gas used</span><strong id="gasLatestMj">—</strong><small id="gasLatestUnits">between readings</small></div>
+          <div class="gas-kpi"><span>Estimated cost</span><strong id="gasLatestCost">—</strong><small>usage + daily supply</small></div>
+          <div class="gas-kpi"><span>Change</span><strong id="gasLatestChange">—</strong><small id="gasChangeCaption">versus previous period</small></div>
+        </section>
+        <section class="gas-goal-card">
+          <div><p class="eyebrow">Reduction goal</p><h2>On the way to zero gas.</h2><p id="gasGoalText">Your first two readings establish the baseline.</p></div>
+          <div class="gas-goal-meter"><div><i id="gasGoalFill"></i></div><strong id="gasGoalPercent">—</strong><small>reduction from baseline</small></div>
+        </section>
+        <section class="explore-section gas-history-section">
+          <div class="explore-head"><div><p class="eyebrow">Daily profile</p><h2>Usage between meter readings</h2><p class="chart-note">Each interval is spread evenly across its days. Drag or scroll sideways to move through time.</p></div><div class="range-control" id="gasRange"><button data-gas-range="30">1M</button><button class="active" data-gas-range="90">3M</button><button data-gas-range="365">1Y</button><button data-gas-range="all">All</button></div></div>
+          <div class="gas-chart-legend"><span><i></i>Daily gas</span><span id="gasChartUnit">MJ/day</span></div>
+          <div class="gas-chart-shell" id="gasChart" aria-label="Scrollable daily gas use chart"></div>
+        </section>
+        <section class="gas-lower-grid">
+          <div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Readings</p><h2>Meter history</h2></div><button class="gas-secondary-button" data-open-meter="gas">Add reading</button></div><div id="gasReadingList" class="gas-reading-list"></div></div>
+          <div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Calculation</p><h2>Gas settings</h2></div></div><div class="gas-settings-grid"><label>Energy conversion <span>MJ per meter unit</span><input id="gasMjPerUnit" type="number" min="0.01" step="0.01" value="38.61"></label><label>Usage rate <span>cents per MJ</span><input id="gasRate" type="number" min="0" step="0.001" value="3.20"></label><label>Daily supply <span>dollars per day</span><input id="gasSupply" type="number" min="0" step="0.01" value="0.90"></label></div><p class="gas-settings-note">Enter the conversion and rates shown on your latest gas bill. Changes save automatically in this browser.</p></div>
+        </section>
       </section>
 
 
@@ -122,16 +145,16 @@
       </section>
 
       <section class="page" id="meters" aria-labelledby="metersTitle">
-        <div class="page-intro"><p class="eyebrow">Meters</p><h1 id="metersTitle">Add a reading.</h1><p class="updated">Manual readings and meter photos are kept in this browser until the shared data store is connected.</p></div>
+        <div class="page-intro"><p class="eyebrow">Meters</p><h1 id="metersTitle">Add a reading.</h1><p class="updated">Type the meter number manually. A photo is optional evidence only; no OCR is used.</p></div>
         <div class="meter-grid">
           <article class="meter-card"><span class="meter-symbol gas-symbol">♨</span><h2>Gas</h2><p>Last reading</p><strong id="gasLastReading">—</strong><small id="gasLastDate">No reading saved</small><button class="primary-action" data-open-meter="gas">Add gas reading</button></article>
           <article class="meter-card"><span class="meter-symbol water-symbol">●</span><h2>Water</h2><p>Last reading</p><strong id="waterLastReading">—</strong><small id="waterLastDate">No reading saved</small><button class="primary-action" data-open-meter="water">Add water reading</button></article>
         </div>
         <div class="meter-entry" id="meterEntry" hidden>
           <div class="meter-entry-head"><div><p class="eyebrow" id="meterKindLabel">Meter</p><h2>New reading</h2></div><button id="closeMeterEntry">Close</button></div>
-          <div class="entry-grid"><label>Reading<input id="meterValue" inputmode="decimal" placeholder="Enter meter value"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
-          <label class="photo-input">Meter photo<input id="meterPhoto" type="file" accept="image/*" capture="environment"><span>Choose or take photo</span></label><img id="meterPreview" class="meter-preview" alt="Meter photo preview" hidden>
-          <p class="entry-note">The photo is retained as a preview only in this version. Confirm or correct the number before saving.</p>
+          <div class="entry-grid"><label>Cumulative meter reading<input id="meterValue" inputmode="decimal" placeholder="Type the number shown on the meter"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
+          <label class="photo-input">Optional meter photo<input id="meterPhoto" type="file" accept="image/*" capture="environment"><span>Choose or take photo</span></label><img id="meterPreview" class="meter-preview" alt="Meter photo preview" hidden>
+          <p class="entry-note">Manual entry is the primary workflow. The photo is shown only so you can check what you typed; it is not read automatically.</p>
           <button class="primary-action" id="saveMeterReading">Save reading</button>
         </div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Reading history</p><h2>Gas and water records</h2></div></div><div class="records-list" id="meterRecords"></div></section>
@@ -163,6 +186,7 @@
   <script src="js/live.js?v=20260805v1"></script>
   <script src="js/weather.js?v=20260726v2"></script>
   <script src="js/local-data.js?v=20260726v2"></script>
+  <script src="js/gas-v2.js?v=20260806v1"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
   <script src="js/bootstrap.js?v=20260726v3"></script>
 </body>

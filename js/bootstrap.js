@@ -5,6 +5,7 @@
   run('Router', () => window.HomeInsightsRouter.start());
   run('Theme', () => window.HomeInsightsTheme.start());
   run('Costs', () => window.HomeInsightsCosts.start());
+  run('Gas V2', () => window.HomeInsightsGasV2.start());
   run('Live energy', () => window.HomeInsightsLive.start());
   run('Electricity date', () => window.HomeInsightsElectricityDate.start());
   run('Weather', () => window.HomeInsightsWeather.start());

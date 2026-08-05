@@ -20,8 +20,11 @@
   };
 
   const setFlow = (selector, active) => {
+    
     document.querySelector(selector)?.classList.toggle('paused', !active);
   };
+
+ 
 
   function renderSharedDay(row) {
     if (!row) return;
@@ -36,6 +39,7 @@
   }
 
   function renderLive(payload, serverTime) {
+    
     const solar = number(payload.solar);
     const house = number(payload.house);
     const batteryPower = number(payload.batteryPower);
