@@ -2,6 +2,8 @@
   'use strict';
   const { cfg, $, money, dayKey, recordFor, upsertDaily } = window.HomeInsights;
   const setText = (id, value) => { const node = $(id); if (node) node.textContent = value; };
+  const hasCost = value => value !== null && value !== '' && Number.isFinite(+value);
+  const costText = value => hasCost(value) ? money(value) : '—';
 
   function renderElectricity(date) {
     const row = recordFor(date);
@@ -22,12 +24,23 @@
     const row = recordFor(date), electric = row?.electricityTotal;
     const gasEstimate = window.HomeInsightsGasV2?.gasEstimateForDate(date, true);
     const gas = gasEstimate?.cost ?? row?.gasTotal, water = row?.waterTotal;
-    const known = [electric, gas, water].filter(value => Number.isFinite(+value));
+    const known = [electric, gas, water].filter(hasCost);
     const total = known.length ? known.reduce((sum, value) => sum + +value, 0) : null;
-    setText('costElectricity', money(electric)); setText('costGas', money(gas)); setText('costWater', money(water));
+    setText('costElectricity', costText(electric)); setText('costGas', costText(gas)); setText('costWater', costText(water));
     if (gasEstimate) setText('costGasCaption', gasEstimate.isLatestEstimate ? `${gasEstimate.mj.toFixed(1)} MJ/day latest estimate` : `${gasEstimate.mj.toFixed(1)} MJ/day ${gasEstimate.source === 'manual' ? 'measured' : 'historical'}`);
     setText('costTotal', money(total));
-    if (includeHome) setText('homeTotalCost', money(total));
+    if (includeHome) {
+      setText('homeElectricityCost', costText(electric));
+      setText('homeGasCost', costText(gas));
+      setText('homeWaterCost', costText(water));
+      setText('homeTotalCost', costText(total));
+      const missing = [
+        ['electricity', electric],
+        ['gas', gas],
+        ['water', water]
+      ].filter(([, value]) => !hasCost(value)).map(([label]) => label);
+      setText('homeCostStatus', missing.length ? `${missing.join(' + ')} pending` : 'combined daily cost');
+    }
   }
 
   async function fetchDay(date) {

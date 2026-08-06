@@ -37,7 +37,18 @@
           <div class="house-node"><span class="house-outline"><i></i></span><span class="node-label">House</span><strong id="houseNow">-- kW</strong><small>Live consumption</small></div>
           <button class="energy-node node-battery" data-page-link="battery"><span class="battery-icon"><i id="batteryFill"></i></span><span class="node-label">Battery</span><strong id="batteryPowerNow">-- kW</strong><small><span id="batteryState">Waiting</span> · <span id="batterySoc">--%</span></small></button>
         </div>
-        <button class="today-cost" data-page-link="costs"><span>Today’s household services</span><strong id="homeTotalCost">—</strong><small>Electricity + estimated gas + estimated water</small></button>
+        <button class="today-cost" data-page-link="costs">
+          <span class="today-cost-title">Today’s household services</span>
+          <span class="home-cost-equation" aria-label="Electricity plus gas plus water equals total household services cost">
+            <span class="home-cost-part electricity-part"><small>Electricity</small><strong id="homeElectricityCost">—</strong><em>running cost</em></span>
+            <b aria-hidden="true">+</b>
+            <span class="home-cost-part gas-part"><small>Gas</small><strong id="homeGasCost">—</strong><em>averaged daily</em></span>
+            <b aria-hidden="true">+</b>
+            <span class="home-cost-part water-part"><small>Water</small><strong id="homeWaterCost">—</strong><em>averaged daily</em></span>
+            <b aria-hidden="true">=</b>
+            <span class="home-cost-part total-part"><small>Total</small><strong id="homeTotalCost">—</strong><em id="homeCostStatus">available services</em></span>
+          </span>
+        </button>
         <div class="home-foot"><button class="weather-glance" data-page-link="weather"><span id="weatherIcon">◌</span><b id="outsideTemp">Outside —</b><small id="weatherSummary">Weather loading…</small></button><span id="tariffStatus">OVO free period 11:00–14:00</span></div>
       </section>
 
@@ -182,11 +193,11 @@
   <script src="js/charts.js?v=20260726v2"></script>
   <script src="js/sankey.js?v=20260726v2"></script>
   <script src="js/theme.js?v=20260726v2"></script>
-  <script src="js/costs.js?v=20260806v2"></script>
-  <script src="js/live.js?v=20260726v2"></script>
+  <script src="js/costs.js?v=20260806v3"></script>
+  <script src="js/live.js?v=20260806v4"></script>
   <script src="js/weather.js?v=20260726v2"></script>
   <script src="js/local-data.js?v=20260726v2"></script>
-  <script src="js/gas-v2.js?v=20260806v2"></script>
+  <script src="js/gas-v2.js?v=20260806v3"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
   <script src="js/bootstrap.js?v=20260726v3"></script>
 </body>

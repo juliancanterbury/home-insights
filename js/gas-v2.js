@@ -180,14 +180,44 @@
     let rows = dailyRows();
     if (settings.range !== 'all') rows = rows.slice(-Number(settings.range));
     if (!rows.length) { $('gasChart').innerHTML = `<div class="gas-empty"><strong>${historyState === 'loading' ? 'Loading gas history…' : 'Two readings make the first interval'}</strong><span>${historyState === 'loading' ? 'Your bill history will appear here shortly.' : 'Daily use will appear here after the next manual reading.'}</span></div>`; return; }
-    const width = Math.max(760, rows.length * 12), height = 270, left = 48, right = 18, top = 18, bottom = 42;
+    const pixelsPerDay = settings.range === 'all' ? .65 : settings.range === '365' ? 3.2 : settings.range === '90' ? 8 : 22;
+    const width = Math.max(760, Math.round(rows.length * pixelsPerDay)), height = 292, left = 48, right = 24, top = 18, bottom = 57;
     const max = Math.max(...rows.map(row => row.mj), 1), plotH = height-top-bottom, plotW = width-left-right;
     const points = rows.map((row,i) => `${left + (i/(Math.max(rows.length-1,1)))*plotW},${top + plotH - row.mj/max*plotH}`).join(' ');
     const area = `${left},${top+plotH} ${points} ${left+plotW},${top+plotH}`;
     const ticks = [0,.25,.5,.75,1].map(n => { const y=top+plotH-n*plotH; return `<line x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"/><text x="${left-9}" y="${y+4}">${(max*n).toFixed(0)}</text>`; }).join('');
-    const labelEvery = Math.max(1,Math.ceil(rows.length/8));
-    const labels = rows.map((row,i) => i%labelEvery===0 || i===rows.length-1 ? `<text class="gas-x-label" x="${left+(i/Math.max(rows.length-1,1))*plotW}" y="${height-13}">${fmtShort(row.date)}</text>` : '').join('');
-    $('gasChart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img"><g class="gas-grid">${ticks}</g><polygon class="gas-area" points="${area}"/><polyline class="gas-line" points="${points}"/>${labels}</svg>`;
+    const candidates = [];
+    rows.forEach((row, i) => {
+      const previous = rows[i-1]?.date;
+      const monthChanged = !previous || row.date.getMonth() !== previous.getMonth();
+      const yearChanged = !previous || row.date.getFullYear() !== previous.getFullYear();
+      const wanted = settings.range === 'all' ? yearChanged : settings.range === '365' ? monthChanged : settings.range === '90' ? i % 14 === 0 : i % 7 === 0;
+      if (wanted || i === 0 || i === rows.length-1) candidates.push(i);
+    });
+    const labelIndices = [];
+    candidates.forEach(i => {
+      const x = left + (i/Math.max(rows.length-1,1))*plotW;
+      const last = labelIndices.at(-1);
+      const lastX = last === undefined ? -Infinity : left + (last/Math.max(rows.length-1,1))*plotW;
+      if (x-lastX >= 68 || i === rows.length-1) {
+        if (i === rows.length-1 && x-lastX < 68) labelIndices.pop();
+        labelIndices.push(i);
+      }
+    });
+    const axisLabel = (date, i) => {
+      if (settings.range === 'all') {
+        if (i === 0 || i === rows.length-1) return [fmtShort(date), String(date.getFullYear())];
+        return [String(date.getFullYear())];
+      }
+      if (settings.range === '365') return date.getMonth() === 0 ? ['Jan', String(date.getFullYear())] : [date.toLocaleDateString('en-AU',{month:'short'})];
+      return [fmtShort(date)];
+    };
+    const labels = labelIndices.map(i => {
+      const x = left+(i/Math.max(rows.length-1,1))*plotW, parts = axisLabel(rows[i].date, i);
+      const tspans = parts.map((part, line) => `<tspan x="${x}" dy="${line ? 12 : 0}">${part}</tspan>`).join('');
+      return `<g class="gas-date-tick"><line x1="${x}" y1="${top+plotH}" x2="${x}" y2="${top+plotH+6}"/><text class="gas-x-label" x="${x}" y="${height-28}">${tspans}</text></g>`;
+    }).join('');
+    $('gasChart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img" aria-label="Daily gas usage from ${fmtDate(rows[0].date)} to ${fmtDate(rows.at(-1).date)}"><g class="gas-grid">${ticks}</g><polygon class="gas-area" points="${area}"/><polyline class="gas-line" points="${points}"/>${labels}</svg>`;
     $('gasChart').scrollLeft = $('gasChart').scrollWidth;
   }
 
