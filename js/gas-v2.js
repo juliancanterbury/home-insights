@@ -161,9 +161,11 @@
 
   function renderReadings() {
     const rows = gasReadings().slice().reverse();
-    $('gasReadingList').innerHTML = rows.length ? rows.map(row => { const bill=row.source==='bill-actual'; return `<div class="gas-reading-row"><div><strong>${row.value.toLocaleString('en-AU',{maximumFractionDigits:4})}</strong><small>${fmtDate(row.time)} · ${bill?'actual bill':`manual${row.source==='manual-with-photo'?' + photo':''}`}</small></div><div>${bill?'<span class="gas-verified">Verified</span>':`<button data-gas-edit="${row.id}">Edit</button><button data-gas-delete="${row.id}">Delete</button>`}</div></div>`; }).join('') : `<div class="gas-empty"><strong>No manual readings yet</strong><span>${historical.length ? `The chart already includes ${historical.length.toLocaleString('en-AU')} days from your bills. ` : ''}Add a reading to extend the record from the meter.</span></div>`;
-    document.querySelectorAll('[data-gas-delete]').forEach(button => button.addEventListener('click', () => {
+    $('gasReadingList').innerHTML = rows.length ? rows.map(row => { const bill=row.source==='bill-actual',photo=row.hasPhoto||row.source==='manual-with-photo'; return `<div class="gas-reading-row${photo?' has-photo':''}"><div>${photo?`<button type="button" class="meter-photo-thumb is-loading" data-meter-photo="${row.id}" aria-label="Open saved meter photo"></button>`:''}<strong>${row.value.toLocaleString('en-AU',{maximumFractionDigits:4})}</strong><small>${fmtDate(row.time)} · ${bill?'actual bill':`manual${photo?' + photo':''}`}</small></div><div>${bill?'<span class="gas-verified">Verified</span>':`<button data-gas-edit="${row.id}">Edit</button><button data-gas-delete="${row.id}">Delete</button>`}</div></div>`; }).join('') : `<div class="gas-empty"><strong>No manual readings yet</strong><span>${historical.length ? `The chart already includes ${historical.length.toLocaleString('en-AU')} days from your bills. ` : ''}Add a reading to extend the record from the meter.</span></div>`;
+    window.HomeInsightsLocalData?.hydratePhotoThumbnails($('gasReadingList'));
+    document.querySelectorAll('[data-gas-delete]').forEach(button => button.addEventListener('click', async () => {
       if (!confirm('Delete this gas meter reading?')) return;
+      await window.HomeInsightsLocalData?.deleteReadingPhoto(button.dataset.gasDelete);
       localStorage.setItem(meterKey, JSON.stringify(readAll().filter(row => row.id !== button.dataset.gasDelete)));
       window.HomeInsightsLocalData?.renderMeters(); window.dispatchEvent(new CustomEvent('homeinsights:meters-changed'));
     }));
