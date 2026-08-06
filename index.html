@@ -116,7 +116,7 @@
       <section class="page gas-v2-page" id="gas" aria-labelledby="gasTitle">
         <div class="page-intro gas-intro"><div><p class="eyebrow">Gas · V2</p><h1 id="gasTitle">Use less. See the difference.</h1><p class="updated" id="gasCoverage">Add two cumulative meter readings to calculate actual usage between them.</p></div><button class="gas-add-button" data-open-meter="gas">+ Add meter reading</button></div>
         <section class="gas-hero" aria-label="Latest gas usage">
-          <div class="gas-hero-main"><span>Latest measured period</span><strong id="gasLatestDaily">—</strong><small id="gasLatestPeriod">Waiting for two readings</small></div>
+          <div class="gas-hero-main"><span>Latest available period</span><strong id="gasLatestDaily">—</strong><small id="gasLatestPeriod">Loading gas history…</small></div>
           <div class="gas-kpi"><span>Gas used</span><strong id="gasLatestMj">—</strong><small id="gasLatestUnits">between readings</small></div>
           <div class="gas-kpi"><span>Estimated cost</span><strong id="gasLatestCost">—</strong><small>usage + daily supply</small></div>
           <div class="gas-kpi"><span>Change</span><strong id="gasLatestChange">—</strong><small id="gasChangeCaption">versus previous period</small></div>
@@ -132,7 +132,7 @@
         </section>
         <section class="gas-lower-grid">
           <div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Readings</p><h2>Meter history</h2></div><button class="gas-secondary-button" data-open-meter="gas">Add reading</button></div><div id="gasReadingList" class="gas-reading-list"></div></div>
-          <div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Calculation</p><h2>Gas settings</h2></div></div><div class="gas-settings-grid"><label>Energy conversion <span>MJ per meter unit</span><input id="gasMjPerUnit" type="number" min="0.01" step="0.01" value="38.61"></label><label>Usage rate <span>cents per MJ</span><input id="gasRate" type="number" min="0" step="0.001" value="3.20"></label><label>Daily supply <span>dollars per day</span><input id="gasSupply" type="number" min="0" step="0.01" value="0.90"></label></div><p class="gas-settings-note">Enter the conversion and rates shown on your latest gas bill. Changes save automatically in this browser.</p></div>
+          <div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Calculation</p><h2>Gas settings</h2></div></div><div class="gas-settings-grid"><label>Energy conversion <span>MJ per meter unit</span><input id="gasMjPerUnit" type="number" min="0.01" step="0.00001" value="38.61638"></label><label>Usage rate <span>cents per MJ</span><input id="gasRate" type="number" min="0" step="0.0001" value="3.64"></label><label>Daily supply <span>dollars per day</span><input id="gasSupply" type="number" min="0" step="0.0001" value="0.9778"></label></div><p class="gas-settings-note">Current settings come from the bill dated 27 July 2026. Changes save automatically in this browser.</p></div>
         </section>
       </section>
 
@@ -177,16 +177,16 @@
   <script src="js/data.js?v=20260726v2"></script>
   <script src="js/api.js?v=20260726v2"></script>
   <script src="js/history-data.js?v=20260726v2"></script>
-  <script src="js/core.js?v=20260805v1"></script>
+  <script src="js/core.js?v=20260726v2"></script>
   <script src="js/router.js?v=20260726v2"></script>
   <script src="js/charts.js?v=20260726v2"></script>
   <script src="js/sankey.js?v=20260726v2"></script>
   <script src="js/theme.js?v=20260726v2"></script>
-  <script src="js/costs.js?v=20260726v2"></script>
-  <script src="js/live.js?v=20260805v1"></script>
+  <script src="js/costs.js?v=20260806v2"></script>
+  <script src="js/live.js?v=20260726v2"></script>
   <script src="js/weather.js?v=20260726v2"></script>
   <script src="js/local-data.js?v=20260726v2"></script>
-  <script src="js/gas-v2.js?v=20260806v1"></script>
+  <script src="js/gas-v2.js?v=20260806v2"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
   <script src="js/bootstrap.js?v=20260726v3"></script>
 </body>
