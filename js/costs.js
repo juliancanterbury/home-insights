@@ -23,11 +23,13 @@
   function renderServices(date, includeHome = false) {
     const row = recordFor(date), electric = row?.electricityTotal;
     const gasEstimate = window.HomeInsightsGasV2?.gasEstimateForDate(date, true);
-    const gas = gasEstimate?.cost ?? row?.gasTotal, water = row?.waterTotal;
+    const waterEstimate = window.HomeInsightsWaterV2?.estimateForDate(date, true);
+    const gas = gasEstimate?.cost ?? row?.gasTotal, water = waterEstimate?.cost ?? row?.waterTotal;
     const known = [electric, gas, water].filter(hasCost);
     const total = known.length ? known.reduce((sum, value) => sum + +value, 0) : null;
     setText('costElectricity', costText(electric)); setText('costGas', costText(gas)); setText('costWater', costText(water));
     if (gasEstimate) setText('costGasCaption', gasEstimate.isLatestEstimate ? `${gasEstimate.mj.toFixed(1)} MJ/day latest estimate` : `${gasEstimate.mj.toFixed(1)} MJ/day ${gasEstimate.source === 'manual' ? 'measured' : 'historical'}`);
+    if (waterEstimate) setText('costWaterCaption', `${waterEstimate.litres.toFixed(0)} L/day averaged`);
     setText('costTotal', money(total));
     if (includeHome) {
       setText('homeElectricityCost', costText(electric));
@@ -93,6 +95,7 @@
       }
     });
     window.addEventListener('homeinsights:gas-data-ready', () => renderServices($('costDate')?.value || today, ($('costDate')?.value || today) === today));
+    window.addEventListener('homeinsights:water-data-ready', () => renderServices($('costDate')?.value || today, ($('costDate')?.value || today) === today));
   }
   window.HomeInsightsCosts = { start, loadElectricity, loadServices, renderElectricity, renderServices };
 })();

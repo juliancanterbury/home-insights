@@ -118,7 +118,7 @@
 
       <section class="page" id="costs" aria-labelledby="costsTitle">
         <div class="page-intro"><p class="eyebrow">Services</p><h1 id="costsTitle">What the house cost.</h1><input class="date-picker" id="costDate" type="date" aria-label="Choose date"></div>
-        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button></div>
+        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-page-link="water"><span>●</span><small>Water</small><strong id="costWater">—</strong><em id="costWaterCaption">Add two meter readings</em></button></div>
         <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
         <div class="details-panel service-detail" id="serviceElectricity"><p>Supply charge + paid imports − export credit. Imports from 11:00–14:00 are free.</p></div><div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills.</p></div><div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period.</p></div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
@@ -148,6 +148,13 @@
       </section>
 
 
+      <section class="page gas-v2-page water-v2-page" id="water" aria-labelledby="waterTitle">
+        <div class="page-intro gas-intro"><div><p class="eyebrow">Water</p><h1 id="waterTitle">Every litre, made visible.</h1><p class="updated" id="waterCoverage">Add two cumulative meter readings to calculate usage between them.</p></div><button class="gas-add-button" data-open-meter="water">+ Add meter reading</button></div>
+        <section class="gas-hero" aria-label="Latest water usage"><div class="gas-hero-main"><span>Latest available period</span><strong id="waterLatestDaily">—</strong><small id="waterLatestPeriod">Waiting for two readings</small></div><div class="gas-kpi"><span>Water used</span><strong id="waterLatestUsed">—</strong><small>between readings</small></div><div class="gas-kpi"><span>Average daily cost</span><strong id="waterLatestCost">—</strong><small id="waterCostNote">Set tariff to calculate</small></div><div class="gas-kpi"><span>Change</span><strong id="waterLatestChange">—</strong><small>versus previous period</small></div></section>
+        <section class="explore-section gas-history-section"><div class="explore-head"><div><p class="eyebrow">Daily profile</p><h2>Usage between meter readings</h2><p class="chart-note">Each interval is spread evenly across its days. Drag or scroll sideways to move through time.</p></div><div class="range-control"><button data-water-range="30">1M</button><button class="active" data-water-range="90">3M</button><button data-water-range="365">1Y</button><button data-water-range="all">All</button></div></div><div class="gas-chart-legend"><span><i></i>Daily water</span><span>L/day</span></div><div class="gas-chart-shell" id="waterChart"></div></section>
+        <section class="gas-lower-grid"><div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Readings</p><h2>Meter history</h2></div><button class="gas-secondary-button" data-open-meter="water">Add reading</button></div><div id="waterReadingList" class="gas-reading-list"></div></div><div class="gas-panel"><div class="gas-panel-head"><div><p class="eyebrow">Calculation</p><h2>Water tariff</h2></div></div><div class="gas-settings-grid"><label>Usage rate <span>dollars per kL</span><input id="waterUsageRate" type="number" min="0" step="0.0001" placeholder="Not configured"></label><label>Daily service charge <span>dollars per day</span><input id="waterServiceDaily" type="number" min="0" step="0.0001" placeholder="Not configured"></label></div><p class="gas-settings-note" id="waterTariffStatus">No Yarra Valley Water tariff was found in the project. Enter bill rates here; they save in this browser. Costs stay blank until configured.</p></div></section>
+      </section>
+
       <section class="page" id="weather" aria-labelledby="weatherTitle">
         <div class="page-intro"><p class="eyebrow">Weather</p><h1 id="weatherTitle">Outside, and what comes next.</h1><p class="updated" id="weatherUpdated">Loading Brunswick forecast…</p></div>
         <div class="weather-hero"><div><span id="weatherHeroIcon">◌</span><strong id="weatherHeroTemp">—°</strong><p id="weatherHeroText">Loading…</p></div><div class="weather-facts"><span>Feels like <b id="feelsLike">—°</b></span><span>Rain <b id="rainChance">—%</b></span><span>Wind <b id="windSpeed">— km/h</b></span><span>Humidity <b id="humidity">—%</b></span></div></div>
@@ -163,10 +170,10 @@
         </div>
         <div class="meter-entry" id="meterEntry" hidden>
           <div class="meter-entry-head"><div><p class="eyebrow" id="meterKindLabel">Meter</p><h2>New reading</h2></div><button id="closeMeterEntry">Close</button></div>
-          <div class="entry-grid"><label>Cumulative meter reading<input id="meterValue" inputmode="decimal" placeholder="Type the number shown on the meter"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
+          <div class="entry-grid"><label>Corrected / manual meter reading<input id="meterValue" inputmode="decimal" placeholder="Type or correct the number shown"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
           <label class="photo-input" id="meterPhotoDrop"><input id="meterPhoto" type="file" accept="image/*" capture="environment"><span><b>Drop meter photo here</b><small>or click to choose / take a photo</small></span></label>
           <div class="meter-photo-preview" id="meterPhotoPreview" hidden><img id="meterPreview" class="meter-preview" alt="Meter photo preview"><div><strong id="meterPhotoName"></strong><small id="meterPhotoDateStatus">Checking photo date…</small><button type="button" id="removeMeterPhoto">Remove photo</button></div></div>
-          <p class="entry-note">The photo and its date are saved with the reading. The meter number remains manual; OCR is not used.</p>
+          <p class="entry-note" id="meterOcrStatus">The original OCR attempt and your corrected reading are saved separately for auditability.</p>
           <button class="primary-action" id="saveMeterReading">Save reading</button>
         </div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Reading history</p><h2>Gas and water records</h2></div></div><div class="records-list" id="meterRecords"></div></section>
@@ -199,6 +206,7 @@
   <script src="js/weather.js?v=20260726v2"></script>
   <script src="js/local-data.js?v=20260806v4"></script>
   <script src="js/gas-v2.js?v=20260806v4"></script>
+  <script src="js/water-v2.js?v=20260807v1"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
   <script src="js/bootstrap.js?v=20260726v3"></script>
 </body>
