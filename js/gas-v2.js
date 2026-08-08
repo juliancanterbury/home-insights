@@ -81,12 +81,16 @@
   function intervalAt(dateString) {
     if (!dateString) return intervals().at(-1);
     const time = new Date(`${dateString}T12:00:00`).getTime();
-    return intervals().find(row => time >= row.start.time.getTime() && time <= row.end.time.getTime());
+    const spans=intervals();
+    return spans.find(row => time >= row.start.time.getTime() && time <= row.end.time.getTime()) || (spans.length && time>spans.at(-1).end.time.getTime()?spans.at(-1):null);
   }
   function renderServiceCostForDate(dateString) {
     const span = intervalAt(dateString); if (!span) return;
     const daily = span.dailyMj * settings.rateCents / 100 + settings.supplyDaily;
-    $('costGas').textContent = money(daily); $('costGasCaption').textContent = `${span.dailyMj.toFixed(1)} MJ/day measured`;
+    $('costGas').textContent = money(daily); $('homeGasCost').textContent = money(daily); $('costGasCaption').textContent = `${span.dailyMj.toFixed(1)} MJ/day measured`;
+    const parse=id=>Number(String($(id)?.textContent||'').replace(/[^0-9.-]/g,''));
+    const electric=parse('costElectricity'),water=parse('costWater'),total=[electric,daily,water].filter(Number.isFinite).reduce((a,b)=>a+b,0);
+    $('costTotal').textContent=money(total);$('homeTotalCost').textContent=money(total);
   }
 
   function renderReadings() {

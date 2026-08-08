@@ -19,12 +19,13 @@
   }
 
   function renderServices(date, includeHome = false) {
-    const row = recordFor(date), electric = row?.electricityTotal, gas = row?.gasTotal, water = row?.waterTotal;
+    const existing=id=>{const text=$(id)?.textContent||'';if(!/\d/.test(text))return null;const value=Number(text.replace(/[^0-9.-]/g,''));return Number.isFinite(value)?value:null;};
+    const row = recordFor(date), electric = row?.electricityTotal, gas = Number.isFinite(+row?.gasTotal) ? +row.gasTotal : existing('costGas'), water = Number.isFinite(+row?.waterTotal) ? +row.waterTotal : existing('costWater');
     const known = [electric, gas, water].filter(value => Number.isFinite(+value));
     const total = known.length ? known.reduce((sum, value) => sum + +value, 0) : null;
     setText('costElectricity', money(electric)); setText('costGas', money(gas)); setText('costWater', money(water));
     setText('costTotal', money(total));
-    if (includeHome) setText('homeTotalCost', money(total));
+    if (includeHome) { setText('homeElectricityCost', money(electric)); setText('homeGasCost', money(gas)); setText('homeWaterCost', money(water)); setText('homeTotalCost', money(total)); }
   }
 
   async function fetchDay(date) {

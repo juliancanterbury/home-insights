@@ -38,7 +38,7 @@
           <div class="house-node"><span class="house-status" id="houseState">Idle</span><span class="house-outline"><i></i></span><span class="node-label">House</span><strong id="houseNow">-- kW</strong><small>Live consumption</small></div>
           <button class="energy-node node-battery" data-page-link="battery"><span class="battery-icon"><i id="batteryFill"></i></span><span class="node-label">Battery</span><strong id="batteryPowerNow">-- kW</strong><small><span id="batteryState">Waiting</span> · <span id="batterySoc">--%</span></small></button>
         </div>
-        <button class="today-cost" data-page-link="costs"><span>Today’s household services</span><strong id="homeTotalCost">—</strong><small>Electricity + estimated gas + estimated water</small></button>
+        <button class="today-cost" data-page-link="costs"><span>Today’s household services</span><div class="home-cost-equation"><div><small>Electricity</small><b id="homeElectricityCost">—</b><em>running cost</em></div><i>+</i><div><small>Gas</small><b id="homeGasCost">—</b><em>daily average</em></div><i>+</i><div><small>Water</small><b id="homeWaterCost">—</b><em>daily average</em></div><i>=</i><div class="home-cost-result"><small>Total</small><strong id="homeTotalCost">—</strong><em>today</em></div></div></button>
         <div class="home-foot"><button class="weather-glance" data-page-link="weather"><span id="weatherIcon">◌</span><b id="outsideTemp">Outside —</b><small id="weatherSummary">Weather loading…</small></button><span id="tariffStatus">OVO free period 11:00–14:00</span></div>
       </section>
 
