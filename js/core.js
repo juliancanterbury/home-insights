@@ -3,7 +3,7 @@
   const cfg = window.HOME_INSIGHTS_CONFIG || {};
   const daily = window.HOME_INSIGHTS_DAILY || [];
   const $ = id => document.getElementById(id);
-  const money = value => Number.isFinite(+value)
+  const money = value => value !== null && value !== undefined && value !== '' && Number.isFinite(+value)
     ? new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD' }).format(+value)
     : '—';
   const number = item => item && item.available && Number.isFinite(Number(item.value)) ? Number(item.value) : null;
@@ -14,7 +14,7 @@
   const upsertDaily = row => {
     if (!row || !row.date) return;
     const index = daily.findIndex(item => String(item.date) === String(row.date));
-    if (index >= 0) daily[index] = row; else daily.push(row);
+    if (index >= 0) daily[index] = { ...daily[index], ...row }; else daily.push(row);
   };
   const recordFor = date => daily.find(row => String(row.date) === String(date));
   window.HomeInsights = { cfg, daily, $, money, number, kw, dayKey, upsertDaily, recordFor };

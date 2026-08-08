@@ -108,7 +108,7 @@
 
       <section class="page" id="costs" aria-labelledby="costsTitle">
         <div class="page-intro"><p class="eyebrow">Services</p><h1 id="costsTitle">What the house cost.</h1><input class="date-picker" id="costDate" type="date" aria-label="Choose date"></div>
-        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em>Daily estimate</em></button></div>
+        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em id="costWaterCaption">Latest bill daily average</em></button></div>
         <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
         <div class="details-panel service-detail" id="serviceElectricity"><p>Supply charge + paid imports − export credit. Imports from 11:00–14:00 are free.</p></div><div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills.</p></div><div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period.</p></div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
@@ -156,7 +156,7 @@
           <div class="entry-grid"><label>Cumulative meter reading<input id="meterValue" inputmode="decimal" placeholder="Type the number shown on the meter"></label><label>Date and time<input id="meterDate" type="datetime-local"></label></div>
           <label class="photo-input">Optional meter photo<input id="meterPhoto" type="file" accept="image/*" capture="environment"><span>Choose or take photo</span></label><img id="meterPreview" class="meter-preview" alt="Meter photo preview" hidden>
           <p class="entry-note">Manual entry is the primary workflow. The photo is shown only so you can check what you typed; it is not read automatically.</p>
-          <button class="primary-action" id="saveMeterReading">Save reading</button>
+          <button class="primary-action" id="saveMeterReading">Save reading</button><small class="entry-note" id="meterSyncStatus">Shared-sheet sync with offline fallback.</small>
         </div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Reading history</p><h2>Gas and water records</h2></div></div><div class="records-list" id="meterRecords"></div></section>
       </section>
@@ -178,7 +178,8 @@
   <script src="js/data.js?v=20260726v2"></script>
   <script src="js/api.js?v=20260726v2"></script>
   <script src="js/history-data.js?v=20260726v2"></script>
-  <script src="js/core.js?v=20260726v2"></script>
+  <script src="js/core.js?v=20260808v3"></script>
+  <script src="js/water-history.js?v=20260808v1"></script>
   <script src="js/router.js?v=20260726v2"></script>
   <script src="js/charts.js?v=20260726v2"></script>
   <script src="js/sankey.js?v=20260726v2"></script>

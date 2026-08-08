@@ -17,16 +17,16 @@
         {id:'gas-bill-2026-05-28',kind:'gas',date:'2026-05-28T12:00:00.000Z',value:4453,source:'verified-bill'},
         {id:'gas-bill-2026-07-27',kind:'gas',date:'2026-07-27T12:00:00.000Z',value:4830,source:'verified-bill'}
       ]);
-      store(combined); ready=true; document.body.dataset.meterSync='cloud'; await sync();
+      store(combined); ready=true; document.body.dataset.meterSync='cloud'; const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Shared Meter Readings sheet connected · offline cache enabled.'; await sync();
       HomeInsightsLocalData?.renderMeters(); dispatchEvent(new CustomEvent('homeinsights:meters-changed',{detail:{fromCloud:true}}));
-    }catch(error){console.warn('Meter readings: offline cache active',error);document.body.dataset.meterSync='offline'}finally{loading=false}
+    }catch(error){console.warn('Meter readings: offline cache active',error);document.body.dataset.meterSync='offline';const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Shared sheet unavailable · saved in this device’s offline cache.'}finally{loading=false}
   }
   async function sync(){
     if(!ready)return;
     const rows=local(), remoteIds=new Set(remote.map(identity));
     const pending=rows.filter(r=>!remoteIds.has(identity(r)));
     for(const row of pending){try{const json=await HomeInsightsApi.meterRequest('saveMeterReading',row);if(!json?.ok)throw new Error(json?.error||'Save failed');remote=merge(remote,[json.reading||row])}catch(error){console.warn('Meter reading remains cached:',error);document.body.dataset.meterSync='offline';return}}
-    document.body.dataset.meterSync='cloud';
+    document.body.dataset.meterSync='cloud';const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Saved to the shared Meter Readings sheet · offline cache enabled.';
   }
   addEventListener('homeinsights:meters-changed',e=>{if(!e.detail?.fromCloud)sync()});
   addEventListener('DOMContentLoaded',load);

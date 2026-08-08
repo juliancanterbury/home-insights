@@ -1,7 +1,7 @@
 :root{--electricity:#f4b942;--gas:#ff8a4c;--water:#43c7e8}
 .electricity-service>span{color:var(--electricity)}
 .chart-legend .legend-electricity{background:var(--electricity)}
-.house-status{position:absolute;top:-28px;color:var(--muted);font-size:11px}
+.house-status{position:absolute;top:-52px;min-width:90px;color:var(--muted);font-size:11px;text-align:center}
 [data-meter-sync="offline"] .meter-entry:after{content:"Offline — reading saved on this device and will sync when the shared service is available";display:block;margin-top:12px;color:var(--muted);font-size:11px}
 .gas-chart-shell{position:relative;touch-action:pan-y;cursor:crosshair}
 .gas-crosshair{position:absolute;top:0;bottom:0;width:1px;background:rgba(255,255,255,.55);pointer-events:none}
