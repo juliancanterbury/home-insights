@@ -28,7 +28,7 @@
     const sources={solar:{y:35,h:Math.max(72,sourceTotals.solar*scale)},grid:{y:155,h:Math.max(72,sourceTotals.grid*scale)},battery:{y:275,h:Math.max(72,sourceTotals.battery*scale)}};
     const dests={house:{y:35,h:Math.max(72,destTotals.house*scale)},battery:{y:155,h:Math.max(72,destTotals.battery*scale)},grid:{y:275,h:Math.max(72,destTotals.grid*scale)}};
     const srcOff={solar:0,grid:0,battery:0},dstOff={house:0,battery:0,grid:0};
-    const styles=getComputedStyle(document.documentElement),colors={solar:styles.getPropertyValue('--solar').trim(),grid:styles.getPropertyValue('--grid').trim(),battery:styles.getPropertyValue('--battery').trim()};
+    const colors={solar:'#9bdd57',grid:'#778cff',battery:'#4fe0df'};
     const links=[['solar','house',f.solarHouse,colors.solar],['solar','battery',f.solarBattery,'#73d9a5'],['solar','grid',f.solarGrid,'#b6d95e'],['grid','house',f.gridHouse,colors.grid],['grid','battery',f.gridBattery,'#718ee9'],['battery','house',f.batteryHouse,colors.battery]];
     let paths='';
     links.forEach(([a,b,v,c])=>{if(v<=.0001)return;const sw=Math.max(3,v*scale),sy=sources[a].y+13+srcOff[a]+sw/2,dy=dests[b].y+13+dstOff[b]+sw/2;srcOff[a]+=sw+2;dstOff[b]+=sw+2;paths+=band(lx+nodeW,sy,rx,dy,sw,c)});

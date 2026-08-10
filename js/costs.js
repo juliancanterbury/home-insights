@@ -2,6 +2,8 @@
   'use strict';
   const { cfg, $, money, dayKey, recordFor, upsertDaily } = window.HomeInsights;
   const setText = (id, value) => { const node = $(id); if (node) node.textContent = value; };
+  const hasCost = value => value !== null && value !== '' && Number.isFinite(+value);
+  const costText = value => hasCost(value) ? money(value) : '—';
 
   function renderElectricity(date) {
     const row = recordFor(date);
@@ -19,13 +21,28 @@
   }
 
   function renderServices(date, includeHome = false) {
-    const existing=id=>{const text=$(id)?.textContent||'';if(!/\d/.test(text))return null;const value=Number(text.replace(/[^0-9.-]/g,''));return Number.isFinite(value)?value:null;};
-    const row = recordFor(date), electric = row?.electricityTotal, gas = Number.isFinite(+row?.gasTotal) ? +row.gasTotal : existing('costGas'), water = Number.isFinite(+row?.waterTotal) ? +row.waterTotal : existing('costWater');
-    const known = [electric, gas, water].filter(value => value !== null && value !== undefined && value !== '' && Number.isFinite(+value));
+    const row = recordFor(date), electric = row?.electricityTotal;
+    const gasEstimate = window.HomeInsightsGasV2?.gasEstimateForDate(date, true);
+    const waterEstimate = window.HomeInsightsWaterV2?.estimateForDate(date, true);
+    const gas = gasEstimate?.cost ?? row?.gasTotal, water = waterEstimate?.cost ?? row?.waterTotal;
+    const known = [electric, gas, water].filter(hasCost);
     const total = known.length ? known.reduce((sum, value) => sum + +value, 0) : null;
-    setText('costElectricity', money(electric)); setText('costGas', money(gas)); setText('costWater', money(water));
+    setText('costElectricity', costText(electric)); setText('costGas', costText(gas)); setText('costWater', costText(water));
+    if (gasEstimate) setText('costGasCaption', gasEstimate.isLatestEstimate ? `${gasEstimate.mj.toFixed(1)} MJ/day latest estimate` : `${gasEstimate.mj.toFixed(1)} MJ/day ${gasEstimate.source === 'manual' ? 'measured' : 'historical'}`);
+    if (waterEstimate) setText('costWaterCaption', `${waterEstimate.litres.toFixed(0)} L/day averaged`);
     setText('costTotal', money(total));
-    if (includeHome) { setText('homeElectricityCost', money(electric)); setText('homeGasCost', money(gas)); setText('homeWaterCost', money(water)); setText('homeTotalCost', money(total)); }
+    if (includeHome) {
+      setText('homeElectricityCost', costText(electric));
+      setText('homeGasCost', costText(gas));
+      setText('homeWaterCost', costText(water));
+      setText('homeTotalCost', costText(total));
+      const missing = [
+        ['electricity', electric],
+        ['gas', gas],
+        ['water', water]
+      ].filter(([, value]) => !hasCost(value)).map(([label]) => label);
+      setText('homeCostStatus', missing.length ? `${missing.join(' + ')} pending` : 'combined daily cost');
+    }
   }
 
   async function fetchDay(date) {
@@ -46,40 +63,35 @@
     renderServices(date, includeHome);
   }
 
+  function localKey(date) { return `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`; }
   function parseQuestion(question) {
-    const q=question.toLowerCase(), services=['electricity','gas','water'].filter(service=>q.includes(service));
-    const monthMatch=q.match(/(?:for|in|during)?\s*(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
-    if(monthMatch){const months=['january','february','march','april','may','june','july','august','september','october','november','december'],month=months.indexOf(monthMatch[1].toLowerCase())+1;return{start:`${monthMatch[2]}-${String(month).padStart(2,'0')}-01`,end:`${monthMatch[2]}-${String(month).padStart(2,'0')}-${new Date(+monthMatch[2],month,0).getDate()}`,services:services.length?services:['electricity','gas','water'],label:`${monthMatch[1]} ${monthMatch[2]}`}}
-    if(q.includes('this time last year')){const d=new Date();d.setFullYear(d.getFullYear()-1);const date=d.toISOString().slice(0,10);return{date,services:services.length?services:['electricity','gas','water']}}
-    const match = question.match(/(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
-    if (!match) return { error: 'Please include a date, for example “7 April 2026”.' };
+    const text=question.toLowerCase().trim(), now=new Date(); let date;
+    if (/this day (?:one |1 )?year ago|same day last year|a year ago|one year ago/.test(text)) { date=new Date(now); date.setFullYear(date.getFullYear()-1); }
+    else if (/\byesterday\b/.test(text)) { date=new Date(now); date.setDate(date.getDate()-1); }
+    else if (/\btoday\b|\bthis day\b/.test(text)) date=now;
+    const numeric=text.match(/\b(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})\b/);
+    if(numeric) date=new Date(+numeric[3],+numeric[2]-1,+numeric[1]);
+    const match = text.match(/(\d{1,2})\s+(january|february|march|april|may|june|july|august|september|october|november|december)\s+(\d{4})/i);
+    if (!date && !match) return { error: 'Try “How much did today cost?”, “this day one year ago”, or “7 April 2026”.' };
     const months = ['january','february','march','april','may','june','july','august','september','october','november','december'];
-    const date = `${match[3]}-${String(months.indexOf(match[2].toLowerCase()) + 1).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
-    return { date, services: services.length ? services : ['electricity','gas','water'] };
+    const dateString = date ? localKey(date) : `${match[3]}-${String(months.indexOf(match[2].toLowerCase()) + 1).padStart(2,'0')}-${String(match[1]).padStart(2,'0')}`;
+    const services = ['electricity','gas','water'].filter(service => question.toLowerCase().includes(service));
+    return { date:dateString, services: services.length ? services : ['electricity','gas','water'] };
   }
 
-  async function answerQuestion(question){
-    const parsed=parseQuestion(question), answer=$('askAnswer'); answer.hidden=false;
-    if(parsed.error){answer.textContent=parsed.error;return}
-    if(parsed.start){
-      try{const json=await window.HomeInsightsApi.request(cfg.sharedApi,{action:'range',start:parsed.start,end:parsed.end});if(json?.ok)(json.days||json.rows||[]).forEach(upsertDaily)}catch(error){console.warn('Ask range:',error)}
-      const rows=(window.HOME_INSIGHTS_DAILY||[]).filter(r=>r.date>=parsed.start&&r.date<=parsed.end),labels={electricity:'Electricity',gas:'Gas',water:'Water'};
-      if(!rows.length){answer.innerHTML=`<strong>No history available</strong><br>There are no shared records for ${parsed.label}.`;return}
-      const totals=parsed.services.map(service=>({name:labels[service],value:rows.reduce((sum,row)=>sum+(Number(row[`${service}Total`])||Number(service==='gas'?row.gasCost:service==='water'?row.waterCost:null)||0),0)}));
-      answer.innerHTML=`<strong>${parsed.label}</strong>`+totals.map(x=>`<div><b>${x.name}</b> ${money(x.value)}</div>`).join('')+`<br><strong>Total ${money(totals.reduce((s,x)=>s+x.value,0))}</strong>`;return
-    }
-    try{await fetchDay(parsed.date)}catch(error){console.warn('Ask day:',error)}
-    const row=recordFor(parsed.date);if(!row){answer.innerHTML='<strong>No history available for that date.</strong>';return}
-    const labels={electricity:'Electricity',gas:'Gas',water:'Water'},values=parsed.services.map(service=>({name:labels[service],value:row[`${service}Total`]??(service==='gas'?row.gasCost:service==='water'?row.waterCost:null)}));
-    answer.innerHTML=values.map(item=>`<div><b>${item.name}</b> ${money(item.value)}</div>`).join('')+`<br><strong>Combined ${money(values.reduce((s,x)=>s+(+x.value||0),0))}</strong>`;
-  }
+  function answerFor(date,services){const row=recordFor(date),historicalElectricity=(window.HOME_INSIGHTS_ELECTRICITY_HISTORY?.daily||[]).find(item=>item.date===date),electricityEstimate=!hasCost(row?.electricityTotal)&&historicalElectricity?Number(cfg.dailySupplyCharge||0)+Number(historicalElectricity.importKwh||0)*Number(cfg.importRate||0)-Number(historicalElectricity.exportKwh||0)*Number(cfg.feedInRate||0):null,gas=window.HomeInsightsGasV2?.gasEstimateForDate(date,false),water=window.HomeInsightsWaterV2?.estimateForDate(date,false),values={electricity:hasCost(row?.electricityTotal)?row.electricityTotal:electricityEstimate,gas:gas?.cost??row?.gasTotal,water:water?.cost??row?.waterTotal},labels={electricity:'Electricity',gas:'Gas',water:'Water'},available=services.filter(service=>hasCost(values[service])),missing=services.filter(service=>!hasCost(values[service])),total=available.reduce((sum,service)=>sum+Number(values[service]),0),heading=new Date(date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),estimatedElectricity=services.includes('electricity')&&electricityEstimate!==null;return `<div class="ask-date">${heading}</div>${available.map(service=>`<div class="ask-cost-row ${service}"><span>${labels[service]}${service==='electricity'&&estimatedElectricity?' <em>estimated</em>':''}</span><strong>${money(values[service])}</strong></div>`).join('')}<div class="ask-cost-total"><span>${missing.length?'Known total':'Combined total'}</span><strong>${available.length?money(total):'—'}</strong></div>${estimatedElectricity?'<p class="ask-note">Historical electricity is estimated from that day’s meter totals using the currently configured import, export and supply rates.</p>':''}${missing.length?`<p class="ask-note">No ${missing.map(item=>labels[item].toLowerCase()).join(' or ')} record is available for that date, so it is not included.</p>`:''}`;}
 
   function start() {
     const today = dayKey();
     if ($('costDate')) $('costDate').value = today;
     $('costDate')?.addEventListener('change', event => loadServices(event.target.value, event.target.value === today));
     loadServices(today, true);
-    $('askForm')?.addEventListener('submit', event => { event.preventDefault(); answerQuestion($('askInput').value.trim()); });
+    $('askForm')?.addEventListener('submit', event => {
+      event.preventDefault(); const parsed = parseQuestion($('askInput').value.trim()); $('askAnswer').hidden = false;
+      if (parsed.error) return void ($('askAnswer').textContent = parsed.error);
+      $('askAnswer').innerHTML = answerFor(parsed.date,parsed.services);
+    });
+    document.querySelectorAll('.ask-suggestions button').forEach(button=>button.addEventListener('click',()=>{$('askInput').value=button.textContent;$('askForm').requestSubmit();}));
     window.addEventListener('homeinsights:shared-day', event => {
       upsertDaily(event.detail);
       if (event.detail.date === today) {
@@ -87,6 +99,8 @@
         if ((window.HomeInsightsElectricityDate?.selectedDate || today) === today) renderElectricity(today);
       }
     });
+    window.addEventListener('homeinsights:gas-data-ready', () => renderServices($('costDate')?.value || today, ($('costDate')?.value || today) === today));
+    window.addEventListener('homeinsights:water-data-ready', () => renderServices($('costDate')?.value || today, ($('costDate')?.value || today) === today));
   }
   window.HomeInsightsCosts = { start, loadElectricity, loadServices, renderElectricity, renderServices };
 })();

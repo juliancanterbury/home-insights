@@ -61,6 +61,5 @@
     });
   }
 
-  const meterRequest = (action, payload = {}) => request(window.HOME_INSIGHTS_CONFIG?.sharedApi, { action, payload: JSON.stringify(payload) });
-  window.HomeInsightsApi = { request, meterRequest };
+  window.HomeInsightsApi = { request };
 })();
