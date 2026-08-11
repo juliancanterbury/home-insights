@@ -165,9 +165,10 @@
     window.HomeInsightsLocalData?.hydratePhotoThumbnails($('gasReadingList'));
     document.querySelectorAll('[data-gas-delete]').forEach(button => button.addEventListener('click', async () => {
       if (!confirm('Delete this gas meter reading?')) return;
-      await window.HomeInsightsLocalData?.deleteReadingPhoto(button.dataset.gasDelete);
-      localStorage.setItem(meterKey, JSON.stringify(readAll().filter(row => row.id !== button.dataset.gasDelete)));
-      window.HomeInsightsLocalData?.renderMeters(); window.dispatchEvent(new CustomEvent('homeinsights:meters-changed'));
+      const deletedId=button.dataset.gasDelete;
+      await window.HomeInsightsLocalData?.deleteReadingPhoto(deletedId);
+      localStorage.setItem(meterKey, JSON.stringify(readAll().filter(row => row.id !== deletedId)));
+      window.HomeInsightsLocalData?.renderMeters(); window.dispatchEvent(new CustomEvent('homeinsights:meters-changed',{detail:{deletedId}}));
     }));
     document.querySelectorAll('[data-gas-edit]').forEach(button => button.addEventListener('click', () => {
       const all = readAll(), row = all.find(item => item.id === button.dataset.gasEdit); if (!row) return;
