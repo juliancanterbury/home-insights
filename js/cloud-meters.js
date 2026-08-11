@@ -1,34 +1,62 @@
 (() => {
   'use strict';
   const key='home-insights-meter-readings';
-  let loading=false, ready=false, remote=[];
+  let loading=false,ready=false,remote=[];
   const local=()=>{try{return JSON.parse(localStorage.getItem(key)||'[]')}catch{return[]}};
-  const identity=r=>r.id||`${r.kind}:${r.date}:${r.value}`;
-  const merge=(...sets)=>Array.from(new Map(sets.flat().filter(Boolean).map(r=>[identity(r),r])).values());
   const store=rows=>localStorage.setItem(key,JSON.stringify(rows));
-  async function load(){
-    if(loading)return; loading=true;
-    try{
-      const json=await HomeInsightsApi.meterRequest('meterReadings');
-      if(!json?.ok)throw new Error(json?.error||'Cloud meter service unavailable');
-      remote=json.readings||json.meterReadings||json.rows||[];
-      let combined=merge(remote,local());
-      if(!combined.some(r=>r.kind==='gas'))combined=merge(combined,[
-        {id:'gas-bill-2026-05-28',kind:'gas',date:'2026-05-28T12:00:00.000Z',value:4453,source:'verified-bill'},
-        {id:'gas-bill-2026-07-27',kind:'gas',date:'2026-07-27T12:00:00.000Z',value:4830,source:'verified-bill'}
-      ]);
-      store(combined); ready=true; document.body.dataset.meterSync='cloud'; const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Shared Meter Readings sheet connected · offline cache enabled.'; await sync();
-      HomeInsightsLocalData?.renderMeters(); dispatchEvent(new CustomEvent('homeinsights:meters-changed',{detail:{fromCloud:true}}));
-    }catch(error){console.warn('Meter readings: offline cache active',error);document.body.dataset.meterSync='offline';const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Shared sheet unavailable · saved in this device’s offline cache.'}finally{loading=false}
+  const identity=row=>String(row.id||`${row.kind}:${row.date}:${row.value}`);
+  const publicRow=row=>{const copy={...row};delete copy.photoDataUrl;delete copy.photoFileId;return copy};
+  const fingerprint=row=>JSON.stringify(publicRow(row),Object.keys(publicRow(row)).sort());
+  const status=text=>{document.body.dataset.meterSync=ready?'cloud':'offline';const node=document.getElementById('meterSyncStatus');if(node)node.textContent=text;};
+  const mergeRemote=(localRows,remoteRows)=>{const map=new Map(localRows.map(row=>[identity(row),row]));remoteRows.forEach(row=>map.set(identity(row),row));return [...map.values()];};
+  const blobDataUrl=blob=>new Promise((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(reader.result);reader.onerror=()=>reject(reader.error);reader.readAsDataURL(blob)});
+
+  async function getPhotoBlob(id){
+    const json=await HomeInsightsApi.meterRequest('meterPhoto',{id});
+    if(!json?.ok||!json.dataUrl)return null;
+    return fetch(json.dataUrl).then(response=>response.blob());
   }
+
+  async function uploadPhoto(row){
+    if(!row.hasPhoto)return;
+    const blob=await HomeInsightsLocalData?.getReadingPhoto(row.id);
+    if(!blob)return;
+    await HomeInsightsApi.meterPost('uploadMeterPhoto',{id:row.id,dataUrl:await blobDataUrl(blob)});
+  }
+
   async function sync(){
     if(!ready)return;
-    const rows=local(), remoteIds=new Set(remote.map(identity));
-    const pending=rows.filter(r=>!remoteIds.has(identity(r)));
-    for(const row of pending){try{const json=await HomeInsightsApi.meterRequest('saveMeterReading',row);if(!json?.ok)throw new Error(json?.error||'Save failed');remote=merge(remote,[json.reading||row])}catch(error){console.warn('Meter reading remains cached:',error);document.body.dataset.meterSync='offline';return}}
-    document.body.dataset.meterSync='cloud';const status=document.getElementById('meterSyncStatus');if(status)status.textContent='Saved to the shared Meter Readings sheet · offline cache enabled.';
+    const rows=local(),localMap=new Map(rows.map(row=>[identity(row),row])),remoteMap=new Map(remote.map(row=>[identity(row),row]));
+    for(const row of rows){
+      const old=remoteMap.get(identity(row));
+      if(!old||fingerprint(old)!==fingerprint(row)){
+        const json=await HomeInsightsApi.meterRequest('saveMeterReading',publicRow(row));
+        if(!json?.ok)throw new Error(json?.error||'Meter save failed');
+        const saved=json.reading||row;remoteMap.set(identity(row),saved);
+        if(row.hasPhoto&&(!old?.hasPhoto||old.updatedAt!==row.updatedAt))await uploadPhoto(row);
+      }
+    }
+    for(const row of remote){
+      if(!localMap.has(identity(row))&&row.source!=='bill-actual'){
+        const json=await HomeInsightsApi.meterRequest('deleteMeterReading',{id:identity(row)});
+        if(!json?.ok)throw new Error(json?.error||'Meter delete failed');
+        remoteMap.delete(identity(row));
+      }
+    }
+    remote=[...remoteMap.values()];ready=true;status('Gas and water readings are synced across devices · photos stored in Drive.');
   }
-  addEventListener('homeinsights:meters-changed',e=>{if(!e.detail?.fromCloud)sync()});
-  addEventListener('DOMContentLoaded',load);
-  window.HomeInsightsCloudMeters={load,sync};
+
+  async function load(){
+    if(loading)return;loading=true;
+    try{
+      const json=await HomeInsightsApi.meterRequest('meterReadings');
+      if(!json?.ok||!Array.isArray(json.readings))throw new Error('The Meter Store backend has not been deployed');
+      remote=json.readings;store(mergeRemote(local(),remote));ready=true;status('Gas and water readings are synced across devices · offline cache enabled.');
+      await sync();HomeInsightsLocalData?.renderMeters();dispatchEvent(new CustomEvent('homeinsights:meters-changed',{detail:{fromCloud:true}}));
+    }catch(error){ready=false;console.warn('Meter sync:',error);status('This device is using its offline meter cache · deploy MeterStore.gs to enable cross-device sync.');}
+    finally{loading=false}
+  }
+
+  addEventListener('homeinsights:meters-changed',event=>{if(event.detail?.fromCloud)return;sync().catch(error=>{ready=false;console.warn('Meter sync:',error);status('Meter change saved on this device · cloud sync will retry automatically.');});});
+  window.HomeInsightsCloudMeters={start(){load();setInterval(load,60000)},load,sync,getPhotoBlob};
 })();

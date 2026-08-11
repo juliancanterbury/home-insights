@@ -11,4 +11,5 @@
   run('Electricity date', () => window.HomeInsightsElectricityDate.start());
   run('Weather', () => window.HomeInsightsWeather.start());
   run('Meters and data', () => window.HomeInsightsLocalData.start());
+  run('Shared meter records', () => window.HomeInsightsCloudMeters.start());
 })();

@@ -174,6 +174,7 @@
       const next = prompt('Correct the cumulative meter reading:', row.value); if (next === null) return;
       const value = Number(next.trim().replace(',','.')); if (!Number.isFinite(value) || value < 0) { alert('Enter a valid meter reading.'); return; }
       row.value = value; row.source = row.source === 'manual-with-photo' ? row.source : 'manual';
+      row.correctedReading = value; row.updatedAt = new Date().toISOString();
       localStorage.setItem(meterKey, JSON.stringify(all)); window.HomeInsightsLocalData?.renderMeters(); window.dispatchEvent(new CustomEvent('homeinsights:meters-changed'));
     }));
   }

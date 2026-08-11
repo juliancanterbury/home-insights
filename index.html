@@ -163,7 +163,7 @@
       </section>
 
       <section class="page" id="meters" aria-labelledby="metersTitle">
-        <div class="page-intro"><p class="eyebrow">Meters</p><h1 id="metersTitle">Add a reading.</h1><p class="updated">Drop in a meter photo to keep a visual record and fill its date automatically. Type the meter number manually.</p></div>
+        <div class="page-intro"><p class="eyebrow">Meters</p><h1 id="metersTitle">Add a reading.</h1><p class="updated">Drop in a meter photo to keep a visual record and fill its date automatically. Type the meter number manually.</p><p class="updated" id="meterSyncStatus">Connecting shared meter records…</p></div>
         <div class="meter-grid">
           <article class="meter-card"><span class="meter-symbol gas-symbol">♨</span><h2>Gas</h2><p>Last reading</p><strong id="gasLastReading">—</strong><small id="gasLastDate">No reading saved</small><button class="primary-action" data-open-meter="gas">Add gas reading</button></article>
           <article class="meter-card"><span class="meter-symbol water-symbol">●</span><h2>Water</h2><p>Last reading</p><strong id="waterLastReading">—</strong><small id="waterLastDate">No reading saved</small><button class="primary-action" data-open-meter="water">Add water reading</button></article>
@@ -194,7 +194,7 @@
     <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
   <script src="js/data.js?v=20260726v2"></script>
-  <script src="js/api.js?v=20260726v2"></script>
+  <script src="js/api.js?v=20260811v1"></script>
   <script src="js/history-data.js?v=20260726v2"></script>
   <script src="js/core.js?v=20260726v2"></script>
   <script src="js/router.js?v=20260726v2"></script>
@@ -204,10 +204,11 @@
   <script src="js/costs.js?v=20260807v5"></script>
   <script src="js/live.js?v=20260807v5"></script>
   <script src="js/weather.js?v=20260726v2"></script>
-  <script src="js/local-data.js?v=20260806v4"></script>
-  <script src="js/gas-v2.js?v=20260806v4"></script>
-  <script src="js/water-v2.js?v=20260807v2"></script>
+  <script src="js/local-data.js?v=20260811v1"></script>
+  <script src="js/gas-v2.js?v=20260811v1"></script>
+  <script src="js/water-v2.js?v=20260811v1"></script>
+  <script src="js/cloud-meters.js?v=20260811v1"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
-  <script src="js/bootstrap.js?v=20260726v3"></script>
+  <script src="js/bootstrap.js?v=20260811v1"></script>
 </body>
 </html>

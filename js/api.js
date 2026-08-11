@@ -61,5 +61,24 @@
     });
   }
 
-  window.HomeInsightsApi = { request };
+  function meterBase() { const cfg=window.HOME_INSIGHTS_CONFIG||{}; return cfg.meterApi||cfg.sharedApi; }
+
+  function meterRequest(action, params = {}) {
+    return request(meterBase(), { action, payload: Object.keys(params).length ? JSON.stringify(params) : undefined });
+  }
+
+  function meterPost(action, payload = {}, timeoutMs = 90000) {
+    return new Promise((resolve, reject) => {
+      const name=`homeInsightsMeterUpload_${Date.now()}_${sequence++}`,iframe=document.createElement('iframe'),form=document.createElement('form');
+      let submitted=false,settled=false;
+      const finish=(error)=>{if(settled)return;settled=true;clearTimeout(timer);setTimeout(()=>{form.remove();iframe.remove();},0);error?reject(error):resolve({ok:true});};
+      iframe.name=name;iframe.hidden=true;form.hidden=true;form.method='post';form.action=meterBase();form.target=name;
+      [['action',action],['payload',JSON.stringify(payload)]].forEach(([key,value])=>{const input=document.createElement('input');input.type='hidden';input.name=key;input.value=value;form.appendChild(input);});
+      iframe.addEventListener('load',()=>{if(submitted)finish();});
+      const timer=setTimeout(()=>finish(new Error('Meter photo upload timed out')),timeoutMs);
+      document.body.append(iframe,form);submitted=true;form.submit();
+    });
+  }
+
+  window.HomeInsightsApi = { request, meterRequest, meterPost };
 })();
