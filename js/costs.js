@@ -87,7 +87,32 @@
     return { date:dateString, services: services.length ? services : ['electricity','gas','water'] };
   }
 
-  function answerFor(date,services){const row=recordFor(date),historicalElectricity=(window.HOME_INSIGHTS_ELECTRICITY_HISTORY?.daily||[]).find(item=>item.date===date),electricityEstimate=!hasCost(row?.electricityTotal)&&historicalElectricity?Number(cfg.dailySupplyCharge||0)+Number(historicalElectricity.importKwh||0)*Number(cfg.importRate||0)-Number(historicalElectricity.exportKwh||0)*Number(cfg.feedInRate||0):null,gas=window.HomeInsightsGasV2?.gasEstimateForDate(date,false),water=window.HomeInsightsWaterV2?.estimateForDate(date,false),values={electricity:hasCost(row?.electricityTotal)?row.electricityTotal:electricityEstimate,gas:gas?.cost??row?.gasTotal,water:water?.cost??row?.waterTotal},labels={electricity:'Electricity',gas:'Gas',water:'Water'},available=services.filter(service=>hasCost(values[service])),missing=services.filter(service=>!hasCost(values[service])),total=available.reduce((sum,service)=>sum+Number(values[service]),0),heading=new Date(date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'}),estimatedElectricity=services.includes('electricity')&&electricityEstimate!==null;return `<div class="ask-date">${heading}</div>${available.map(service=>`<div class="ask-cost-row ${service}"><span>${labels[service]}${service==='electricity'&&estimatedElectricity?' <em>estimated</em>':''}</span><strong>${money(values[service])}</strong></div>`).join('')}<div class="ask-cost-total"><span>${missing.length?'Known total':'Combined total'}</span><strong>${available.length?money(total):'—'}</strong></div>${estimatedElectricity?'<p class="ask-note">Historical electricity is estimated from that day’s meter totals using the currently configured import, export and supply rates.</p>':''}${missing.length?`<p class="ask-note">No ${missing.map(item=>labels[item].toLowerCase()).join(' or ')} record is available for that date, so it is not included.</p>`:''}`;}
+  function answerFor(date,services){
+    const row=recordFor(date);
+    const historicalElectricity=(window.HOME_INSIGHTS_ELECTRICITY_HISTORY?.daily||[]).find(item=>item.date===date);
+    const recordedElectricity=hasCost(row?.electricityTotal)?Number(row.electricityTotal):null;
+    const reconstructedElectricity=recordedElectricity===null&&historicalElectricity
+      ?Number(cfg.dailySupplyCharge||0)+Number(historicalElectricity.importKwh||0)*Number(cfg.importRate||0)-Number(historicalElectricity.exportKwh||0)*Number(cfg.feedInRate||0)
+      :null;
+    const gas=window.HomeInsightsGasV2?.gasEstimateForDate(date,false);
+    const water=window.HomeInsightsWaterV2?.estimateForDate(date,false);
+    const waterValue=water?.cost??row?.waterTotal;
+    const values={electricity:recordedElectricity??reconstructedElectricity,gas:gas?.cost??row?.gasTotal,water:waterValue};
+    const labels={electricity:'Electricity',gas:'Gas',water:'Water'};
+    const provenance={
+      electricity:recordedElectricity!==null?'recorded daily cost':reconstructedElectricity!==null?'metered usage · current tariff reconstruction':'',
+      gas:gas?`${gas.source==='historical'?'bill-derived':'meter interval'} daily average`:hasCost(row?.gasTotal)?'recorded cost':'',
+      water:water?'meter interval daily average':hasCost(row?.waterTotal)?'actual bill-period daily average':''
+    };
+    const available=services.filter(service=>hasCost(values[service])),missing=services.filter(service=>!hasCost(values[service]));
+    const total=available.reduce((sum,service)=>sum+Number(values[service]),0);
+    const heading=new Date(date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const rows=available.map(service=>`<div class="ask-cost-row ${service}"><span>${labels[service]}${provenance[service]?` <em>${provenance[service]}</em>`:''}</span><strong>${money(values[service])}</strong></div>`).join('');
+    const electricityNote=reconstructedElectricity!==null&&services.includes('electricity')?`<p class="ask-note">Electricity uses the exact meter totals for this date (${Number(historicalElectricity.importKwh).toFixed(3)} kWh imported, ${Number(historicalElectricity.exportKwh).toFixed(3)} kWh exported). The dollar amount uses the currently configured tariff because an electricity-only historical tariff is not attached to this record.</p>`:'';
+    const waterNote=hasCost(row?.waterTotal)&&!water&&services.includes('water')?`<p class="ask-note">Water is the exact Yarra Valley Water bill total averaged across its ${row.waterBillingStart} to ${row.waterBillingEnd} billing period; it is not claimed as individually metered usage for this day.</p>`:'';
+    const missingNote=missing.length?`<p class="ask-note">No ${missing.map(item=>labels[item].toLowerCase()).join(' or ')} record is available for that date, so it is not included.</p>`:'';
+    return `<div class="ask-date">${heading}</div>${rows}<div class="ask-cost-total"><span>${missing.length?'Known total':'Combined total'}</span><strong>${available.length?money(total):'—'}</strong></div>${electricityNote}${waterNote}${missingNote}`;
+  }
 
   function start() {
     const today = dayKey();
