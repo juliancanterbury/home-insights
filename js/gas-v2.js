@@ -231,6 +231,7 @@
       const response = await fetch('data/home_insights.json', { cache:'no-store' });
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const json = await response.json();
+      window.HOME_INSIGHTS_ENERGY_DAILY = json.energyDaily || [];
       historical = (json.energyDaily || []).filter(row => row.date && row.gasMJ !== null && row.gasMJ !== '' && Number.isFinite(Number(row.gasMJ))).map(row => ({ date:String(row.date), time:dateAtNoon(row.date), mj:Number(row.gasMJ) })).sort((a,b) => a.time-b.time);
       historyState = 'ready';
     } catch (error) {

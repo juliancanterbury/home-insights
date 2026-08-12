@@ -4,6 +4,7 @@
   const setText = (id, value) => { const node = $(id); if (node) node.textContent = value; };
   const hasCost = value => value !== null && value !== '' && Number.isFinite(+value);
   const costText = value => hasCost(value) ? money(value) : '—';
+  const roundedMoneyValue = value => Math.round(Number(value)*100)/100;
   const intervalText = estimate => {
     const days=Number(estimate?.averagingDays);
     if(!Number.isFinite(days)||days<=0)return 'latest available daily estimate';
@@ -32,7 +33,7 @@
     const waterEstimate = window.HomeInsightsWaterV2?.estimateForDate(date, true);
     const gas = gasEstimate?.cost ?? row?.gasTotal, water = waterEstimate?.cost ?? row?.waterTotal;
     const known = [electric, gas, water].filter(hasCost);
-    const total = known.length ? known.reduce((sum, value) => sum + +value, 0) : null;
+    const total = known.length ? known.reduce((sum, value) => sum + roundedMoneyValue(value), 0) : null;
     setText('costElectricity', costText(electric)); setText('costGas', costText(gas)); setText('costWater', costText(water));
     if (gasEstimate) setText('costGasCaption', gasEstimate.isLatestEstimate ? `${gasEstimate.mj.toFixed(1)} MJ/day latest estimate` : `${gasEstimate.mj.toFixed(1)} MJ/day ${gasEstimate.source === 'manual' ? 'measured' : 'historical'}`);
     if (waterEstimate) setText('costWaterCaption', `${waterEstimate.litres.toFixed(0)} L/day averaged`);
@@ -89,13 +90,16 @@
 
   function answerFor(date,services){
     const row=recordFor(date);
-    const historicalElectricity=(window.HOME_INSIGHTS_ELECTRICITY_HISTORY?.daily||[]).find(item=>item.date===date);
+    const legacyEnergy=(window.HOME_INSIGHTS_ENERGY_DAILY||[]).find(item=>item.date===date);
+    const historicalElectricity=(window.HOME_INSIGHTS_ELECTRICITY_HISTORY?.daily||[]).find(item=>item.date===date)
+      ||(legacyEnergy&&Number.isFinite(Number(legacyEnergy.gridImport))&&Number.isFinite(Number(legacyEnergy.gridExport))?{date,importKwh:Number(legacyEnergy.gridImport),exportKwh:Number(legacyEnergy.gridExport),source:'Home Insights historical energy data'}:null);
     const recordedElectricity=hasCost(row?.electricityTotal)?Number(row.electricityTotal):null;
     const reconstructedElectricity=recordedElectricity===null&&historicalElectricity
       ?Number(cfg.dailySupplyCharge||0)+Number(historicalElectricity.importKwh||0)*Number(cfg.importRate||0)-Number(historicalElectricity.exportKwh||0)*Number(cfg.feedInRate||0)
       :null;
-    const gas=window.HomeInsightsGasV2?.gasEstimateForDate(date,false);
-    const water=window.HomeInsightsWaterV2?.estimateForDate(date,false);
+    const isToday=date===dayKey();
+    const gas=window.HomeInsightsGasV2?.gasEstimateForDate(date,isToday);
+    const water=window.HomeInsightsWaterV2?.estimateForDate(date,isToday);
     const waterValue=water?.cost??row?.waterTotal;
     const values={electricity:recordedElectricity??reconstructedElectricity,gas:gas?.cost??row?.gasTotal,water:waterValue};
     const labels={electricity:'Electricity',gas:'Gas',water:'Water'};
@@ -105,7 +109,7 @@
       water:water?'meter interval daily average':hasCost(row?.waterTotal)?'actual bill-period daily average':''
     };
     const available=services.filter(service=>hasCost(values[service])),missing=services.filter(service=>!hasCost(values[service]));
-    const total=available.reduce((sum,service)=>sum+Number(values[service]),0);
+    const total=available.reduce((sum,service)=>sum+roundedMoneyValue(values[service]),0);
     const heading=new Date(date+'T12:00:00').toLocaleDateString('en-AU',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
     const rows=available.map(service=>`<div class="ask-cost-row ${service}"><span>${labels[service]}${provenance[service]?` <em>${provenance[service]}</em>`:''}</span><strong>${money(values[service])}</strong></div>`).join('');
     const electricityNote=reconstructedElectricity!==null&&services.includes('electricity')?`<p class="ask-note">Electricity uses the exact meter totals for this date (${Number(historicalElectricity.importKwh).toFixed(3)} kWh imported, ${Number(historicalElectricity.exportKwh).toFixed(3)} kWh exported). The dollar amount uses the currently configured tariff because an electricity-only historical tariff is not attached to this record.</p>`:'';
