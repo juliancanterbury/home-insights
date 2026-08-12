@@ -96,7 +96,7 @@
       const cursor = new Date(interval.start.time); cursor.setHours(12,0,0,0);
       const endDay = new Date(interval.end.time); endDay.setHours(12,0,0,0);
       while (interval.endInclusive ? cursor <= endDay : cursor < endDay) {
-        byDate.set(dateKey(cursor), { date:new Date(cursor), mj:interval.dailyMj, source:'manual' });
+        byDate.set(dateKey(cursor), { date:new Date(cursor), mj:interval.dailyMj, source:'manual', averagingDays:interval.days });
         cursor.setDate(cursor.getDate()+1);
       }
     });

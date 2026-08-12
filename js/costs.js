@@ -4,6 +4,12 @@
   const setText = (id, value) => { const node = $(id); if (node) node.textContent = value; };
   const hasCost = value => value !== null && value !== '' && Number.isFinite(+value);
   const costText = value => hasCost(value) ? money(value) : '—';
+  const intervalText = estimate => {
+    const days=Number(estimate?.averagingDays);
+    if(!Number.isFinite(days)||days<=0)return 'latest available daily estimate';
+    const shown=days<10?days.toFixed(1):days.toFixed(0);
+    return `average over ${shown} ${Math.abs(days-1)<0.05?'day':'days'}`;
+  };
 
   function renderElectricity(date) {
     const row = recordFor(date);
@@ -35,6 +41,8 @@
       setText('homeElectricityCost', costText(electric));
       setText('homeGasCost', costText(gas));
       setText('homeWaterCost', costText(water));
+      setText('homeGasPeriod', intervalText(gasEstimate));
+      setText('homeWaterPeriod', intervalText(waterEstimate));
       setText('homeTotalCost', costText(total));
       const missing = [
         ['electricity', electric],

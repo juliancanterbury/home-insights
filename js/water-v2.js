@@ -33,7 +33,7 @@
   }
   function dailyRows(){
     const rows=[];
-    intervals().forEach(interval=>{const cursor=new Date(interval.start.time);cursor.setHours(12,0,0,0);const end=new Date(interval.end.time);end.setHours(12,0,0,0);while(cursor<end){rows.push({date:new Date(cursor),litres:interval.dailyLitres,cost:interval.dailyCost,source:'manual'});cursor.setDate(cursor.getDate()+1);}});
+    intervals().forEach(interval=>{const cursor=new Date(interval.start.time);cursor.setHours(12,0,0,0);const end=new Date(interval.end.time);end.setHours(12,0,0,0);while(cursor<end){rows.push({date:new Date(cursor),litres:interval.dailyLitres,cost:interval.dailyCost,source:'manual',averagingDays:interval.days});cursor.setDate(cursor.getDate()+1);}});
     return rows;
   }
   function estimateForDate(value,useLatest=true){const rows=dailyRows();if(!rows.length||!configured())return null;const exact=rows.find(row=>dateKey(row.date)===String(value||'').slice(0,10));const row=exact||(useLatest?rows.at(-1):null);return row?{...row,isLatestEstimate:!exact}:null;}
