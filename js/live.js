@@ -16,14 +16,6 @@
     document.querySelector(selector)?.classList.toggle('paused', !active);
   };
 
-  function balancedHouseValue(solar, rawHouse, batteryPower, gridImport, gridExport) {
-    const flowValues = [solar, batteryPower, gridImport, gridExport];
-    const complete = flowValues.every(value => value !== null && value !== undefined && value !== '' && Number.isFinite(Number(value)));
-    if (!complete) return rawHouse;
-    const solarKw = Number(solar), batteryKw = Number(batteryPower), importKw = Number(gridImport), exportKw = Number(gridExport);
-    return Math.max(0, solarKw + importKw + Math.max(0, -batteryKw) - exportKw - Math.max(0, batteryKw));
-  }
-
  
 
   function renderSharedDay(row) {
@@ -53,15 +45,6 @@
     const discharging = (batteryPower || 0) < -0.02;
 
     /*
-     * Sigenergy presents house load as the balanced remainder of the visible
-     * flows. Home Assistant's separate house sensor can arrive a few seconds
-     * before or after the other entities, which makes the screen appear not to
-     * add up. Keep that raw value in each sample for diagnostics, but use the
-     * same balanced presentation as the Sigenergy app.
-     */
-    const balancedHouse = balancedHouseValue(solar, house, batteryPower, gridImport, gridExport);
-
-    /*
      * Sigenergy may report 100% while the battery is still completing
      * its final charging or balancing stage. Show 99.9% until charging
      * has stopped, then allow 100.0%.
@@ -80,7 +63,8 @@
       (solar || 0) > 0.02 ? 'Generating' : 'Idle'
     );
 
-    setText('houseNow', kw(balancedHouse));
+    setText('houseNow', kw(house));
+    setText('houseState', (house || 0) > 0.02 ? 'Active' : 'Idle');
     setText(
       'gridNow',
       kw(importing ? gridImport : exporting ? gridExport : 0)
@@ -136,8 +120,7 @@
     $('gridFlow')?.classList.toggle('reverse', exporting);
     $('batteryFlow')?.classList.toggle('reverse', charging);
 
-    const currentTime = new Date(serverTime || Date.now());
-    const hour = currentTime.getHours();
+    const hour = new Date().getHours();
     const freeNow =
       hour >= cfg.freeWindow.start &&
       hour < cfg.freeWindow.end;
@@ -150,10 +133,10 @@
       'tariffStatus',
       freeNow
         ? 'Free electricity period active until 14:00'
-        : 'Standard electricity rate · 11:00–14:00 window'
+        : 'OVO free period 11:00–14:00'
     );
 
-    const stamp = currentTime;
+    const stamp = new Date(serverTime || Date.now());
 
     setText(
       'updatedAt',
@@ -175,8 +158,7 @@
     const sample = {
       time: stamp.toISOString(),
       solar: solar || 0,
-      house: balancedHouse || 0,
-      houseRaw: house,
+      house: house || 0,
       grid: importing
         ? gridImport || 0
         : exporting
@@ -281,8 +263,7 @@
       const samples = (json.samples || []).map(sample => ({
         time: sample.timestamp,
         solar: sample.solar,
-        house: balancedHouseValue(sample.solar, sample.house, sample.batteryPower, sample.gridImport, sample.gridExport),
-        houseRaw: sample.house,
+        house: sample.house,
         battery: sample.batteryPower,
         soc: sample.batterySoc,
         grid:
