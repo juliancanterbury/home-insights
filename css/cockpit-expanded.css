@@ -20,6 +20,7 @@ body.cockpit-active .cp-battery{top:160px;right:6%}
 
 /* Overview energy-stage spacing: keep Solar's live status clear of the roof. */
 .home-stage .node-solar small{margin-top:6px;line-height:1.25}
+.home-stage .house-status{position:absolute;top:48px;left:50%;transform:translateX(-50%);z-index:4;font-size:9px;line-height:1;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;pointer-events:none}
 .home-stage .house-node{top:220px}
 .home-stage .node-grid,.home-stage .node-battery{top:244px}
 .home-stage .path-solar{top:119px;height:139px}
@@ -48,5 +49,5 @@ body.cockpit-active .cp-battery{top:160px;right:6%}
 .cp-history-chart .solar{stroke:var(--solar)}.cp-history-chart .grid{stroke:var(--grid)}.cp-history-chart .house{stroke:var(--accent)}
 @media(min-width:1500px){body.cockpit-active .cockpit-grid{grid-template-columns:1.15fr 1.15fr .9fr .9fr .9fr}body.cockpit-active .cockpit-energy{grid-column:span 2}.cockpit-trends{grid-column:span 2!important}.cockpit-history{grid-column:span 3!important}.cockpit-controls{grid-column:span 2!important}.cockpit-page{font-size:15px}}
 @media(max-width:1100px){body.cockpit-active .cockpit-grid{grid-template-columns:1fr 1fr}body.cockpit-active .cockpit-energy,body.cockpit-active .cockpit-trends,body.cockpit-active .cockpit-controls,body.cockpit-active .cockpit-history{grid-column:1/-1}.cockpit-log{grid-column:span 1!important}}
-@media(max-width:760px){.home-stage{height:468px}.home-stage .house-node{top:210px}.home-stage .node-grid,.home-stage .node-battery{top:235px}.home-stage .path-solar{top:110px;height:137px}.home-stage .path-grid,.home-stage .path-battery{top:274px}.today-cost{margin-top:-16px}}
+@media(max-width:760px){.home-stage{height:478px}.home-stage .house-node{top:225px}.home-stage .node-grid,.home-stage .node-battery{top:250px}.home-stage .path-solar{top:110px;height:152px}.home-stage .path-grid,.home-stage .path-battery{top:289px}.today-cost{margin-top:-16px}}
 @media(max-width:650px){body.cockpit-active main{padding-left:0;padding-right:0}body.cockpit-active .cockpit-page{padding:9px}body.cockpit-active .cockpit-grid{grid-template-columns:1fr}body.cockpit-active .cockpit-energy,body.cockpit-active .cockpit-resources,body.cockpit-active .cockpit-environment,body.cockpit-active .cockpit-infrastructure,body.cockpit-active .cockpit-trends,body.cockpit-active .cockpit-controls,body.cockpit-active .cockpit-log,body.cockpit-active .cockpit-history{grid-column:1}.cp-trend-kpis{grid-template-columns:1fr 1fr}.cp-live-chart{height:210px}}
