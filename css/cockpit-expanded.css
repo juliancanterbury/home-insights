@@ -1,0 +1,52 @@
+body.cockpit-active{overflow-x:hidden;background:#02070b}
+body.cockpit-active .topbar{height:58px;padding-left:20px;padding-right:20px;background:rgba(2,7,11,.9)}
+body.cockpit-active main{width:100%;max-width:none;padding:0 10px 90px}
+body.cockpit-active .cockpit-page{width:100%;min-height:calc(100vh - 58px);border-radius:0;padding:14px 16px 18px;position:relative;overflow:hidden}
+body.cockpit-active .cockpit-grid{grid-template-columns:1.05fr 1fr 1fr 1fr;grid-auto-flow:dense;gap:9px}
+body.cockpit-active .cockpit-panel{padding:11px;clip-path:polygon(0 0,calc(100% - 10px) 0,100% 10px,100% 100%,10px 100%,0 calc(100% - 10px))}
+body.cockpit-active .cockpit-panel>header{margin-bottom:8px;padding-bottom:7px}
+body.cockpit-active .cockpit-energy{grid-column:span 2;grid-row:span 2}
+body.cockpit-active .cockpit-resources{grid-column:span 1}
+body.cockpit-active .cockpit-environment{grid-column:span 1}
+body.cockpit-active .cockpit-infrastructure{grid-column:span 1}
+body.cockpit-active .cockpit-trends{grid-column:span 2;grid-row:span 2}
+body.cockpit-active .cockpit-controls{grid-column:span 2}
+body.cockpit-active .cockpit-log{grid-column:span 1}
+body.cockpit-active .cockpit-history{grid-column:span 3}
+body.cockpit-active .cockpit-flow{height:350px}
+body.cockpit-active .cp-core{width:132px;height:132px;top:133px}
+body.cockpit-active .cp-grid{top:157px;left:7%}
+body.cockpit-active .cp-battery{top:160px;right:6%}
+
+/* Overview energy-stage spacing: keep Solar's live status clear of the roof. */
+.home-stage .node-solar small{margin-top:6px;line-height:1.25}
+.home-stage .house-node{top:220px}
+.home-stage .node-grid,.home-stage .node-battery{top:244px}
+.home-stage .path-solar{top:119px;height:139px}
+.home-stage .path-grid,.home-stage .path-battery{top:288px}
+.home-stage{height:520px}
+.today-cost{margin-top:-30px}
+.cp-chart-legend,.cp-history-legend{display:flex;gap:18px;font:700 8px ui-monospace,monospace;letter-spacing:.11em;color:#78909b;margin:2px 0 8px}
+.cp-chart-legend span:before,.cp-history-legend span:before{content:"";display:inline-block;width:14px;height:2px;margin:0 6px 2px 0;background:currentColor}
+.cp-chart-legend .solar,.cp-history-legend .solar{color:var(--solar)}
+.cp-chart-legend .house,.cp-history-legend .house{color:var(--accent)}
+.cp-chart-legend .grid,.cp-history-legend .grid{color:var(--grid)}
+.cp-chart-legend .battery{color:var(--battery)}
+.cp-live-chart{height:250px;position:relative;border:1px solid rgba(117,234,255,.1);background:repeating-linear-gradient(0deg,transparent 0 49px,rgba(117,234,255,.06) 50px),repeating-linear-gradient(90deg,transparent 0 89px,rgba(117,234,255,.04) 90px)}
+.cp-live-chart svg{width:calc(100% - 40px);height:100%;margin-left:40px}
+.cp-live-chart path{fill:none;stroke-width:2;vector-effect:non-scaling-stroke}
+.cp-live-chart .area{stroke:none;opacity:.07}
+.cp-live-chart .solar{stroke:var(--solar)}.cp-live-chart .house{stroke:var(--accent)}.cp-live-chart .grid{stroke:var(--grid)}.cp-live-chart .battery{stroke:var(--battery)}
+.cp-chart-scale{position:absolute;inset:8px auto 8px 6px;display:flex;flex-direction:column;justify-content:space-between;font:8px ui-monospace,monospace;color:#607985}
+.cp-trend-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-top:7px}
+.cp-trend-kpis div{border:1px solid rgba(117,234,255,.1);background:rgba(255,255,255,.02);padding:8px}
+.cp-trend-kpis span{display:block;font:700 7px ui-monospace,monospace;color:#69808a;letter-spacing:.1em}
+.cp-trend-kpis strong{font:700 15px ui-monospace,monospace;color:#dff9ff}
+.cp-history-chart{height:175px;background:repeating-linear-gradient(0deg,transparent 0 42px,rgba(117,234,255,.05) 43px);border-left:1px solid rgba(117,234,255,.1);border-bottom:1px solid rgba(117,234,255,.1)}
+.cp-history-chart svg{width:100%;height:100%}
+.cp-history-chart polyline{fill:none;stroke-width:2;vector-effect:non-scaling-stroke}
+.cp-history-chart .solar{stroke:var(--solar)}.cp-history-chart .grid{stroke:var(--grid)}.cp-history-chart .house{stroke:var(--accent)}
+@media(min-width:1500px){body.cockpit-active .cockpit-grid{grid-template-columns:1.15fr 1.15fr .9fr .9fr .9fr}body.cockpit-active .cockpit-energy{grid-column:span 2}.cockpit-trends{grid-column:span 2!important}.cockpit-history{grid-column:span 3!important}.cockpit-controls{grid-column:span 2!important}.cockpit-page{font-size:15px}}
+@media(max-width:1100px){body.cockpit-active .cockpit-grid{grid-template-columns:1fr 1fr}body.cockpit-active .cockpit-energy,body.cockpit-active .cockpit-trends,body.cockpit-active .cockpit-controls,body.cockpit-active .cockpit-history{grid-column:1/-1}.cockpit-log{grid-column:span 1!important}}
+@media(max-width:760px){.home-stage{height:468px}.home-stage .house-node{top:210px}.home-stage .node-grid,.home-stage .node-battery{top:235px}.home-stage .path-solar{top:110px;height:137px}.home-stage .path-grid,.home-stage .path-battery{top:274px}.today-cost{margin-top:-16px}}
+@media(max-width:650px){body.cockpit-active main{padding-left:0;padding-right:0}body.cockpit-active .cockpit-page{padding:9px}body.cockpit-active .cockpit-grid{grid-template-columns:1fr}body.cockpit-active .cockpit-energy,body.cockpit-active .cockpit-resources,body.cockpit-active .cockpit-environment,body.cockpit-active .cockpit-infrastructure,body.cockpit-active .cockpit-trends,body.cockpit-active .cockpit-controls,body.cockpit-active .cockpit-log,body.cockpit-active .cockpit-history{grid-column:1}.cp-trend-kpis{grid-template-columns:1fr 1fr}.cp-live-chart{height:210px}}

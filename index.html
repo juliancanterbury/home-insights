@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/electricity.css">
   <link rel="stylesheet" href="css/design-system.css?v=20260808v1">
   <link rel="stylesheet" href="css/cockpit.css?v=20260830v1">
+  <link rel="stylesheet" href="css/cockpit-expanded.css?v=20260830v3">
 </head>
 <body>
   <div class="app-shell">
@@ -169,26 +170,39 @@
             <div class="cp-total"><span>HOUSEHOLD SERVICES</span><strong id="cpTotalCost">—</strong><small>today</small></div>
           </section>
 
+          <section class="cockpit-panel cockpit-trends">
+            <header><span>03</span><div><b>LIVE POWER SIGNATURE</b><small>ROLLING TELEMETRY · LAST 30 SAMPLES</small></div></header>
+            <div class="cp-chart-legend"><span class="solar">SOLAR</span><span class="house">HOUSE</span><span class="grid">GRID</span><span class="battery">BATTERY</span></div>
+            <div class="cp-live-chart"><div class="cp-chart-scale"><span>+10</span><span>0 kW</span><span>−10</span></div><svg id="cpLiveChart" viewBox="0 0 900 230" preserveAspectRatio="none" aria-label="Rolling live electricity telemetry"></svg></div>
+            <div class="cp-trend-kpis"><div><span>PEAK LOAD</span><strong id="cpPeakLoad">—</strong></div><div><span>SOLAR SHARE</span><strong id="cpSolarShare">—%</strong></div><div><span>NET GRID</span><strong id="cpNetGrid">—</strong></div><div><span>SELF POWERED</span><strong id="cpSelfPowered">—%</strong></div></div>
+          </section>
+
           <section class="cockpit-panel cockpit-environment">
-            <header><span>03</span><div><b>ENVIRONMENT</b><small>BRUNSWICK / LOCAL</small></div></header>
+            <header><span>04</span><div><b>ENVIRONMENT</b><small>BRUNSWICK / LOCAL</small></div></header>
             <div class="cp-weather"><span id="cpWeatherIcon">◌</span><strong id="cpOutsideTemp">—°</strong><div><b id="cpWeatherText">LOADING</b><small>Feels <i id="cpFeels">—°</i></small></div></div>
             <div class="cp-facts"><div><span>HUMIDITY</span><strong id="cpHumidity">—%</strong></div><div><span>WIND</span><strong id="cpWind">—</strong></div><div><span>RAIN</span><strong id="cpRain">—%</strong></div><div><span>FORECAST</span><strong id="cpForecast">—</strong></div></div>
           </section>
 
           <section class="cockpit-panel cockpit-infrastructure">
-            <header><span>04</span><div><b>INFRASTRUCTURE</b><small>OPTIONAL HA ENTITIES</small></div></header>
+            <header><span>05</span><div><b>INFRASTRUCTURE</b><small>OPTIONAL HA ENTITIES</small></div></header>
             <div class="cp-infra-grid" id="cpInfrastructure"><div><span>HOME ASSISTANT</span><strong id="cpHaStatus">CHECKING</strong><small id="cpHaDetail">Shared bridge</small></div><div><span>INTERNET</span><strong id="cpInternet">NOT MAPPED</strong><small id="cpInternetDetail">Add optional entity mapping</small></div><div><span>NETWORK</span><strong id="cpNetwork">NOT MAPPED</strong><small id="cpNetworkDetail">Latency / throughput</small></div><div><span>RECORDER</span><strong id="cpRecorder">CHECKING</strong><small id="cpRecorderDetail">Daily history</small></div></div>
           </section>
 
           <section class="cockpit-panel cockpit-controls">
-            <header><span>05</span><div><b>HOUSE CONTROLS</b><small>HOME ASSISTANT · ALLOW-LISTED</small></div></header>
+            <header><span>06</span><div><b>HOUSE CONTROLS</b><small>HOME ASSISTANT · ALLOW-LISTED</small></div></header>
             <div class="cp-control-message" id="cpControlMessage">Safe controls appear here when configured in the Home Assistant bridge.</div>
             <div class="cp-control-grid" id="cpControls"></div>
           </section>
 
           <section class="cockpit-panel cockpit-log">
-            <header><span>06</span><div><b>EVENT STREAM</b><small>LOCAL SESSION</small></div></header>
+            <header><span>07</span><div><b>EVENT STREAM</b><small>LOCAL SESSION</small></div></header>
             <ol id="cpEventLog"><li><time>--:--</time><span>Cockpit initialising</span></li></ol>
+          </section>
+
+          <section class="cockpit-panel cockpit-history">
+            <header><span>08</span><div><b>14-DAY ENERGY ENVELOPE</b><small>DAILY TOTALS · kWh</small></div></header>
+            <div class="cp-history-chart"><svg id="cpHistoryChart" viewBox="0 0 900 190" preserveAspectRatio="none" aria-label="Fourteen day energy history"></svg></div>
+            <div class="cp-history-legend"><span class="solar">SOLAR GENERATION</span><span class="grid">GRID IMPORT</span><span class="house">HOUSE LOAD</span></div>
           </section>
         </div>
       </section>
