@@ -23,6 +23,7 @@
 - Fixed the Overview solar status label colliding with the house roof at compact widths.
 - Moved the House live-state label inside the house graphic so it cannot collide with Solar's status.
 - Made Cockpit full-screen sizing resilient to cached navigation scripts, preloaded its live graph from recorded samples, and strengthened the spacecraft presentation.
+- Added auto-discovered read-only Rinnai, SpeedTest and lunar telemetry plus weather, water and cost visualisations.
 - Added a separate dense, dark Cockpit dashboard without changing the existing page layouts.
 - Added live power routing, SOC, resource and cost summaries, weather, tariff state, infrastructure status and compact trends.
 - Added optional, explicitly allow-listed Home Assistant toggle and climate-mode controls.
