@@ -36,7 +36,8 @@
   const pctText = value => `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value).toFixed(0)}%`;
 
   function dailyRows() {
-    const out = [];
+    const out = [], readings=gasReadings(), firstManual=readings[0]?.time;
+    (window.HOME_INSIGHTS_DAILY||[]).filter(row=>Number.isFinite(Number(row.gasMJ))&&Number(row.gasMJ)>=0&&(!firstManual||new Date(row.date+'T12:00:00')<firstManual)).forEach(row=>out.push({date:new Date(row.date+'T12:00:00'),mj:Number(row.gasMJ),cost:Number(row.gasMJ)*settings.rateCents/100+settings.supplyDaily,source:'archive'}));
     intervals().forEach(interval => {
       const cursor = new Date(interval.start.time); cursor.setHours(12,0,0,0);
       const endDay = new Date(interval.end.time); endDay.setHours(12,0,0,0);
@@ -133,6 +134,7 @@
     document.querySelectorAll('[data-gas-range]').forEach(button => button.classList.toggle('active',button.dataset.gasRange===settings.range));
     $('costDate')?.addEventListener('change', event => setTimeout(()=>renderServiceCostForDate(event.target.value),0));
     window.addEventListener('homeinsights:meters-changed', render);
+    window.addEventListener('homeinsights:data-ready', render);
     window.addEventListener('storage', event => { if(event.key===meterKey||event.key===settingsKey) render(); });
     render();
   }

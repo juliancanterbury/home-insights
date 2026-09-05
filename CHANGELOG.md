@@ -20,6 +20,7 @@
 - Added consistent Powershop-style vertical spot cursors and wheel/drag-friendly horizontal navigation across chart types.
 # 2026-08-30 — Cockpit
 
+- 2026-09-05: repaired services/electricity/water chart scaling, restored archived gas history for long ranges, restored meter-photo drag and drop, and rebuilt the Sankey as aligned translucent Sigenergy-style lanes.
 - Fixed the Overview solar status label colliding with the house roof at compact widths.
 - Moved the House live-state label inside the house graphic so it cannot collide with Solar's status.
 - Made Cockpit full-screen sizing resilient to cached navigation scripts, preloaded its live graph from recorded samples, and strengthened the spacecraft presentation.

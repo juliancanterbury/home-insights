@@ -1,0 +1,5 @@
+.photo-input.drag-active{border-color:var(--water);background:rgba(85,215,243,.09);box-shadow:0 0 0 3px rgba(85,215,243,.08),inset 0 0 25px rgba(85,215,243,.05)}
+.sankey-diagram{background:radial-gradient(circle at 50% 50%,rgba(85,215,243,.055),transparent 56%),rgba(2,8,13,.52)}
+.sankey-band{transition:opacity .2s ease;mix-blend-mode:screen}.sankey-band:hover{opacity:1}
+.sankey-glass-node .sankey-node{filter:drop-shadow(0 10px 22px rgba(0,0,0,.24))}
+.sankey-node-label{fill:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em}.sankey-node-value{fill:var(--text);font-size:24px;font-weight:750}.sankey-node-unit{fill:var(--muted);font-size:10px}
