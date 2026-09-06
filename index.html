@@ -8,6 +8,9 @@
   <link rel="stylesheet" href="css/app.css">
   <link rel="stylesheet" href="css/electricity.css">
   <link rel="stylesheet" href="css/design-system.css?v=20260808v1">
+  <link rel="stylesheet" href="css/cockpit.css?v=20260830v1">
+  <link rel="stylesheet" href="css/cockpit-expanded.css?v=20260905v7">
+  <link rel="stylesheet" href="css/repairs.css?v=20260906v3">
 </head>
 <body>
   <div class="app-shell">
@@ -108,7 +111,7 @@
 
       <section class="page" id="costs" aria-labelledby="costsTitle">
         <div class="page-intro"><p class="eyebrow">Services</p><h1 id="costsTitle">What the house cost.</h1><input class="date-picker" id="costDate" type="date" aria-label="Choose date"></div>
-        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-expand="serviceWater"><span>●</span><small>Water</small><strong id="costWater">—</strong><em id="costWaterCaption">Latest bill daily average</em></button></div>
+        <div class="service-costs"><button class="service-card electricity-service" data-expand="serviceElectricity"><span>⚡</span><small>Electricity</small><strong id="costElectricity">—</strong><em>Tariff calculated</em></button><button class="service-card gas-service" data-page-link="gas"><span>♨</span><small>Gas</small><strong id="costGas">—</strong><em id="costGasCaption">Add a meter reading</em></button><button class="service-card water-service" data-page-link="water"><span>●</span><small>Water</small><strong id="costWater">—</strong><em id="costWaterCaption">Latest bill daily average</em><b class="service-card-action">Water history &amp; add reading →</b></button></div>
         <div class="service-total"><span>Total</span><strong id="costTotal">—</strong></div>
         <div class="details-panel service-detail" id="serviceElectricity"><p>Supply charge + paid imports − export credit. Imports from 11:00–14:00 are free.</p></div><div class="details-panel service-detail" id="serviceGas"><p>Gas is averaged between consecutive meter readings or bills.</p></div><div class="details-panel service-detail" id="serviceWater"><p>Water is averaged across each billing period.</p></div>
         <section class="explore-section"><div class="explore-head"><div><p class="eyebrow">Explore</p><h2>Services over time</h2></div><div class="range-control" data-chart-range="costs"><button data-range="7">7D</button><button class="active" data-range="30">30D</button><button data-range="365">1Y</button></div></div><div class="chart-legend"><span><i class="legend-electricity"></i>Electricity</span><span><i class="legend-gas"></i>Gas</span><span><i class="legend-water"></i>Water</span></div><div class="interactive-chart" id="costsChart" aria-label="Interactive household services cost chart"></div></section>
@@ -137,6 +140,111 @@
         </section>
       </section>
 
+
+      <section class="page cockpit-page" id="cockpit" aria-labelledby="cockpitTitle">
+        <div class="cockpit-header">
+          <div><p class="cockpit-kicker">Whole-house command</p><h1 id="cockpitTitle">COCKPIT</h1></div>
+          <div class="cockpit-clock"><strong id="cockpitTime">--:--:--</strong><span id="cockpitDate">SYSTEM TIME</span></div>
+          <div class="cockpit-status"><i id="cockpitStatusLamp"></i><b id="cockpitLinkState">LINKING</b><span id="cockpitUpdated">Awaiting telemetry</span></div>
+        </div>
+
+        <div class="cockpit-alert" id="cockpitTariff"><b>PAID GRID</b><span>Free import window 11:00–14:00</span><strong id="cockpitTariffCountdown">—</strong></div>
+
+        <div class="cockpit-grid">
+          <section class="cockpit-panel cockpit-energy">
+            <header><span>01</span><div><b>POWER ROUTING</b><small>LIVE · kW</small></div></header>
+            <div class="cockpit-flow" aria-label="Live electricity flow">
+              <div class="cp-source cp-solar"><span>☀</span><small>SOLAR</small><strong id="cpSolar">—</strong></div>
+              <div class="cp-source cp-grid"><span>⇄</span><small>GRID</small><strong id="cpGrid">—</strong><em id="cpGridMode">IDLE</em></div>
+              <div class="cp-core"><i></i><small>HOUSE LOAD</small><strong id="cpHouse">—</strong></div>
+              <div class="cp-source cp-battery"><span class="cp-battery-shell"><i id="cpBatteryFill"></i></span><small>BATTERY</small><strong id="cpBattery">—</strong><em id="cpBatteryMode">IDLE</em></div>
+              <svg class="cp-flow-lines" viewBox="0 0 600 330" aria-hidden="true"><path class="solar-line" d="M300 55V134"/><path class="grid-line" d="M105 205H244"/><path class="battery-line" d="M356 205H495"/></svg>
+            </div>
+            <div class="cockpit-soc"><span>STATE OF CHARGE</span><div><i id="cpSocBar"></i></div><strong id="cpSoc">—%</strong></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-resources">
+            <header><span>02</span><div><b>RESOURCE LOAD</b><small>TODAY / CURRENT PERIOD</small></div></header>
+            <div class="cp-resource electricity"><span>⚡</span><div><small>ELECTRICITY</small><strong id="cpElectricityUse">— kWh</strong><em id="cpElectricityCost">—</em></div><svg id="cpElectricitySpark" viewBox="0 0 160 38"></svg></div>
+            <div class="cp-resource gas"><span>♨</span><div><small>GAS</small><strong id="cpGasUse">— MJ</strong><em id="cpGasCost">—</em></div><svg id="cpGasSpark" viewBox="0 0 160 38"></svg></div>
+            <div class="cp-resource water"><span>●</span><div><small>WATER</small><strong id="cpWaterUse">— L</strong><em id="cpWaterCost">—</em></div><svg id="cpWaterSpark" viewBox="0 0 160 38"></svg></div>
+            <div class="cp-total"><span>HOUSEHOLD SERVICES</span><strong id="cpTotalCost">—</strong><small>today</small></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-trends">
+            <header><span>03</span><div><b>LIVE POWER SIGNATURE</b><small>ROLLING TELEMETRY · LAST 30 SAMPLES</small></div></header>
+            <div class="cp-chart-legend"><span class="solar">SOLAR</span><span class="house">HOUSE</span><span class="grid">GRID</span><span class="battery">BATTERY</span></div>
+            <div class="cp-live-chart"><div class="cp-chart-scale"><span>+10</span><span>0 kW</span><span>−10</span></div><svg id="cpLiveChart" viewBox="0 0 900 230" preserveAspectRatio="none" aria-label="Rolling live electricity telemetry"></svg></div>
+            <div class="cp-trend-kpis"><div><span>PEAK LOAD</span><strong id="cpPeakLoad">—</strong></div><div><span>SOLAR SHARE</span><strong id="cpSolarShare">—%</strong></div><div><span>NET GRID</span><strong id="cpNetGrid">—</strong></div><div><span>SELF POWERED</span><strong id="cpSelfPowered">—%</strong></div></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-environment">
+            <header><span>04</span><div><b>ENVIRONMENT</b><small>BRUNSWICK / LOCAL</small></div></header>
+            <div class="cp-weather"><span id="cpWeatherIcon">◌</span><strong id="cpOutsideTemp">—°</strong><div><b id="cpWeatherText">LOADING</b><small>Feels <i id="cpFeels">—°</i></small></div></div>
+            <div class="cp-facts"><div><span>HUMIDITY</span><strong id="cpHumidity">—%</strong></div><div><span>WIND</span><strong id="cpWind">—</strong></div><div><span>RAIN</span><strong id="cpRain">—%</strong></div><div><span>FORECAST</span><strong id="cpForecast">—</strong></div></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-infrastructure">
+            <header><span>05</span><div><b>INFRASTRUCTURE</b><small>OPTIONAL HA ENTITIES</small></div></header>
+            <div class="cp-infra-grid" id="cpInfrastructure"><div><span>HOME ASSISTANT</span><strong id="cpHaStatus">CHECKING</strong><small id="cpHaDetail">Shared bridge</small></div><div><span>INTERNET</span><strong id="cpInternet">NOT MAPPED</strong><small id="cpInternetDetail">Add optional entity mapping</small></div><div><span>NETWORK</span><strong id="cpNetwork">NOT MAPPED</strong><small id="cpNetworkDetail">Latency / throughput</small></div><div><span>RECORDER</span><strong id="cpRecorder">CHECKING</strong><small id="cpRecorderDetail">Daily history</small></div></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-controls">
+            <header><span>06</span><div><b>HOUSE CONTROLS</b><small>HOME ASSISTANT · ALLOW-LISTED</small></div></header>
+            <div class="cp-control-message" id="cpControlMessage">Safe controls appear here when configured in the Home Assistant bridge.</div>
+            <div class="cp-control-grid" id="cpControls"></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-log">
+            <header><span>07</span><div><b>EVENT STREAM</b><small>LOCAL SESSION</small></div></header>
+            <ol id="cpEventLog"><li><time>--:--</time><span>Cockpit initialising</span></li></ol>
+          </section>
+
+          <section class="cockpit-panel cockpit-history">
+            <header><span>08</span><div><b>14-DAY ENERGY ENVELOPE</b><small>DAILY TOTALS · kWh</small></div></header>
+            <div class="cp-history-chart"><svg id="cpHistoryChart" viewBox="0 0 900 190" preserveAspectRatio="none" aria-label="Fourteen day energy history"></svg></div>
+            <div class="cp-history-legend"><span class="solar">SOLAR GENERATION</span><span class="grid">GRID IMPORT</span><span class="house">HOUSE LOAD</span></div>
+          </section>
+
+          <section class="cockpit-panel cockpit-heatpump">
+            <header><span>09</span><div><b>RINNAI HEAT PUMP</b><small>LIVE HOME ASSISTANT</small></div></header>
+            <div class="cp-dial heat" id="cpHeatDial"><div><small id="cpHeatMode">HEAT</small><strong id="cpHeatTemp">—°</strong><span>WATER</span></div></div>
+            <div class="cp-dial-stats"><div><span>TARGET</span><strong id="cpHeatTarget">—°</strong></div><div><span>STATE</span><strong id="cpHeatState">NOT MAPPED</strong></div></div>
+            <svg class="cp-mini-history heat" id="cpHeatHistory" viewBox="0 0 360 90" preserveAspectRatio="none"></svg>
+          </section>
+          <section class="cockpit-panel cockpit-network">
+            <header><span>10</span><div><b>NETWORK ARRAY</b><small>SPEEDTEST · LIVE</small></div></header>
+            <div class="cp-network-dials"><div class="cp-dial net" id="cpDownloadDial"><div><small>DOWNLOAD</small><strong id="cpDownload">—</strong><span>Mbit/s</span></div></div><div class="cp-dial ping" id="cpPingDial"><div><small>PING</small><strong id="cpPing">—</strong><span>ms</span></div></div></div>
+            <svg class="cp-mini-history network" id="cpNetworkHistory" viewBox="0 0 360 80" preserveAspectRatio="none"></svg>
+          </section>
+          <section class="cockpit-panel cockpit-lunar">
+            <header><span>11</span><div><b>LUNAR NAVIGATION</b><small>HOME ASSISTANT ASTRONOMY</small></div></header>
+            <div class="cp-moon"><div class="cp-moon-disc" id="cpMoonDisc"></div><div><small>PHASE</small><strong id="cpMoonPhase">NOT MAPPED</strong><span id="cpMoonNext">—</span></div></div>
+            <div class="cp-lunar-grid"><div><span>AGE</span><strong id="cpMoonAge">—</strong></div><div><span>ALTITUDE</span><strong id="cpMoonAltitude">—</strong></div><div><span>AZIMUTH</span><strong id="cpMoonAzimuth">—</strong></div><div><span>DISTANCE</span><strong id="cpMoonDistance">—</strong></div><div><span>ILLUMINATION</span><strong id="cpMoonIllumination">—</strong></div><div><span>MOONRISE</span><strong id="cpMoonRise">—</strong></div></div>
+          </section>
+          <section class="cockpit-panel cockpit-weather-graph">
+            <header><span>12</span><div><b>WEATHER ENVELOPE</b><small>365 DAYS · TEMPERATURE / RAIN</small></div></header>
+            <div class="cp-weather-chart"><svg id="cpWeatherHistory" viewBox="0 0 1000 230" preserveAspectRatio="none"></svg></div>
+            <div class="cp-history-legend"><span class="temperature">TEMPERATURE</span><span class="rain">RAINFALL</span><span class="weather-range" id="cpWeatherRange">LOADING HISTORY</span></div>
+          </section>
+          <section class="cockpit-panel cockpit-water-graph">
+            <header><span>13</span><div><b>WATER TELEMETRY</b><small>READINGS / DAILY RATE</small></div></header>
+            <div class="cp-water-bars" id="cpWaterBars"></div>
+            <div class="cp-dial-stats"><div><span>LATEST READING</span><strong id="cpWaterLatest">—</strong></div><div><span>DAILY AVERAGE</span><strong id="cpWaterDaily">—</strong></div></div>
+          </section>
+          <section class="cockpit-panel cockpit-cost-orbit">
+            <header><span>14</span><div><b>COST ORBIT</b><small>SERVICE SHARE · TODAY</small></div></header>
+            <div class="cp-cost-wrap"><div class="cp-cost-donut" id="cpCostDonut"><strong id="cpCostCentre">—</strong><span>TOTAL</span></div><div class="cp-cost-legend"><span class="electricity">ELECTRICITY <b id="cpCostElectricityShare">—</b></span><span class="gas">GAS <b id="cpCostGasShare">—</b></span><span class="water">WATER <b id="cpCostWaterShare">—</b></span></div></div>
+          </section>
+        </div>
+      </section>
+
+      <section class="page water-v2-page" id="water" aria-labelledby="waterTitle">
+        <div class="page-intro gas-intro"><div><p class="eyebrow">Water</p><h1 id="waterTitle">Every drop, over time.</h1><p class="updated" id="waterCoverage">Loading water records…</p></div><button class="gas-add-button water-add-button" data-open-meter="water">+ Add meter reading</button></div>
+        <section class="water-hero" aria-label="Latest water summary"><div><span>Latest measured rate</span><strong id="waterLatestDaily">—</strong><small id="waterLatestPeriod">Add two readings to calculate use</small></div><div><span>Latest bill</span><strong id="waterLatestBill">—</strong><small id="waterLatestBillDate">billing history</small></div><div><span>Latest meter</span><strong id="waterPageReading">—</strong><small id="waterPageReadingDate">no reading saved</small></div></section>
+        <section class="explore-section water-history-section"><div class="explore-head"><div><p class="eyebrow">Water history</p><h2>Bills and measured daily use</h2><p class="chart-note">Bill totals use the water scale; meter intervals use litres per day.</p></div><div class="range-control" id="waterRange"><button data-water-range="365">1Y</button><button data-water-range="all" class="active">All</button></div></div><div class="water-chart-legend"><span class="bill">Bill total</span><span class="usage">Measured L/day</span></div><div class="water-v2-chart" id="waterChartV2"></div></section>
+        <section class="gas-panel water-readings-panel"><div class="gas-panel-head"><div><p class="eyebrow">Readings</p><h2>Water meter history</h2></div><button class="gas-secondary-button" data-open-meter="water">Add reading</button></div><div id="waterReadingList" class="gas-reading-list"></div></section>
+      </section>
 
       <section class="page" id="weather" aria-labelledby="weatherTitle">
         <div class="page-intro"><p class="eyebrow">Weather</p><h1 id="weatherTitle">Outside, and what comes next.</h1><p class="updated" id="weatherUpdated">Loading Brunswick forecast…</p></div>
@@ -168,30 +276,34 @@
         <div class="chart-empty" id="dataEmpty" hidden><div><strong>No records yet</strong>Live and historical source data will appear here without cluttering the main screens.</div></div>
       </section>
 
-      <section class="page" id="more" aria-labelledby="moreTitle"><div class="page-intro"><p class="eyebrow">More</p><h1 id="moreTitle">Tools and records.</h1></div><div class="more-grid"><button data-page-link="meters"><span>◉</span><b>Meter readings</b><small>Add gas and water readings or photos</small></button><button data-page-link="weather"><span>☁</span><b>Weather</b><small>Hourly and seven-day forecast</small></button><button data-page-link="data"><span>≡</span><b>Detailed data</b><small>Search, inspect and export records</small></button><button data-page-link="ask"><span>⌕</span><b>Ask Home Insights</b><small>Ask questions about dates and costs</small></button></div></section>
+      <section class="page" id="more" aria-labelledby="moreTitle"><div class="page-intro"><p class="eyebrow">More</p><h1 id="moreTitle">Tools and records.</h1></div><div class="more-grid"><button data-page-link="water"><span>●</span><b>Water</b><small>Usage, bills and meter-reading history</small></button><button data-page-link="meters"><span>◉</span><b>Meter readings</b><small>Add gas and water readings or photos</small></button><button data-page-link="weather"><span>☁</span><b>Weather</b><small>Hourly and seven-day forecast</small></button><button data-page-link="data"><span>≡</span><b>Detailed data</b><small>Search, inspect and export records</small></button><button data-page-link="ask"><span>⌕</span><b>Ask Home Insights</b><small>Ask questions about dates and costs</small></button></div></section>
 
       <section class="page ask-page" id="ask" aria-labelledby="askTitle"><div class="page-intro centered"><p class="eyebrow">Ask Home Insights</p><h1 id="askTitle">Ask about your house.</h1></div><form class="ask-form" id="askForm"><input id="askInput" placeholder="How much did gas and water cost on 7 April 2026?" autocomplete="off"><button type="submit" aria-label="Ask">↑</button></form><div class="ask-answer" id="askAnswer" hidden></div></section>
     </main>
 
-    <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
+    <nav class="bottom-nav" aria-label="Primary navigation"><button class="active" data-page-link="home"><span>⌂</span><small>Home</small></button><button data-page-link="cockpit"><span>⌁</span><small>Cockpit</small></button><button data-page-link="electricity"><span>⚡</span><small>Electricity</small></button><button data-page-link="costs"><span>$</span><small>Services</small></button><button data-page-link="water"><span>●</span><small>Water</small></button><button data-page-link="weather"><span>☁</span><small>Weather</small></button><button data-page-link="more"><span>•••</span><small>More</small></button></nav>
   </div>
   <script src="js/data.js?v=20260726v2"></script>
   <script src="js/api.js?v=20260726v2"></script>
   <script src="js/history-data.js?v=20260726v2"></script>
   <script src="js/core.js?v=20260808v3"></script>
+  <script src="js/archive-data.js?v=20260905v1"></script>
+  <script src="js/gas-history.js?v=20260906v1"></script>
   <script src="js/water-history.js?v=20260808v1"></script>
-  <script src="js/router.js?v=20260726v2"></script>
-  <script src="js/charts.js?v=20260726v2"></script>
-  <script src="js/sankey.js?v=20260726v2"></script>
+  <script src="js/water-v2.js?v=20260906v1"></script>
+  <script src="js/router.js?v=20260830v3"></script>
+  <script src="js/charts.js?v=20260905v1"></script>
+  <script src="js/sankey.js?v=20260906v3"></script>
   <script src="js/theme.js?v=20260726v2"></script>
   <script src="js/costs.js?v=20260726v2"></script>
   <script src="js/live.js?v=20260726v2"></script>
   <script src="js/weather.js?v=20260726v2"></script>
-  <script src="js/local-data.js?v=20260726v2"></script>
-  <script src="js/gas-v2.js?v=20260808v2"></script>
+  <script src="js/local-data.js?v=20260905v1"></script>
+  <script src="js/gas-v2.js?v=20260906v2"></script>
   <script src="js/cloud-meters.js?v=20260808v1"></script>
   <script src="js/chart-interactions.js?v=20260808v1"></script>
   <script src="js/electricity-date.js?v=20260726v3"></script>
-  <script src="js/bootstrap.js?v=20260726v3"></script>
+  <script src="js/cockpit.js?v=20260831v3"></script>
+  <script src="js/bootstrap.js?v=20260906v1"></script>
 </body>
 </html>

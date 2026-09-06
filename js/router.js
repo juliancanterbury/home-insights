@@ -10,6 +10,7 @@
     if (!pages.has(id)) id = 'home';
     document.querySelectorAll('.page').forEach(page => page.classList.toggle('active', page.id === id));
     document.querySelectorAll('.bottom-nav [data-page-link]').forEach(button => button.classList.toggle('active', button.dataset.pageLink === id));
+    document.body.classList.toggle('cockpit-active', id === 'cockpit');
     document.title = id === 'home' ? 'Home Insights' : `${id.charAt(0).toUpperCase() + id.slice(1)} · Home Insights`;
     if (updateUrl && location.hash !== routeFor(id)) history.pushState(null, '', routeFor(id));
     window.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });

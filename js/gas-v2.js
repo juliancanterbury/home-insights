@@ -35,8 +35,21 @@
   const fmtShort = date => date.toLocaleDateString('en-AU', { day:'numeric', month:'short' });
   const pctText = value => `${value > 0 ? '+' : value < 0 ? '−' : ''}${Math.abs(value).toFixed(0)}%`;
 
-  function dailyRows() {
+  function archivedDailyRows() {
     const out = [];
+    (window.HOME_INSIGHTS_GAS_ARCHIVE || []).forEach(([startText,endText,totalMj]) => {
+      const start = new Date(`${startText}T12:00:00`), end = new Date(`${endText}T12:00:00`);
+      const days = Math.max(1, Math.round((end-start)/86400000)+1), dailyMj = Number(totalMj)/days;
+      for (const cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate()+1)) {
+        out.push({date:new Date(cursor),mj:dailyMj,cost:dailyMj*settings.rateCents/100+settings.supplyDaily,source:'archive'});
+      }
+    });
+    return out;
+  }
+
+  function dailyRows() {
+    const out = [], readings=gasReadings(), firstManual=readings[0]?.time;
+    archivedDailyRows().filter(row=>!firstManual||row.date<firstManual).forEach(row=>out.push(row));
     intervals().forEach(interval => {
       const cursor = new Date(interval.start.time); cursor.setHours(12,0,0,0);
       const endDay = new Date(interval.end.time); endDay.setHours(12,0,0,0);
@@ -45,7 +58,7 @@
         cursor.setDate(cursor.getDate()+1);
       }
     });
-    return out;
+    return Array.from(new Map(out.sort((a,b)=>a.date-b.date).map(row=>[row.date.toISOString().slice(0,10),row])).values());
   }
 
   function renderSummary() {
@@ -114,15 +127,17 @@
     let rows = dailyRows();
     if (settings.range !== 'all') rows = rows.slice(-Number(settings.range));
     if (!rows.length) { $('gasChart').innerHTML = '<div class="gas-empty"><strong>Two readings make the first interval</strong><span>Daily use will appear here after the next manual reading.</span></div>'; return; }
-    const width = Math.max(760, rows.length * 12), height = 270, left = 48, right = 18, top = 18, bottom = 42;
+    const fitWidth = settings.range === '365' || settings.range === 'all';
+    const width = fitWidth ? 1000 : Math.max(760, rows.length * 12), height = 270, left = 48, right = 18, top = 18, bottom = 42;
     const max = Math.max(...rows.map(row => row.mj), 1), plotH = height-top-bottom, plotW = width-left-right;
     const points = rows.map((row,i) => `${left + (i/(Math.max(rows.length-1,1)))*plotW},${top + plotH - row.mj/max*plotH}`).join(' ');
     const area = `${left},${top+plotH} ${points} ${left+plotW},${top+plotH}`;
     const ticks = [0,.25,.5,.75,1].map(n => { const y=top+plotH-n*plotH; return `<line x1="${left}" y1="${y}" x2="${width-right}" y2="${y}"/><text x="${left-9}" y="${y+4}">${(max*n).toFixed(0)}</text>`; }).join('');
     const labelEvery = Math.max(1,Math.ceil(rows.length/8));
     const labels = rows.map((row,i) => i%labelEvery===0 || i===rows.length-1 ? `<text class="gas-x-label" x="${left+(i/Math.max(rows.length-1,1))*plotW}" y="${height-13}">${fmtShort(row.date)}</text>` : '').join('');
-    $('gasChart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" role="img"><g class="gas-grid">${ticks}</g><polygon class="gas-area" points="${area}"/><polyline class="gas-line" points="${points}"/>${labels}</svg>`;
-    $('gasChart').scrollLeft = $('gasChart').scrollWidth;
+    $('gasChart').style.overflowX = fitWidth ? 'hidden' : 'auto';
+    $('gasChart').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${fitWidth?'100%':width}" height="${height}" role="img"><g class="gas-grid">${ticks}</g><polygon class="gas-area" points="${area}"/><polyline class="gas-line" points="${points}"/>${labels}</svg>`;
+    if (!fitWidth) $('gasChart').scrollLeft = $('gasChart').scrollWidth;
   }
 
   function render() { renderSummary(); renderReadings(); renderChart(); }
@@ -133,6 +148,7 @@
     document.querySelectorAll('[data-gas-range]').forEach(button => button.classList.toggle('active',button.dataset.gasRange===settings.range));
     $('costDate')?.addEventListener('change', event => setTimeout(()=>renderServiceCostForDate(event.target.value),0));
     window.addEventListener('homeinsights:meters-changed', render);
+    window.addEventListener('homeinsights:data-ready', render);
     window.addEventListener('storage', event => { if(event.key===meterKey||event.key===settingsKey) render(); });
     render();
   }

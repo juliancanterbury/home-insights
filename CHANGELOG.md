@@ -18,3 +18,17 @@
 - Fixed the FREE badge so it is truly hidden outside 11:00–14:00; the configured free-window calculation remains timestamp-based.
 - Recolored and clarified Sankey sources/destinations with coherent directional flows.
 - Added consistent Powershop-style vertical spot cursors and wheel/drag-friendly horizontal navigation across chart types.
+# 2026-08-30 — Cockpit
+
+- 2026-09-06 v10: embedded the complete August 2018–June 2026 Gas billing archive, converted each billing total into its correct daily MJ profile, merged it with newer manual readings, and made 1Y/All render directly at the available width without a scrollbar.
+- 2026-09-06 v9: made Water a permanent primary-navigation destination, added an explicit Water-history/Add-reading action to the Services card, and replaced Sankey strokes with filled translucent glass ribbons and Sigenergy-style stacked source/destination panels.
+- 2026-09-06: restored a dedicated Water page with its own bill/use graph, Add reading access and historic readings; made Electricity and Gas 1Y/All charts fit the available width; and rebuilt the Sankey with proportional stacked nodes, percentages and translucent Sigenergy-style bands in the established resource colours.
+- 2026-09-05: repaired services/electricity/water chart scaling, restored archived gas history for long ranges, restored meter-photo drag and drop, and rebuilt the Sankey as aligned translucent Sigenergy-style lanes.
+- Fixed the Overview solar status label colliding with the house roof at compact widths.
+- Moved the House live-state label inside the house graphic so it cannot collide with Solar's status.
+- Made Cockpit full-screen sizing resilient to cached navigation scripts, preloaded its live graph from recorded samples, and strengthened the spacecraft presentation.
+- Added auto-discovered read-only Rinnai, SpeedTest and lunar telemetry plus weather, water and cost visualisations.
+- Added a separate dense, dark Cockpit dashboard without changing the existing page layouts.
+- Added live power routing, SOC, resource and cost summaries, weather, tariff state, infrastructure status and compact trends.
+- Added optional, explicitly allow-listed Home Assistant toggle and climate-mode controls.
+- Added responsive desktop, iPad and phone layouts and a Cockpit navigation item.
