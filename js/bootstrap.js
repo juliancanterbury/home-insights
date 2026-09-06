@@ -9,6 +9,5 @@
   run('Live energy', () => window.HomeInsightsLive.start());
   run('Electricity date', () => window.HomeInsightsElectricityDate.start());
   run('Weather', () => window.HomeInsightsWeather.start());
-  run('Cockpit', () => window.HomeInsightsCockpit.start());
   run('Meters and data', () => window.HomeInsightsLocalData.start());
 })();
